@@ -118,7 +118,8 @@ export class OpenCogNanoBrainKernel {
 
   constructor(config: Partial<OpenCogNanoBrainConfig> = {}) {
     this.config = this.initializeConfig(config);
-    this.cognitiveKernel = new UnifiedCognitiveKernel(this.config.cognitiveKernelConfig);
+    // Initialize cognitive kernel later to avoid circular dependencies
+    this.cognitiveKernel = null as any; // Will be initialized in start()
     this.atomSpace = new Map();
     this.linkSpace = new Map();
     this.timeCrystals = new Map();
@@ -199,8 +200,15 @@ export class OpenCogNanoBrainKernel {
       return;
     }
 
-    // Initialize cognitive kernel
-    await this.cognitiveKernel.initialize();
+    try {
+      // Initialize cognitive kernel only if available
+      if (typeof window !== 'undefined' && UnifiedCognitiveKernel) {
+        this.cognitiveKernel = new UnifiedCognitiveKernel(this.config.cognitiveKernelConfig);
+        await this.cognitiveKernel.initialize();
+      }
+    } catch (error) {
+      console.warn('Cognitive kernel initialization failed, running in standalone mode:', error);
+    }
 
     // Create fundamental atoms based on PPM and FIT
     this.initializeFundamentalAtoms();
@@ -215,7 +223,9 @@ export class OpenCogNanoBrainKernel {
    */
   async stop(): Promise<void> {
     this.isActive = false;
-    await this.cognitiveKernel.shutdown();
+    if (this.cognitiveKernel && this.cognitiveKernel.shutdown) {
+      await this.cognitiveKernel.shutdown();
+    }
   }
 
   /**
@@ -384,25 +394,31 @@ export class OpenCogNanoBrainKernel {
     const processFrame = () => {
       if (!this.isActive) return;
 
-      // 1. Update time crystal quantum states
-      this.updateTimeCrystalStates();
+      try {
+        // 1. Update time crystal quantum states
+        this.updateTimeCrystalStates();
 
-      // 2. Perform ECAN attention allocation with PPM weighting
-      this.performECANAttentionAllocation();
+        // 2. Perform ECAN attention allocation with PPM weighting
+        this.performECANAttentionAllocation();
 
-      // 3. Execute PLN reasoning with fractal enhancement
-      this.performEnhancedPLNReasoning();
+        // 3. Execute PLN reasoning with fractal enhancement
+        this.performEnhancedPLNReasoning();
 
-      // 4. Update geometric musical language resonances
-      this.updateGMLResonances();
+        // 4. Update geometric musical language resonances
+        this.updateGMLResonances();
 
-      // 5. Process cognitive kernel integration
-      this.processCognitiveIntegration();
+        // 5. Process cognitive kernel integration
+        this.processCognitiveIntegration();
 
-      this.cycleCount++;
+        this.cycleCount++;
+      } catch (error) {
+        console.warn('Processing cycle error:', error);
+      }
 
       // Schedule next cycle
-      setTimeout(processFrame, 1000 / this.config.temporalProcessingFrequency);
+      if (this.isActive) {
+        setTimeout(processFrame, 1000 / this.config.temporalProcessingFrequency);
+      }
     };
 
     processFrame();
@@ -681,7 +697,13 @@ export class OpenCogNanoBrainKernel {
     }));
 
     // Process through cognitive kernel if available
-    this.cognitiveKernel.processAtoms(cognitiveNodes);
+    if (this.cognitiveKernel && this.cognitiveKernel.processAtoms) {
+      try {
+        this.cognitiveKernel.processAtoms(cognitiveNodes);
+      } catch (error) {
+        console.warn('Cognitive kernel processing error:', error);
+      }
+    }
   }
 
   /**
@@ -785,16 +807,27 @@ export class OpenCogNanoBrainKernel {
    * Calculate emergent consciousness metric
    */
   private calculateConsciousnessEmergence(): number {
-    const metrics = this.getMetrics();
+    // Calculate consciousness factors directly to avoid circular dependency
+    const atoms = Array.from(this.atomSpace.values());
+    const links = Array.from(this.linkSpace.values());
+    
+    if (atoms.length === 0) return 0;
+    
+    // Calculate factors directly
+    const avgAttention = atoms.reduce((sum, atom) => sum + atom.attentionValue.sti, 0) / atoms.length;
+    const avgCoherence = atoms.reduce((sum, atom) => sum + atom.timeCrystalState.temporalCoherence, 0) / atoms.length;
+    const primeAlignment = this.calculateOverallPrimeAlignment();
+    const fractalComplexity = this.calculateFractalComplexity();
+    const temporalStability = this.calculateTemporalStability();
     
     // Consciousness emerges from integration of multiple factors
     const factors = [
-      metrics.quantumCoherence,
-      metrics.temporalStability,
-      metrics.primeAlignment,
-      metrics.fractalComplexity,
-      Math.min(metrics.averageAttention / 100, 1.0), // Normalize attention
-      Math.min(metrics.totalLinks / Math.max(metrics.totalAtoms * 2, 1), 1.0) // Connection density
+      avgCoherence,
+      temporalStability,
+      primeAlignment,
+      fractalComplexity,
+      Math.min(avgAttention / 100, 1.0), // Normalize attention
+      Math.min(links.length / Math.max(atoms.length * 2, 1), 1.0) // Connection density
     ];
 
     // Geometric mean for emergence calculation
@@ -821,5 +854,12 @@ export class OpenCogNanoBrainKernel {
    */
   getTimeCrystals(): Map<string, TimeCrystalQuantumState> {
     return new Map(this.timeCrystals);
+  }
+
+  /**
+   * Get current configuration
+   */
+  getConfig(): OpenCogNanoBrainConfig {
+    return this.config;
   }
 }
