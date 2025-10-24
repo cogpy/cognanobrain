@@ -1,6 +1,6 @@
 # NanoBrain
 
-## Chapter 1: Philosophical transformation essential to reverse engineer consciousness
+## Chapter 1: [IN PROGRESS - 2025-10-24] Philosophical transformation essential to reverse engineer consciousness
 1.1 How do we differ from the existing worldview
 1.2 Ten research fields that we cover here
 1.3 The universe within and above not side by side
