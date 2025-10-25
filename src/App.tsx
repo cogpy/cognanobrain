@@ -10,7 +10,8 @@ import { ConsciousnessUploading } from './components/ConsciousnessUploading';
 import { FundamentalFeaturesPanel } from './components/FundamentalFeaturesPanel';
 import { EnhancedSystemsStatus } from './components/EnhancedSystemsStatus';
 import { GgmlTensorDemo } from './components/GgmlTensorDemo';
-import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu } from 'lucide-react';
+import { OpenCogNanoBrainVisualization } from './components/OpenCogNanoBrainVisualization';
+import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles } from 'lucide-react';
 
 function App() {
   const { 
@@ -29,6 +30,7 @@ function App() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Brain },
+    { id: 'opencog', label: 'OpenCog NanoBrain', icon: Sparkles },
     { id: 'tensor', label: 'GGML Tensors', icon: Zap },
     { id: 'enhanced', label: 'Enhanced Systems', icon: Cpu },
     { id: 'features', label: 'Fundamental Features', icon: Network },
@@ -201,6 +203,10 @@ function App() {
               </div>
             </div>
           </div>
+        )}
+
+        {activeTab === 'opencog' && (
+          <OpenCogNanoBrainVisualization />
         )}
 
         {activeTab === 'enhanced' && (
