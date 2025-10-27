@@ -14,6 +14,7 @@ import {
   TimeCrystalInference,
   TimeCrystalQuantumState
 } from '../core/OpenCogNanoBrainKernel';
+import { CognitiveKernelConfig } from '../core/UnifiedCognitiveKernel';
 import { CognitiveNode, ConsciousnessMetric, AgentState, TimeCluster } from '../types';
 
 /**
@@ -120,6 +121,8 @@ export const useOpenCogNanoBrain = (
         kernelRef.current.stop();
       }
     };
+    // initialConfig is intentionally not in dependencies as we only want to initialize once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Start monitoring when active
@@ -140,6 +143,8 @@ export const useOpenCogNanoBrain = (
         clearInterval(monitoringIntervalRef.current);
       }
     };
+    // updateMetrics is intentionally not in dependencies to avoid re-creating the interval
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isActive]);
 
   /**
@@ -412,7 +417,7 @@ export const useOpenCogNanoBrain = (
   const getConfig = useCallback((): OpenCogNanoBrainConfig => {
     // Return the default configuration - in full implementation, get from kernel
     return kernelRef.current?.['config'] || {
-      cognitiveKernelConfig: {} as any,
+      cognitiveKernelConfig: {} as CognitiveKernelConfig,
       timeCrystalDimensions: 11,
       fundamentalPrimes: [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47],
       fractalResolution: 5,

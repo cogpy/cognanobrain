@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ConsciousnessMetric, CognitiveNode } from '../types';
 
 // Phase Prime Metrics (PPM) - The 15-prime mathematical engine
@@ -34,7 +34,7 @@ export const usePhasePrimeMetrics = () => {
   const evolutionPhaseRef = useRef<number>(0);
 
   // The fundamental 15 primes that govern 99.99% of universal patterns
-  const FUNDAMENTAL_PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
+  const FUNDAMENTAL_PRIMES = useMemo(() => [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47], []);
 
   // Calculate universal symmetries from prime patterns
   const calculateUniversalSymmetries = useCallback((primeMetrics: PrimeMetric[]): UniversalSymmetry[] => {
