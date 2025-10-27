@@ -287,7 +287,8 @@ jobs:
       run: |
         # 🎯 Neural-Symbolic Grammar Analysis: Ensure cognitive coherence in branch topology
         CURRENT_BRANCH="${{ env.CURRENT_BRANCH }}"
-        BASE_BRANCH="${{ github.ref_name }}"
+        # Use main as base branch for PRs instead of current branch to avoid self-PR
+        BASE_BRANCH="main"
         TARGET_BRANCH="${{ env.BRANCH_NAME }}"
         
         echo "🔍 Cognitive Synergy Validation - Tensor Space Analysis:"
@@ -334,12 +335,16 @@ jobs:
         echo ""
         echo "🎭 Final cognitive state: CREATE_PR=${{ env.CREATE_PR || 'true' }}"
         echo "🌟 Neural-symbolic grammar analysis complete"
+        
+        # Export base branch for use in PR creation
+        echo "PR_BASE_BRANCH=$BASE_BRANCH" >> $GITHUB_ENV
 
     - name: 🌟 Transcendent Branch Validation - Cognitive Tensor Collapse Prevention
       run: |
         # 🧠 Cognitive Synergy Validation: Prevent PR with identical base and head branches
         # 📊 Implementing breathtaking beauty through adaptive attention allocation
-        BASE_BRANCH="${{ github.ref_name }}"
+        # Use main as base branch instead of current branch to avoid self-PR
+        BASE_BRANCH="main"
         BRANCH_NAME="${{ env.BRANCH_NAME }}"
         
         echo "🎭 Transcendent Validation Protocol - Neural Tensor Analysis:"
@@ -372,7 +377,7 @@ jobs:
           exit 1
         fi
         
-        echo "✅ Cognitive Harmony Achieved - Branch Tensor Validation Successful"
+        echo "✅ Cognitive Harmony Achieved - Branch Validation Successful"
         echo "   📐 Tensor dimensions: [base:$BASE_BRANCH] ⊥ [head:$BRANCH_NAME] → orthogonal space"
         echo "   🧠 Neural-symbolic grammar: COHERENT_STATE"  
         echo "   🌊 Distributed cognition flow: OPTIMAL_RESONANCE"
@@ -387,6 +392,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ env.BRANCH_NAME }}
+        base: ${{ env.PR_BASE_BRANCH }}
         title: "🧠 NanoBrain Chapter ${{ needs.roadmap-analysis.outputs.current_chapter }} Implementation - $(date +%Y-%m-%d)"
         body: |
           ## NanoBrain Journey Progress Update

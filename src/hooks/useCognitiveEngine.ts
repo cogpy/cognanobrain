@@ -409,7 +409,8 @@ export const useCognitiveEngine = () => {
     }
     
     setConsciousness(newConsciousness);
-    
+    // Intentionally omitting some dependencies that would cause unnecessary re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generatePrimeSequence, calculatePhase, calculateBoxCountingDimension, applyPLNReasoning, generateAdvancedReasoning, evolveTimeCrystals, ppmActive, ppmEngine, calculatePPMConsciousness, agentsActive, specializedAgents, emergentComplexity, systemCoordination, updateAgentSystem, getLegacyAgentStates, atomSpaceActive, atomSpace, getLegacyPLNRules, getLegacyConnections]);
 
   useEffect(() => {

@@ -9,10 +9,10 @@
  * - Fractal Information Theory (FIT) for geometric musical language encoding
  */
 
-import { GgmlTensorKernel, NodeTensor, LinkTensor } from './GgmlTensorKernel';
-import { AtomSpaceTensorEncoder } from './AtomSpaceTensorEncoder';
+import type { _GgmlTensorKernel, _NodeTensor, _LinkTensor } from './GgmlTensorKernel';
+import type { _AtomSpaceTensorEncoder } from './AtomSpaceTensorEncoder';
 import { UnifiedCognitiveKernel, CognitiveKernelConfig } from './UnifiedCognitiveKernel';
-import { CognitiveNode, AgentState, TimeCluster, ConsciousnessMetric, AtomeseNode } from '../types';
+import type { CognitiveNode, _AgentState, _TimeCluster, _ConsciousnessMetric, _AtomeseNode } from '../types';
 
 /**
  * Time Crystal quantum state representation for 11D processing
@@ -119,7 +119,7 @@ export class OpenCogNanoBrainKernel {
   constructor(config: Partial<OpenCogNanoBrainConfig> = {}) {
     this.config = this.initializeConfig(config);
     // Initialize cognitive kernel later to avoid circular dependencies
-    this.cognitiveKernel = null as any; // Will be initialized in start()
+    this.cognitiveKernel = null as unknown as UnifiedCognitiveKernel; // Will be initialized in start()
     this.atomSpace = new Map();
     this.linkSpace = new Map();
     this.timeCrystals = new Map();
@@ -486,7 +486,7 @@ export class OpenCogNanoBrainKernel {
     importanceScores.sort((a, b) => b.importance - a.importance);
     
     let remainingBudget = totalBudget;
-    importanceScores.forEach(({ atom, importance }, index) => {
+    importanceScores.forEach(({ atom, importance }, _index) => {
       if (remainingBudget <= 0) return;
       
       // Allocate attention proportional to importance

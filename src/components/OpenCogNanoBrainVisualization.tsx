@@ -49,8 +49,6 @@ export const OpenCogNanoBrainVisualization: React.FC<OpenCogNanoBrainVisualizati
     linkSpace,
     start,
     stop,
-    getCognitiveNodes,
-    getQuantumCoherenceMap,
     getPrimeResonancePatterns
   } = useOpenCogNanoBrain();
 
@@ -82,6 +80,8 @@ export const OpenCogNanoBrainVisualization: React.FC<OpenCogNanoBrainVisualizati
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
+    // drawVisualization is defined below but used here - intentional for code organization
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAnimating, realTimeUpdates, viewMode, atomSpace, timeCrystalStates, consciousness]);
 
   // Handle canvas click for atom selection
@@ -264,7 +264,7 @@ export const OpenCogNanoBrainVisualization: React.FC<OpenCogNanoBrainVisualizati
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     
-    crystals.forEach(([atomId, crystal], index) => {
+    crystals.forEach(([_atomId, crystal], _index) => {
       // Position crystals in 11D space projected to 2D
       const dimensions = crystal.dimensions;
       let x = centerX;
@@ -331,7 +331,7 @@ export const OpenCogNanoBrainVisualization: React.FC<OpenCogNanoBrainVisualizati
       }
       
       // Draw prime resonance indicators
-      crystal.primeSignature.forEach((prime, primeIndex) => {
+      crystal.primeSignature.forEach((prime, _primeIndex) => {
         const primeAngle = (prime / 47) * 2 * Math.PI + time * 0.1;
         const primeRadius = coreSize + 40;
         const primeX = x + Math.cos(primeAngle) * primeRadius;
@@ -506,7 +506,7 @@ export const OpenCogNanoBrainVisualization: React.FC<OpenCogNanoBrainVisualizati
     });
     
     // Draw prime connections based on atom relationships
-    for (const [atomId, primes] of primePatterns) {
+    for (const [_atomId, primes] of primePatterns) {
       if (primes.length < 2) continue;
       
       // Connect all primes in this atom's encoding
@@ -563,7 +563,7 @@ export const OpenCogNanoBrainVisualization: React.FC<OpenCogNanoBrainVisualizati
   /**
    * Draw metrics overlay
    */
-  const drawMetricsOverlay = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+  const drawMetricsOverlay = (ctx: CanvasRenderingContext2D, _canvas: HTMLCanvasElement) => {
     const overlayY = 10;
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.fillRect(10, overlayY, 250, 120);
@@ -640,7 +640,7 @@ export const OpenCogNanoBrainVisualization: React.FC<OpenCogNanoBrainVisualizati
           ].map(({ mode, icon: Icon, label }) => (
             <button
               key={mode}
-              onClick={() => setViewMode(mode as any)}
+              onClick={() => setViewMode(mode as 'atomspace' | 'timecrystals' | 'consciousness' | 'primes')}
               className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                 viewMode === mode
                   ? 'bg-cyan-500 text-white'

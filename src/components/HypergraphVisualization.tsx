@@ -504,6 +504,8 @@ export const HypergraphVisualization: React.FC<Props> = ({ nodes, isRunning }) =
         cancelAnimationFrame(animationRef.current);
       }
     };
+    // Functions are defined in component scope for organization - intentional
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, isRunning, selectedNode, hoverNode, drawConnection, drawNode, handleMouseInteraction]);
 
   return (

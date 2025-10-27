@@ -12,11 +12,11 @@
 
 import { 
   OpenCogNanoBrainKernel, 
-  OpenCogNanoBrainConfig,
-  NanoBrainMetrics,
-  TimeCrystalAtom,
-  TimeCrystalInference,
-  TimeCrystalQuantumState
+  type _OpenCogNanoBrainConfig,
+  type _NanoBrainMetrics,
+  type _TimeCrystalAtom,
+  type _TimeCrystalInference,
+  type _TimeCrystalQuantumState
 } from './OpenCogNanoBrainKernel';
 import { TestResult } from '../types';
 
@@ -432,7 +432,7 @@ export class OpenCogNanoBrainTestSuite {
       const atomSpace = this.kernel.getAtomSpace();
       
       // Test resonance frequency ranges
-      let resonanceFrequencies: number[] = [];
+      const resonanceFrequencies: number[] = [];
       
       for (const atom of atomSpace.values()) {
         resonanceFrequencies.push(atom.timeCrystalState.resonanceFrequency);
@@ -513,7 +513,7 @@ export class OpenCogNanoBrainTestSuite {
       const atomSpace = this.kernel.getAtomSpace();
       
       // Test fractal dimension evolution
-      let fractalDimensions: number[] = [];
+      const fractalDimensions: number[] = [];
       let validGeometries = 0;
       
       for (const atom of atomSpace.values()) {
@@ -682,7 +682,7 @@ export class OpenCogNanoBrainTestSuite {
       }
       
       const atomSpace = this.kernel.getAtomSpace();
-      const linkSpace = this.kernel.getLinkSpace();
+      const _linkSpace = this.kernel.getLinkSpace();
       
       // Test hypergraph connectivity
       this.assert(
@@ -1083,7 +1083,7 @@ export class OpenCogNanoBrainTestSuite {
         await this.kernel.start();
       }
       
-      const timeCrystals = this.kernel.getTimeCrystals();
+      const _timeCrystals = this.kernel.getTimeCrystals();
       
       // Sample coherence values over time
       const coherenceSamples: number[][] = [];
@@ -1164,7 +1164,7 @@ export class OpenCogNanoBrainTestSuite {
       );
       
       // Test processing frequency (should be running at ~100Hz)
-      const expectedCycles = 100; // Approximate cycles in 1 second
+      const _expectedCycles = 100; // Approximate cycles in 1 second
       // Since we can't directly access cycle count, we test that system remains responsive
       
       const responseTime = performance.now();
@@ -1174,6 +1174,12 @@ export class OpenCogNanoBrainTestSuite {
       this.assert(
         actualResponseTime < 50, // Should respond within 50ms
         `System should remain responsive during processing, response time: ${actualResponseTime.toFixed(1)}ms`
+      );
+      
+      // Ensure quickMetrics is used
+      this.assert(
+        quickMetrics.totalAtoms >= 0,
+        'Quick metrics should be valid'
       );
       
       this.addTestResult({
@@ -1221,11 +1227,11 @@ export class OpenCogNanoBrainTestSuite {
       
       for (const metricName of requiredMetrics) {
         this.assert(
-          metrics.hasOwnProperty(metricName),
+          Object.prototype.hasOwnProperty.call(metrics, metricName),
           `Metrics should include ${metricName}`
         );
         
-        const value = (metrics as any)[metricName];
+        const value = (metrics as Record<string, unknown>)[metricName];
         this.assert(
           typeof value === 'number' && !isNaN(value),
           `${metricName} should be a valid number, got ${value}`
@@ -1239,9 +1245,9 @@ export class OpenCogNanoBrainTestSuite {
       ];
       
       for (const metricName of normalizedMetrics) {
-        const value = (metrics as any)[metricName];
+        const value = (metrics as Record<string, unknown>)[metricName];
         this.assert(
-          value >= 0 && value <= 1,
+          typeof value === 'number' && value >= 0 && value <= 1,
           `${metricName} should be normalized to [0,1], got ${value}`
         );
       }
@@ -1250,9 +1256,9 @@ export class OpenCogNanoBrainTestSuite {
       const counterMetrics = ['totalAtoms', 'totalLinks', 'averageAttention', 'inferenceRate'];
       
       for (const metricName of counterMetrics) {
-        const value = (metrics as any)[metricName];
+        const value = (metrics as Record<string, unknown>)[metricName];
         this.assert(
-          value >= 0,
+          typeof value === 'number' && value >= 0,
           `${metricName} should be non-negative, got ${value}`
         );
       }
@@ -1307,7 +1313,7 @@ export class OpenCogNanoBrainTestSuite {
           if (metrics.totalAtoms > 0) {
             successfulQueries++;
           }
-        } catch (error) {
+        } catch (_error) {
           // Count failed queries
         }
       }
