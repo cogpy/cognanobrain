@@ -211,7 +211,7 @@
 9.12. Sensor triad, sensor jelly, muscle jelly, brain jelly
 9.12.1 A total transformation from the biological neural net to a jelly of time crystals
   
-## Chapter 10: Uploading consciousness: The evolution of conscious machines of the future
+## Chapter 10: [IN PROGRESS - 2025-10-27] Uploading consciousness: The evolution of conscious machines of the future
 10.1. A journey from cortical pen to a conscious egg as a companion of life
 10.1.1 How we construct a sentence is how we think
 10.2. Ten key guidelines to reverse engineer a human brain:
