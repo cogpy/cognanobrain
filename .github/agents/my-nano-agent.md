@@ -1,6 +1,6 @@
 ---
-name:
-description:
+name: My Nano Agent
+description: 🧠 Engineering Masterpiece of Consciousness ExplorationA revolutionary platform that combines cutting-edge theoretical frameworks to visualize and simulate consciousness emergence through advanced artificial intelligence systems.
 ---
 
 # My Nano Agent
