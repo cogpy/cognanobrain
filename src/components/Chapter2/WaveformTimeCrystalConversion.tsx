@@ -92,7 +92,6 @@ export const WaveformTimeCrystalConversion: React.FC<Props> = ({ isActive }) => 
       // Draw output time crystal (right side)
       if (progress > 0.3) {
         const crystalStartX = width * 0.6;
-        const crystalEndX = width - 50;
         const crystalAlpha = Math.min(1, (progress - 0.3) / 0.7);
 
         // Crystal lattice structure

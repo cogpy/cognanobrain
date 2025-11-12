@@ -5,7 +5,7 @@ interface Props {
   isActive: boolean;
 }
 
-export const GMLvsAlgorithms: React.FC<Props> = ({ isActive }) => {
+export const GMLvsAlgorithms: React.FC<Props> = ({ isActive: _isActive }) => {
   const comparisonAspects = [
     {
       aspect: 'Processing Model',

@@ -5,7 +5,7 @@ interface Props {
   isActive: boolean;
 }
 
-export const QuaternionOctonionDedication: React.FC<Props> = ({ isActive }) => {
+export const QuaternionOctonionDedication: React.FC<Props> = ({ isActive: _isActive }) => {
   const hyperComplexSystems = [
     {
       name: 'Quaternions',

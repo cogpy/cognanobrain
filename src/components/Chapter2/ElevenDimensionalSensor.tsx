@@ -5,7 +5,7 @@ interface Props {
   isActive: boolean;
 }
 
-export const ElevenDimensionalSensor: React.FC<Props> = ({ isActive }) => {
+export const ElevenDimensionalSensor: React.FC<Props> = ({ isActive: _isActive }) => {
   const dimensions = [
     { id: 'x', name: 'Spatial X', type: 'spatial', color: 'cyan', intensity: 0.85 },
     { id: 'y', name: 'Spatial Y', type: 'spatial', color: 'cyan', intensity: 0.82 },

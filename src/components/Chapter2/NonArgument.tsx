@@ -5,7 +5,7 @@ interface Props {
   isActive: boolean;
 }
 
-export const NonArgument: React.FC<Props> = ({ isActive }) => {
+export const NonArgument: React.FC<Props> = ({ isActive: _isActive }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

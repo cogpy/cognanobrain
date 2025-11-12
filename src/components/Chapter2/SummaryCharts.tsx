@@ -5,7 +5,7 @@ interface Props {
   isActive: boolean;
 }
 
-export const FITSummaryChart: React.FC<Props> = ({ isActive }) => {
+export const FITSummaryChart: React.FC<Props> = ({ isActive: _isActive }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -171,7 +171,7 @@ export const FITSummaryChart: React.FC<Props> = ({ isActive }) => {
   );
 };
 
-export const GMLSummaryChart: React.FC<Props> = ({ isActive }) => {
+export const GMLSummaryChart: React.FC<Props> = ({ isActive: _isActive }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

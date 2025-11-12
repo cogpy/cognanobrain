@@ -5,7 +5,7 @@ interface Props {
   isActive: boolean;
 }
 
-export const TimeCrystalComparison: React.FC<Props> = ({ isActive }) => {
+export const TimeCrystalComparison: React.FC<Props> = ({ isActive: _isActive }) => {
   const approaches = [
     {
       name: 'Winfree Time Crystal',

@@ -5,7 +5,7 @@ interface Props {
   isActive: boolean;
 }
 
-export const HigherDimensionalData: React.FC<Props> = ({ isActive }) => {
+export const HigherDimensionalData: React.FC<Props> = ({ isActive: _isActive }) => {
   const dimensionExamples = [
     {
       dimension: '1D',
