@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { FractalPattern, GeometricShape, SensorMetric } from '../types';
-import { Layers, TrendingUp, Zap, RotateCw, Music, Box, Scan, Activity, Clock, Calculator, Database, GitCompare, Orbit } from 'lucide-react';
+import { Layers, TrendingUp, Zap, RotateCw, Music, Box, Scan, Activity, Clock, Calculator, Database, GitCompare, Orbit, Grid3X3, AlertTriangle } from 'lucide-react';
 import { 
   FractalTapeVisualization,
   GeometricSelfAssembly,
   FifteenGeometricShapes,
   WaveformTimeCrystalConversion,
+  GardenOfGardens,
   ElevenDimensionalSensor,
   TimeCrystalComparison,
   QuaternionOctonionDedication,
+  HigherDimensionalData,
+  GMLvsAlgorithms,
+  NonArgument,
   FITSummaryChart,
   GMLSummaryChart
 } from './Chapter2';
@@ -18,7 +22,7 @@ export const FractalInformationPanel: React.FC = () => {
   const [selectedPattern, setSelectedPattern] = useState<FractalPattern | null>(null);
   const [geometricShapes, setGeometricShapes] = useState<GeometricShape[]>([]);
   const [sensorMetrics, setSensorMetrics] = useState<SensorMetric[]>([]);
-  const [activeTab, setActiveTab] = useState<'patterns' | 'shapes' | 'sensors' | 'theory' | 'fractal-tape' | 'assembly' | 'waveform' | 'comparison' | 'quaternion' | 'fit-summary' | 'gml-summary' | 'conclusion'>('fractal-tape');
+  const [activeTab, setActiveTab] = useState<'patterns' | 'shapes' | 'sensors' | 'theory' | 'fractal-tape' | 'assembly' | 'waveform' | 'garden' | 'higher-dim' | 'gml-vs-algo' | 'non-argument' | 'comparison' | 'quaternion' | 'fit-summary' | 'gml-summary' | 'conclusion'>('fractal-tape');
 
   useEffect(() => {
     const generatePatterns = () => {
@@ -132,9 +136,13 @@ export const FractalInformationPanel: React.FC = () => {
           { id: 'assembly', label: '2.1.2 Self-Assembly', icon: Box },
           { id: 'shapes', label: '2.2.2 15 Shapes', icon: Music },
           { id: 'waveform', label: '2.2.3 Waveform', icon: Clock },
+          { id: 'garden', label: '2.3 Garden of Gardens', icon: Grid3X3 },
           { id: 'sensors', label: '2.4 11D Sensors', icon: Scan },
           { id: 'comparison', label: '2.5 Comparison', icon: GitCompare },
           { id: 'quaternion', label: '2.6 Quaternions', icon: Calculator },
+          { id: 'higher-dim', label: '2.7 Higher Dim Data', icon: Box },
+          { id: 'gml-vs-algo', label: '2.8 GML vs Algo', icon: Activity },
+          { id: 'non-argument', label: '2.9 Non-Argument', icon: AlertTriangle },
           { id: 'fit-summary', label: '2.10 FIT Chart', icon: Database },
           { id: 'gml-summary', label: '2.11 GML Chart', icon: Music },
           { id: 'conclusion', label: '2.12 Conclusion', icon: Orbit }
@@ -162,9 +170,13 @@ export const FractalInformationPanel: React.FC = () => {
       {activeTab === 'assembly' && <GeometricSelfAssembly isActive={true} />}
       {activeTab === 'shapes' && <FifteenGeometricShapes isActive={true} />}
       {activeTab === 'waveform' && <WaveformTimeCrystalConversion isActive={true} />}
+      {activeTab === 'garden' && <GardenOfGardens isActive={true} />}
       {activeTab === 'sensors' && <ElevenDimensionalSensor isActive={true} />}
       {activeTab === 'comparison' && <TimeCrystalComparison isActive={true} />}
       {activeTab === 'quaternion' && <QuaternionOctonionDedication isActive={true} />}
+      {activeTab === 'higher-dim' && <HigherDimensionalData isActive={true} />}
+      {activeTab === 'gml-vs-algo' && <GMLvsAlgorithms isActive={true} />}
+      {activeTab === 'non-argument' && <NonArgument isActive={true} />}
       {activeTab === 'fit-summary' && <FITSummaryChart isActive={true} />}
       {activeTab === 'gml-summary' && <GMLSummaryChart isActive={true} />}
       {activeTab === 'conclusion' && (
