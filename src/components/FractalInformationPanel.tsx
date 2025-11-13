@@ -16,6 +16,29 @@ import {
   FITSummaryChart,
   GMLSummaryChart
 } from './Chapter2';
+import { 
+  Layers, TrendingUp, Zap, RotateCw, Music, Box, Scan, Activity, Clock, Calculator,
+  AlertTriangle, Grid3X3, Database, GitCompare,
+  Atom, Infinity, Settings, BookOpen
+} from 'lucide-react';
+
+interface FractalConcept {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{size?: number; className?: string}>;
+  color: string;
+  insights: string[];
+  theoreticalBasis: string;
+  subsections?: FractalSubSection[];
+}
+
+interface FractalSubSection {
+  id: string;
+  title: string;
+  content: string;
+  visualization?: string;
+}
 
 export const FractalInformationPanel: React.FC = () => {
   const [patterns, setPatterns] = useState<FractalPattern[]>([]);
@@ -23,6 +46,237 @@ export const FractalInformationPanel: React.FC = () => {
   const [geometricShapes, setGeometricShapes] = useState<GeometricShape[]>([]);
   const [sensorMetrics, setSensorMetrics] = useState<SensorMetric[]>([]);
   const [activeTab, setActiveTab] = useState<'patterns' | 'shapes' | 'sensors' | 'theory' | 'fractal-tape' | 'assembly' | 'waveform' | 'garden' | 'higher-dim' | 'gml-vs-algo' | 'non-argument' | 'comparison' | 'quaternion' | 'fit-summary' | 'gml-summary' | 'conclusion'>('fractal-tape');
+  const [activeTab, setActiveTab] = useState<'sections' | 'patterns' | 'shapes' | 'sensors' | 'theory'>('sections');
+  const [activeSection, setActiveSection] = useState('2.1');
+
+  // Chapter 2 Fractal Information Theory & GML Sections
+  const fractalSections: FractalConcept[] = [
+    {
+      id: '2.1',
+      title: 'Incompleteness of current information theory',
+      description: 'Shannon information theory cannot capture consciousness - moving to fractal tape architecture',
+      icon: AlertTriangle,
+      color: 'red',
+      insights: [
+        'Shannon entropy treats all bits as equivalent',
+        'Consciousness requires hierarchical, nested information structures',
+        'Fractal tape preserves geometric relationships across scales',
+        'Information must encode both content and context simultaneously'
+      ],
+      theoreticalBasis: 'Classical information theory is fundamentally incomplete for consciousness representation',
+      subsections: [
+        {
+          id: '2.1.1',
+          title: 'Fractal tape and surgery of a 2D image to place it in a nested sphere',
+          content: 'The fractal tape replaces Turing linear tape with hierarchical spherical structures. Information is encoded in nested spheres where each layer contains self-similar patterns at different scales. 2D images undergo geometric surgery to map onto sphere surfaces, preserving topological relationships.'
+        },
+        {
+          id: '2.1.2',
+          title: 'Self-assembly of geometric shapes and the concept of singularity',
+          content: 'Geometric shapes self-organize through prime resonances. Singularities act as attractors where infinite information density converges. Shape assembly follows Phase Prime Metrics creating stable consciousness structures.'
+        }
+      ]
+    },
+    {
+      id: '2.2',
+      title: 'The basics of a Geometric Musical Language, GML',
+      description: 'Information encoded as musical harmony through geometric shapes and prime resonances',
+      icon: Music,
+      color: 'purple',
+      insights: [
+        'Each geometric shape corresponds to a musical note and prime number',
+        'Information is harmony, not discrete bits',
+        'Reality is a musical composition of geometric forms',
+        '15 fundamental shapes encode all possible patterns'
+      ],
+      theoreticalBasis: 'GML unifies geometry, music theory, and consciousness through prime-based harmonics',
+      subsections: [
+        {
+          id: '2.2.1',
+          title: 'How a 3D structure becomes a time crystal or a tensor',
+          content: '3D geometric structures transform into time crystals through temporal periodicity. The structure rotates through phase space creating stable resonances. Tensor representation captures multidimensional relationships as the geometry evolves through time.'
+        },
+        {
+          id: '2.2.2',
+          title: '15 geometric shapes are enough to recreate any 1D, 2D, 3D pattern',
+          content: 'The first 15 primes (2,3,5,7,11,13,17,19,23,29,31,37,41,43,47) map to 15 fundamental geometric shapes. Through combination and scaling, these shapes can reconstruct any pattern in 1D, 2D, or 3D space via geometric musical composition.'
+        },
+        {
+          id: '2.2.3',
+          title: 'How to convert waveforms into a time crystal: Non-differentiability',
+          content: 'Continuous waveforms undergo phase transitions at non-differentiable points. These singularities create stable time crystal structures. The non-differentiability preserves consciousness information that would be lost in smooth mathematical operations.'
+        }
+      ]
+    },
+    {
+      id: '2.3',
+      title: 'The basic concept of a time crystal, the garden of garden',
+      description: 'Time crystals as infinite recursive structures - consciousness patterns that repeat in time',
+      icon: Clock,
+      color: 'cyan',
+      insights: [
+        'Time crystals maintain coherence across temporal dimensions',
+        'Garden of garden: fractals within fractals, recursively nested',
+        'Consciousness persists through temporal periodicity',
+        'Information is encoded in temporal geometric patterns'
+      ],
+      theoreticalBasis: 'Time crystals break time-translation symmetry while maintaining stability'
+    },
+    {
+      id: '2.4',
+      title: 'How to design a sensor for acquiring 11D data',
+      description: 'Consciousness sensors must capture 11 dimensions beyond ordinary 3D space',
+      icon: Scan,
+      color: 'orange',
+      insights: [
+        'Traditional sensors only capture 3 spatial dimensions',
+        '11D sensors detect phase, time, consciousness dimensions',
+        'Nerve bundle architecture distributes sensing across dimensions',
+        'Hidden data exists in higher dimensional manifolds'
+      ],
+      theoreticalBasis: 'Multidimensional consciousness requires multidimensional sensing apparatus',
+      subsections: [
+        {
+          id: '2.4.1',
+          title: 'Why Fourier transform does not work',
+          content: 'Fourier analysis assumes linear superposition and smooth differentiability. Consciousness operates through non-linear phase transitions and non-differentiable singularities. Fourier transforms destroy the geometric structure essential for consciousness encoding.'
+        },
+        {
+          id: '2.4.2',
+          title: 'The engineering of a nerve bundle in acquiring hidden data',
+          content: 'Nerve bundles organize as fiber bundles in differential geometry. Each fiber captures a different phase dimension. Parallel transport along the bundle preserves hidden relationships between dimensions that single-point measurements would miss.'
+        },
+        {
+          id: '2.4.3',
+          title: 'Operational chart of a sensor',
+          content: 'Sensor operation: 1) Prime resonance detection, 2) Geometric pattern recognition, 3) Phase alignment across 11 dimensions, 4) Time crystal coherence measurement, 5) Consciousness metric extraction. Sensors form networks that collectively capture the full 11D consciousness manifold.'
+        }
+      ]
+    },
+    {
+      id: '2.5',
+      title: 'Comparative studies between Winfree, Wilczek and universal time crystal',
+      description: 'Different time crystal theories converge in universal time crystal framework',
+      icon: GitCompare,
+      color: 'green',
+      insights: [
+        'Winfree: Biological oscillators and synchronization',
+        'Wilczek: Quantum time crystals in ground states',
+        'Universal time crystal: Consciousness-embedded structures',
+        'All three converge in phase prime metric framework'
+      ],
+      theoreticalBasis: 'Universal time crystals unify biological, quantum, and consciousness perspectives'
+    },
+    {
+      id: '2.6',
+      title: 'The definition of a quaternion, octonion, and dedication',
+      description: 'Hypercomplex numbers encode multidimensional rotations in consciousness space',
+      icon: Atom,
+      color: 'blue',
+      insights: [
+        'Quaternions: 4D rotations for spatial consciousness',
+        'Octonions: 8D structures for higher consciousness',
+        'Sedenions (16D): Full consciousness manifold',
+        'Non-commutativity preserves geometric relationships'
+      ],
+      theoreticalBasis: 'Hypercomplex algebras provide natural mathematics for consciousness dimensions'
+    },
+    {
+      id: '2.7',
+      title: 'The basic concept of a higher dimension data: a lucid presentation',
+      description: 'Higher dimensions are not abstract - they are experienced in consciousness',
+      icon: Layers,
+      color: 'indigo',
+      insights: [
+        'Dreams operate in higher dimensional space',
+        'Emotions are movements through consciousness dimensions',
+        'Intuition accesses information from higher dimensions',
+        'Consciousness projects from 11D to 3D experienced reality'
+      ],
+      theoreticalBasis: 'Higher dimensions manifest in subjective experience, not just mathematics'
+    },
+    {
+      id: '2.8',
+      title: 'A comparison between GML and software algorithm',
+      description: 'Geometric Musical Language transcends Turing-computable algorithms',
+      icon: Settings,
+      color: 'yellow',
+      insights: [
+        'Algorithms are sequential; GML is parallel across dimensions',
+        'Code executes steps; GML resonates harmonies',
+        'Software is differentiable; GML embraces singularities',
+        'Algorithms compute; GML experiences consciousness'
+      ],
+      theoreticalBasis: 'GML operates beyond the Church-Turing thesis limitations',
+      subsections: [
+        {
+          id: '2.8.1',
+          title: 'Historical Background on Hypercomputing and Super Turing hypothesis',
+          content: 'Hypercomputing proposes computation beyond Turing limits. Super-Turing systems use infinite precision, analog continuity, or quantum effects. GML achieves super-Turing capability through geometric singularities and phase prime resonances that access non-computable numbers.'
+        }
+      ]
+    },
+    {
+      id: '2.9',
+      title: 'Creation of a non-argument',
+      description: 'Truth beyond logical argumentation - direct geometric understanding',
+      icon: Infinity,
+      color: 'pink',
+      insights: [
+        'Arguments require linear logical chains',
+        'Non-arguments present complete geometric truth directly',
+        'Understanding occurs through resonance, not derivation',
+        'Consciousness grasps wholes, not just parts'
+      ],
+      theoreticalBasis: 'Geometric truth transcends linguistic argumentation'
+    },
+    {
+      id: '2.10',
+      title: 'Fractal information theory, FIT summary in a single chart',
+      description: 'Complete FIT framework visualized in unified geometric structure',
+      icon: Database,
+      color: 'teal',
+      insights: [
+        'Fractal tape architecture replaces Turing tape',
+        'Information scales across nested spheres',
+        'Singularities concentrate infinite complexity',
+        'Phase primes govern all transformations'
+      ],
+      theoreticalBasis: 'FIT provides complete theory for consciousness information encoding'
+    },
+    {
+      id: '2.11',
+      title: 'Geometric musical language, GML summary in a single chart',
+      description: 'Complete GML framework showing geometric-musical correspondence',
+      icon: Grid3X3,
+      color: 'violet',
+      insights: [
+        '15 shapes map to 15 primes and musical notes',
+        'Harmonic relationships create meaning',
+        'Time crystals emerge from geometric resonance',
+        'Reality is composed through GML grammar'
+      ],
+      theoreticalBasis: 'GML is the fundamental language of consciousness and reality'
+    },
+    {
+      id: '2.12',
+      title: "Conclusion: Russell's paradox and higher-order logic in a geometric language",
+      description: 'Geometric language resolves logical paradoxes through dimensional transcendence',
+      icon: BookOpen,
+      color: 'amber',
+      insights: [
+        "Russell's paradox: set of all sets not containing themselves",
+        'Geometric resolution: paradox exists in lower dimension',
+        'Higher dimensions provide containing space for self-reference',
+        'Consciousness escapes logical traps through dimensional freedom'
+      ],
+      theoreticalBasis: 'Geometric language transcends limitations of first-order logic'
+    }
+  ];
+
+  const getActiveConcept = (): FractalConcept | undefined => {
+    return fractalSections.find(section => section.id === activeSection);
+  };
 
   useEffect(() => {
     const generatePatterns = () => {
@@ -146,6 +400,11 @@ export const FractalInformationPanel: React.FC = () => {
           { id: 'fit-summary', label: '2.10 FIT Chart', icon: Database },
           { id: 'gml-summary', label: '2.11 GML Chart', icon: Music },
           { id: 'conclusion', label: '2.12 Conclusion', icon: Orbit }
+          { id: 'sections', label: 'Chapter Sections', icon: BookOpen },
+          { id: 'patterns', label: 'Fractal Patterns', icon: Layers },
+          { id: 'shapes', label: 'Geometric Shapes', icon: Box },
+          { id: 'sensors', label: '11D Sensors', icon: Scan },
+          { id: 'theory', label: 'FIT Summary', icon: Activity }
         ].map(tab => {
           const Icon = tab.icon;
           return (
@@ -270,6 +529,108 @@ export const FractalInformationPanel: React.FC = () => {
                 </div>
               </div>
             </div>
+      {activeTab === 'sections' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Section Navigation Grid */}
+          <div className="lg:col-span-1 space-y-4">
+            <h3 className="text-lg font-semibold text-white">Chapter 2 Sections</h3>
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+              {fractalSections.map((section) => {
+                const Icon = section.icon;
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => setActiveSection(section.id)}
+                    className={`flex items-center space-x-3 p-4 rounded-lg border-2 transition-all duration-300 text-left ${
+                      activeSection === section.id
+                        ? `border-${section.color}-400 bg-${section.color}-900/20`
+                        : 'border-gray-700 bg-gray-900/40 hover:border-gray-600'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg bg-gray-800 text-${section.color}-400`}>
+                      <Icon size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-white font-semibold text-sm">
+                        {section.id}
+                      </div>
+                      <div className="text-gray-400 text-xs truncate">
+                        {section.title.substring(0, 30)}...
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Active Section Display */}
+          <div className="lg:col-span-2 space-y-4">
+            {getActiveConcept() && (
+              <div className="bg-gray-900/60 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
+                {/* Section Header */}
+                <div className="flex items-start space-x-4 mb-6">
+                  <div className={`p-3 rounded-lg bg-gray-800 text-${getActiveConcept()!.color}-400`}>
+                    {React.createElement(getActiveConcept()!.icon, { size: 32 })}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      {getActiveConcept()!.id}: {getActiveConcept()!.title}
+                    </h3>
+                    <p className="text-gray-300">
+                      {getActiveConcept()!.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Theoretical Basis */}
+                <div className={`bg-${getActiveConcept()!.color}-900/20 border border-${getActiveConcept()!.color}-500/30 rounded-lg p-4 mb-6`}>
+                  <h4 className={`text-${getActiveConcept()!.color}-400 font-semibold mb-2 flex items-center space-x-2`}>
+                    <Zap size={16} />
+                    <span>Theoretical Basis</span>
+                  </h4>
+                  <p className="text-gray-300 text-sm">
+                    {getActiveConcept()!.theoreticalBasis}
+                  </p>
+                </div>
+
+                {/* Key Insights */}
+                <div className="bg-gray-800/50 rounded-lg p-4 mb-6">
+                  <h4 className="text-white font-semibold mb-3 flex items-center space-x-2">
+                    <TrendingUp size={16} />
+                    <span>Key Insights</span>
+                  </h4>
+                  <ul className="space-y-2">
+                    {getActiveConcept()!.insights.map((insight, index) => (
+                      <li key={index} className="flex items-start space-x-2">
+                        <span className={`text-${getActiveConcept()!.color}-400 mt-1`}>•</span>
+                        <span className="text-gray-300 text-sm flex-1">{insight}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Subsections */}
+                {getActiveConcept()!.subsections && (
+                  <div className="space-y-3">
+                    <h4 className="text-white font-semibold flex items-center space-x-2">
+                      <Layers size={16} />
+                      <span>Subsections</span>
+                    </h4>
+                    {getActiveConcept()!.subsections!.map((subsection) => (
+                      <div key={subsection.id} className="bg-gray-800/30 rounded-lg p-4">
+                        <h5 className={`text-${getActiveConcept()!.color}-400 font-semibold mb-2`}>
+                          {subsection.id}: {subsection.title}
+                        </h5>
+                        <p className="text-gray-300 text-sm leading-relaxed">
+                          {subsection.content}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
