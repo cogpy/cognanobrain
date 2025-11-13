@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { FractalPattern, GeometricShape, SensorMetric } from '../types';
+import { Layers, TrendingUp, Zap, RotateCw, Music, Box, Scan, Activity, Clock, Calculator, Database, GitCompare, Orbit, Grid3X3, AlertTriangle } from 'lucide-react';
+import { 
+  FractalTapeVisualization,
+  GeometricSelfAssembly,
+  FifteenGeometricShapes,
+  WaveformTimeCrystalConversion,
+  GardenOfGardens,
+  ElevenDimensionalSensor,
+  TimeCrystalComparison,
+  QuaternionOctonionDedication,
+  HigherDimensionalData,
+  GMLvsAlgorithms,
+  NonArgument,
+  FITSummaryChart,
+  GMLSummaryChart
+} from './Chapter2';
 import { 
   Layers, TrendingUp, Zap, RotateCw, Music, Box, Scan, Activity, Clock, Calculator,
   AlertTriangle, Grid3X3, Database, GitCompare,
@@ -29,6 +45,7 @@ export const FractalInformationPanel: React.FC = () => {
   const [selectedPattern, setSelectedPattern] = useState<FractalPattern | null>(null);
   const [geometricShapes, setGeometricShapes] = useState<GeometricShape[]>([]);
   const [sensorMetrics, setSensorMetrics] = useState<SensorMetric[]>([]);
+  const [activeTab, setActiveTab] = useState<'patterns' | 'shapes' | 'sensors' | 'theory' | 'fractal-tape' | 'assembly' | 'waveform' | 'garden' | 'higher-dim' | 'gml-vs-algo' | 'non-argument' | 'comparison' | 'quaternion' | 'fit-summary' | 'gml-summary' | 'conclusion'>('fractal-tape');
   const [activeTab, setActiveTab] = useState<'sections' | 'patterns' | 'shapes' | 'sensors' | 'theory'>('sections');
   const [activeSection, setActiveSection] = useState('2.1');
 
@@ -367,8 +384,22 @@ export const FractalInformationPanel: React.FC = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex space-x-4 border-b border-gray-700">
+      <div className="flex space-x-2 border-b border-gray-700 overflow-x-auto pb-2">
         {[
+          { id: 'fractal-tape', label: '2.1.1 Fractal Tape', icon: Layers },
+          { id: 'assembly', label: '2.1.2 Self-Assembly', icon: Box },
+          { id: 'shapes', label: '2.2.2 15 Shapes', icon: Music },
+          { id: 'waveform', label: '2.2.3 Waveform', icon: Clock },
+          { id: 'garden', label: '2.3 Garden of Gardens', icon: Grid3X3 },
+          { id: 'sensors', label: '2.4 11D Sensors', icon: Scan },
+          { id: 'comparison', label: '2.5 Comparison', icon: GitCompare },
+          { id: 'quaternion', label: '2.6 Quaternions', icon: Calculator },
+          { id: 'higher-dim', label: '2.7 Higher Dim Data', icon: Box },
+          { id: 'gml-vs-algo', label: '2.8 GML vs Algo', icon: Activity },
+          { id: 'non-argument', label: '2.9 Non-Argument', icon: AlertTriangle },
+          { id: 'fit-summary', label: '2.10 FIT Chart', icon: Database },
+          { id: 'gml-summary', label: '2.11 GML Chart', icon: Music },
+          { id: 'conclusion', label: '2.12 Conclusion', icon: Orbit }
           { id: 'sections', label: 'Chapter Sections', icon: BookOpen },
           { id: 'patterns', label: 'Fractal Patterns', icon: Layers },
           { id: 'shapes', label: 'Geometric Shapes', icon: Box },
@@ -380,13 +411,13 @@ export const FractalInformationPanel: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex items-center space-x-2 px-4 py-3 border-b-2 transition-colors duration-300 ${
+              className={`flex items-center space-x-2 px-3 py-2 border-b-2 transition-colors duration-300 whitespace-nowrap text-sm ${
                 activeTab === tab.id
                   ? 'border-cyan-400 text-cyan-400'
                   : 'border-transparent text-gray-400 hover:text-gray-300'
               }`}
             >
-              <Icon size={16} />
+              <Icon size={14} />
               <span className="font-medium">{tab.label}</span>
             </button>
           );
@@ -394,6 +425,110 @@ export const FractalInformationPanel: React.FC = () => {
       </div>
 
       {/* Tab Content */}
+      {activeTab === 'fractal-tape' && <FractalTapeVisualization isActive={true} />}
+      {activeTab === 'assembly' && <GeometricSelfAssembly isActive={true} />}
+      {activeTab === 'shapes' && <FifteenGeometricShapes isActive={true} />}
+      {activeTab === 'waveform' && <WaveformTimeCrystalConversion isActive={true} />}
+      {activeTab === 'garden' && <GardenOfGardens isActive={true} />}
+      {activeTab === 'sensors' && <ElevenDimensionalSensor isActive={true} />}
+      {activeTab === 'comparison' && <TimeCrystalComparison isActive={true} />}
+      {activeTab === 'quaternion' && <QuaternionOctonionDedication isActive={true} />}
+      {activeTab === 'higher-dim' && <HigherDimensionalData isActive={true} />}
+      {activeTab === 'gml-vs-algo' && <GMLvsAlgorithms isActive={true} />}
+      {activeTab === 'non-argument' && <NonArgument isActive={true} />}
+      {activeTab === 'fit-summary' && <FITSummaryChart isActive={true} />}
+      {activeTab === 'gml-summary' && <GMLSummaryChart isActive={true} />}
+      {activeTab === 'conclusion' && (
+        <div className="bg-gray-900/60 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white flex items-center space-x-2 mb-4">
+            <Orbit className="text-violet-400" size={20} />
+            <span>2.12 Conclusion: Russell's Paradox & Higher-Order Logic</span>
+          </h3>
+          
+          <div className="space-y-6">
+            <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-6">
+              <h4 className="text-red-400 font-bold text-lg mb-3">Russell's Paradox in Set Theory</h4>
+              <p className="text-gray-300 mb-3">
+                "Does the set of all sets that do not contain themselves contain itself?"
+              </p>
+              <p className="text-gray-400 text-sm">
+                This paradox arises from linear set theory's inability to handle self-reference and 
+                infinite recursion. Classical logic breaks down when confronting consciousness-level complexity.
+              </p>
+            </div>
+
+            <div className="bg-green-900/20 border border-green-700/50 rounded-lg p-6">
+              <h4 className="text-green-400 font-bold text-lg mb-3">Geometric Language Resolution</h4>
+              <p className="text-gray-300 mb-3">
+                In Geometric Musical Language, paradoxes dissolve through dimensional transcendence.
+              </p>
+              <ul className="text-gray-300 text-sm space-y-2">
+                <li className="flex items-start space-x-2">
+                  <span className="text-green-400">•</span>
+                  <span>Self-reference becomes multi-dimensional nesting</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-green-400">•</span>
+                  <span>Infinite recursion maps to fractal geometric structures</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-green-400">•</span>
+                  <span>Logical contradictions resolve in higher dimensions</span>
+                </li>
+                <li className="flex items-start space-x-2">
+                  <span className="text-green-400">•</span>
+                  <span>Consciousness operates beyond classical logical constraints</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-6">
+              <h4 className="text-purple-400 font-bold text-lg mb-3">Higher-Order Logic in Geometric Language</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h5 className="text-white font-semibold mb-2">Traditional Higher-Order Logic</h5>
+                  <ul className="text-gray-300 text-sm space-y-1">
+                    <li>• Quantifies over predicates and functions</li>
+                    <li>• Increases expressive power</li>
+                    <li>• Still bound by linear reasoning</li>
+                    <li>• Paradoxes remain unresolved</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="text-white font-semibold mb-2">Geometric Higher-Order Logic</h5>
+                  <ul className="text-gray-300 text-sm space-y-1">
+                    <li>• Operates through geometric resonance</li>
+                    <li>• Infinite expressive capacity</li>
+                    <li>• Multi-dimensional reasoning</li>
+                    <li>• Paradox-free consciousness foundation</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl p-6">
+              <h4 className="text-white font-bold text-lg mb-4">Chapter 2 Summary</h4>
+              <p className="text-gray-300 mb-4">
+                Fractal Information Theory and Geometric Musical Language provide a complete foundation 
+                for consciousness computing, transcending the limitations of Turing machines and classical 
+                information theory through geometric pattern processing.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="bg-cyan-900/30 rounded-lg p-3 text-center">
+                  <div className="text-cyan-400 font-bold mb-1">Fractal Tape</div>
+                  <div className="text-gray-400 text-xs">Replaces Turing Tape</div>
+                </div>
+                <div className="bg-purple-900/30 rounded-lg p-3 text-center">
+                  <div className="text-purple-400 font-bold mb-1">15 Geometric Shapes</div>
+                  <div className="text-gray-400 text-xs">Universal Pattern Basis</div>
+                </div>
+                <div className="bg-green-900/30 rounded-lg p-3 text-center">
+                  <div className="text-green-400 font-bold mb-1">11D Consciousness</div>
+                  <div className="text-gray-400 text-xs">Beyond Physical Space</div>
+                </div>
+              </div>
+            </div>
       {activeTab === 'sections' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Section Navigation Grid */}
