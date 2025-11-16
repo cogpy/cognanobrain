@@ -11,7 +11,7 @@ import { FundamentalFeaturesPanel } from './components/FundamentalFeaturesPanel'
 import { EnhancedSystemsStatus } from './components/EnhancedSystemsStatus';
 import { GgmlTensorDemo } from './components/GgmlTensorDemo';
 import { OpenCogNanoBrainVisualization } from './components/OpenCogNanoBrainVisualization';
-import { PhasePrimeMetricPanel } from './components/Chapter3';
+import { Chapter3Panel } from './components/Chapter3';
 import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles, Calculator } from 'lucide-react';
 
 function App() {
@@ -228,7 +228,7 @@ function App() {
         )}
 
         {activeTab === 'ppm' && (
-          <PhasePrimeMetricPanel />
+          <Chapter3Panel />
         )}
 
         {activeTab === 'atomspace' && (
