@@ -46,7 +46,6 @@ export const FractalInformationPanel: React.FC = () => {
   const [geometricShapes, setGeometricShapes] = useState<GeometricShape[]>([]);
   const [sensorMetrics, setSensorMetrics] = useState<SensorMetric[]>([]);
   const [activeTab, setActiveTab] = useState<'patterns' | 'shapes' | 'sensors' | 'theory' | 'fractal-tape' | 'assembly' | 'waveform' | 'garden' | 'higher-dim' | 'gml-vs-algo' | 'non-argument' | 'comparison' | 'quaternion' | 'fit-summary' | 'gml-summary' | 'conclusion'>('fractal-tape');
-  const [activeTab, setActiveTab] = useState<'sections' | 'patterns' | 'shapes' | 'sensors' | 'theory'>('sections');
   const [activeSection, setActiveSection] = useState('2.1');
 
   // Chapter 2 Fractal Information Theory & GML Sections
@@ -400,11 +399,6 @@ export const FractalInformationPanel: React.FC = () => {
           { id: 'fit-summary', label: '2.10 FIT Chart', icon: Database },
           { id: 'gml-summary', label: '2.11 GML Chart', icon: Music },
           { id: 'conclusion', label: '2.12 Conclusion', icon: Orbit }
-          { id: 'sections', label: 'Chapter Sections', icon: BookOpen },
-          { id: 'patterns', label: 'Fractal Patterns', icon: Layers },
-          { id: 'shapes', label: 'Geometric Shapes', icon: Box },
-          { id: 'sensors', label: '11D Sensors', icon: Scan },
-          { id: 'theory', label: 'FIT Summary', icon: Activity }
         ].map(tab => {
           const Icon = tab.icon;
           return (
@@ -631,6 +625,13 @@ export const FractalInformationPanel: React.FC = () => {
                 )}
               </div>
             )}
+          </div>
+          </div>
+          </div>
+          </div>
+          </div>
+          </div>
+          </div>
           </div>
         </div>
       )}
