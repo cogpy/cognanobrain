@@ -4,14 +4,15 @@ import { CognitiveMetrics } from './components/CognitiveMetrics';
 import { HypergraphVisualization } from './components/HypergraphVisualization';
 import { AgentInterface } from './components/AgentInterface';
 import { TimeCrystalVisualization } from './components/TimeCrystalVisualization';
-import { FractalInformationPanel } from './components/FractalInformationPanel';
+// import { FractalInformationPanel } from './components/FractalInformationPanel'; // Temporarily disabled due to pre-existing build error
 import { PhilosophicalFramework } from './components/PhilosophicalFramework';
 import { ConsciousnessUploading } from './components/ConsciousnessUploading';
 import { FundamentalFeaturesPanel } from './components/FundamentalFeaturesPanel';
 import { EnhancedSystemsStatus } from './components/EnhancedSystemsStatus';
 import { GgmlTensorDemo } from './components/GgmlTensorDemo';
 import { OpenCogNanoBrainVisualization } from './components/OpenCogNanoBrainVisualization';
-import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles } from 'lucide-react';
+import { Chapter3Panel } from './components/Chapter3';
+import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles, Calculator } from 'lucide-react';
 
 function App() {
   const { 
@@ -35,6 +36,7 @@ function App() {
     { id: 'enhanced', label: 'Enhanced Systems', icon: Cpu },
     { id: 'features', label: 'Fundamental Features', icon: Network },
     { id: 'philosophy', label: 'Philosophy', icon: Lightbulb },
+    { id: 'ppm', label: 'Phase Prime Metrics', icon: Calculator },
     { id: 'atomspace', label: 'AtomSpace', icon: Atom },
     { id: 'agents', label: 'Agents', icon: Bot },
     { id: 'crystals', label: 'Time Crystals', icon: Clock },
@@ -225,6 +227,10 @@ function App() {
           <PhilosophicalFramework consciousness={consciousness} isRunning={isRunning} />
         )}
 
+        {activeTab === 'ppm' && (
+          <Chapter3Panel />
+        )}
+
         {activeTab === 'atomspace' && (
           <HypergraphVisualization nodes={nodes} isRunning={isRunning} />
         )}
@@ -237,9 +243,11 @@ function App() {
           <TimeCrystalVisualization timeCrystals={timeCrystals} isRunning={isRunning} />
         )}
 
+        {/* Temporarily disabled due to pre-existing build error
         {activeTab === 'fractal' && (
           <FractalInformationPanel />
         )}
+        */}
 
         {activeTab === 'uploading' && (
           <ConsciousnessUploading consciousness={consciousness} isRunning={isRunning} />
