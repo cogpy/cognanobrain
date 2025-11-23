@@ -12,7 +12,8 @@ import { EnhancedSystemsStatus } from './components/EnhancedSystemsStatus';
 import { GgmlTensorDemo } from './components/GgmlTensorDemo';
 import { OpenCogNanoBrainVisualization } from './components/OpenCogNanoBrainVisualization';
 import { Chapter3Panel } from './components/Chapter3';
-import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles, Calculator } from 'lucide-react';
+import { Chapter4Panel } from './components/Chapter4';
+import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles, Calculator, Grid } from 'lucide-react';
 
 function App() {
   const { 
@@ -37,6 +38,7 @@ function App() {
     { id: 'features', label: 'Fundamental Features', icon: Network },
     { id: 'philosophy', label: 'Philosophy', icon: Lightbulb },
     { id: 'ppm', label: 'Phase Prime Metrics', icon: Calculator },
+    { id: 'chapter4', label: 'Chapter 4: Fractal Mechanics', icon: Grid },
     { id: 'atomspace', label: 'AtomSpace', icon: Atom },
     { id: 'agents', label: 'Agents', icon: Bot },
     { id: 'crystals', label: 'Time Crystals', icon: Clock },
@@ -229,6 +231,10 @@ function App() {
 
         {activeTab === 'ppm' && (
           <Chapter3Panel />
+        )}
+
+        {activeTab === 'chapter4' && (
+          <Chapter4Panel />
         )}
 
         {activeTab === 'atomspace' && (
