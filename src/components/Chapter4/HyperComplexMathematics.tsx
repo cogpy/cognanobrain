@@ -44,7 +44,7 @@ export const HyperComplexMathematics: React.FC = () => {
   };
 
   const dodecanionData = {
-    basis: ['1', 'd₁', 'd₂', '...', 'd₁₁'],
+    basis: ['1', 'd₁', 'd₂', 'd₃', 'd₄', 'd₅', 'd₆', 'd₇', 'd₈', 'd₉', 'd₁₀', 'd₁₁'],
     rules: [
       '12-dimensional hypercomplex',
       'Non-associative, non-commutative',

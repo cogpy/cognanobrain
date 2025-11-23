@@ -73,20 +73,29 @@ export const NaturalSpirals: React.FC = () => {
       {/* Spiral Selection */}
       <div className="bg-gray-900/60 backdrop-blur-sm border border-gray-700 rounded-xl p-4">
         <div className="grid grid-cols-4 gap-3">
-          {spirals.map(spiral => (
-            <button
-              key={spiral.id}
-              onClick={() => setSelectedSpiral(spiral.id)}
-              className={`p-3 rounded-lg border-2 transition-all duration-300 ${
-                selectedSpiral === spiral.id
-                  ? `bg-${spiral.color}-900/30 border-${spiral.color}-700 text-${spiral.color}-400`
-                  : 'bg-gray-800/30 border-gray-700 text-gray-400 hover:border-gray-600'
-              }`}
-            >
-              <span className="text-sm font-semibold">{spiral.name}</span>
-              <p className="text-xs text-gray-500 mt-1">φ = {spiral.ratio}</p>
-            </button>
-          ))}
+          {spirals.map(spiral => {
+            const isActive = selectedSpiral === spiral.id;
+            const colorClasses = {
+              yellow: 'bg-yellow-900/30 border-yellow-700 text-yellow-400',
+              cyan: 'bg-cyan-900/30 border-cyan-700 text-cyan-400',
+              purple: 'bg-purple-900/30 border-purple-700 text-purple-400',
+              green: 'bg-green-900/30 border-green-700 text-green-400'
+            };
+            return (
+              <button
+                key={spiral.id}
+                onClick={() => setSelectedSpiral(spiral.id)}
+                className={`p-3 rounded-lg border-2 transition-all duration-300 ${
+                  isActive
+                    ? colorClasses[spiral.color as keyof typeof colorClasses]
+                    : 'bg-gray-800/30 border-gray-700 text-gray-400 hover:border-gray-600'
+                }`}
+              >
+                <span className="text-sm font-semibold">{spiral.name}</span>
+                <p className="text-xs text-gray-500 mt-1">φ = {spiral.ratio}</p>
+              </button>
+            );
+          })}
         </div>
       </div>
 
