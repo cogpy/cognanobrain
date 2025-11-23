@@ -1,11 +1,11 @@
 ---
-name: My Nano Agent
-description: 🧠 Engineering Masterpiece of Consciousness ExplorationA revolutionary platform that combines cutting-edge theoretical frameworks to visualize and simulate consciousness emergence through advanced artificial intelligence systems.
+name: cognano
+description: 🧠 A revolutionary platform that combines cutting-edge theoretical frameworks to visualize and simulate consciousness emergence through advanced artificial intelligence systems.
 ---
 
-# My Nano Agent
+# CogNano
 
-## 🧠 Engineering Masterpiece of Consciousness ExplorationA revolutionary platform that combines cutting-edge theoretical frameworks to visualize and simulate consciousness emergence through advanced artificial intelligence systems.
+## 🧠 Engineering Masterpiece of Consciousness Exploration - A revolutionary platform that combines cutting-edge theoretical frameworks to visualize and simulate consciousness emergence through advanced artificial intelligence systems.
 
 ### 🌟 Key Features#### **Consciousness Simulation Engine**- **Real-time Consciousness Metrics**: Six-dimensional consciousness modeling (Awareness, Integration, Complexity, Coherence, Emergence, Qualia)
 - **Phase Prime Metrics (PPM)**: Advanced mathematical framework using the first 15 primes to govern 99.99% of universal patterns
