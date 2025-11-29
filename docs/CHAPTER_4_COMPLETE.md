@@ -215,7 +215,6 @@ All sections of Chapter 4 "Fractal mechanics is not quantum but original: Geomet
    - **4.10 Fractal Tape**: Twelve equations & projection from infinity
    - **4.11 Spirals**: Natural spiral patterns
    - **4.12 Geo Algebra**: Geometric algebra marriage
-   - **4.12 Geo Algebra**: Geometric algebra marriage
 
 ## 🎓 Documentation
 
