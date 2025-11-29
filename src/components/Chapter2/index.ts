@@ -10,3 +10,4 @@ export { HigherDimensionalData } from './HigherDimensionalData';
 export { GMLvsAlgorithms } from './GMLvsAlgorithms';
 export { NonArgument } from './NonArgument';
 export { FITSummaryChart, GMLSummaryChart } from './SummaryCharts';
+export { Chapter2Panel } from './Chapter2Panel';

@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FractalPattern, GeometricShape, SensorMetric } from '../types';
-import { Layers, TrendingUp, Zap, RotateCw, Music, Box, Scan, Activity, Clock, Calculator, Database, GitCompare, Orbit, Grid3X3, AlertTriangle } from 'lucide-react';
+import { 
+  Layers, TrendingUp, Zap, RotateCw, Music, Box, Scan, Activity, Clock, Calculator,
+  AlertTriangle, Grid3X3, Database, GitCompare, Orbit,
+  Atom, Infinity, Settings, BookOpen
+} from 'lucide-react';
 import { 
   FractalTapeVisualization,
   GeometricSelfAssembly,
@@ -16,11 +20,6 @@ import {
   FITSummaryChart,
   GMLSummaryChart
 } from './Chapter2';
-import { 
-  Layers, TrendingUp, Zap, RotateCw, Music, Box, Scan, Activity, Clock, Calculator,
-  AlertTriangle, Grid3X3, Database, GitCompare,
-  Atom, Infinity, Settings, BookOpen
-} from 'lucide-react';
 
 interface FractalConcept {
   id: string;
