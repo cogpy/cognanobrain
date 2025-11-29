@@ -44,7 +44,7 @@ export const OrderedFactorMetric: React.FC = () => {
     const primes = [2, 3, 5, 7, 11, 13, 17];
     const coords = { x: 0, y: 0, z: 0 };
     
-    factors.forEach((prime, idx) => {
+    factors.forEach((prime) => {
       const primeIdx = primes.indexOf(prime);
       if (primeIdx !== -1) {
         if (primeIdx % 3 === 0) coords.x += 1;

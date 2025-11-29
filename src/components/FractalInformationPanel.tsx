@@ -523,6 +523,10 @@ export const FractalInformationPanel: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
       {activeTab === 'sections' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Section Navigation Grid */}
@@ -625,13 +629,6 @@ export const FractalInformationPanel: React.FC = () => {
                 )}
               </div>
             )}
-          </div>
-          </div>
-          </div>
-          </div>
-          </div>
-          </div>
-          </div>
           </div>
         </div>
       )}
