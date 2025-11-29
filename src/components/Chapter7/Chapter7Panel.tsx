@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, Hexagon, Activity, Dna, Circle, Grid, Sparkles } from 'lucide-react';
+import { Brain, Hexagon, Activity, Dna, Circle, Sparkles } from 'lucide-react';
 import { BrainPrimeEngineeringPanel } from './BrainPrimeEngineeringPanel';
 import { SensorySystemPrimesPanel } from './SensorySystemPrimesPanel';
 import { BrainStructurePrimesPanel } from './BrainStructurePrimesPanel';

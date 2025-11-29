@@ -26,6 +26,8 @@ export const BrainStructurePrimesPanel: React.FC = () => {
     },
   };
 
+  // Connectome structure details (unused in subcortical view but needed for potential future expansion)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const connectomeStructures = {
     spinalCord: {
       primes: [2, 3, 5, 7],
@@ -313,7 +315,7 @@ export const BrainStructurePrimesPanel: React.FC = () => {
                     'Lateral', 'Basal', 'Accessory Basal', 'Central',
                     'Medial', 'Cortical', 'Intercalated', 'Anterior',
                     'Posterior', 'Basomedial', 'Basolateral', 'Cortico-medial', 'Extended'
-                  ].map((nucleus, idx) => (
+                  ].map((nucleus) => (
                     <div key={nucleus} className="bg-orange-900/20 border border-orange-700/30 rounded p-2">
                       <div className="text-orange-400 text-xs font-semibold">{nucleus}</div>
                     </div>
@@ -354,7 +356,7 @@ export const BrainStructurePrimesPanel: React.FC = () => {
                     { layer: 'IV', name: 'Internal Granular', cells: 'Stellate, sensory input' },
                     { layer: 'V', name: 'Internal Pyramidal', cells: 'Large pyramidal (prime)' },
                     { layer: 'VI', name: 'Multiform', cells: 'Diverse, thalamic' },
-                  ].map((layer, idx) => (
+                  ].map((layer) => (
                     <div key={layer.layer} className="bg-pink-900/20 border border-pink-700/30 rounded-lg p-2">
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-pink-600 rounded flex items-center justify-center text-white font-bold text-sm">

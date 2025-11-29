@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Circle, Hexagon, Zap, Grid } from 'lucide-react';
+import { Circle, Hexagon, Zap } from 'lucide-react';
 
 /**
  * Section 7.7: Brain's wheel of primes
