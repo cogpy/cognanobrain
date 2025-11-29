@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calculator, Activity, Layers, Sparkles, Atom, Zap, GitBranch, GitCompare, Target, Wind, Grid } from 'lucide-react';
+import { Calculator, Activity, Layers, Sparkles, Atom, Zap, GitBranch, GitCompare, Target, Wind, Grid, Infinity } from 'lucide-react';
 import { QuantumClockBasics } from './QuantumClockBasics';
 import { FractalMechanicsPhaseSpace } from './FractalMechanicsPhaseSpace';
 import { MechanicsComparison } from './MechanicsComparison';
@@ -9,6 +9,7 @@ import { FundamentalConstants } from './FundamentalConstants';
 import { InterferenceExperiments } from './InterferenceExperiments';
 import { NaturalSpirals } from './NaturalSpirals';
 import { GeometricAlgebraIntegration } from './GeometricAlgebraIntegration';
+import { FractalTapeEquations } from './FractalTapeEquations';
 
 // Main Chapter 4 Panel with navigation
 export const Chapter4Panel: React.FC = () => {
@@ -22,6 +23,7 @@ export const Chapter4Panel: React.FC = () => {
     { id: 'interference', label: '4.6 Interference', icon: Zap, component: InterferenceExperiments },
     { id: 'clock-math', label: '4.8 Clock Math', icon: Calculator, component: ClockBasedMathematics },
     { id: 'hypercomplex', label: '4.9 Hypercomplex', icon: Atom, component: HyperComplexMathematics },
+    { id: 'fractal-tape', label: '4.10 Fractal Tape', icon: Infinity, component: FractalTapeEquations },
     { id: 'spirals', label: '4.11 Spirals', icon: Wind, component: NaturalSpirals },
     { id: 'geometric-algebra', label: '4.12 Geo Algebra', icon: Grid, component: GeometricAlgebraIntegration }
   ];

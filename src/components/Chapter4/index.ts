@@ -7,4 +7,5 @@ export { ClockBasedMathematics } from './ClockBasedMathematics';
 export { HyperComplexMathematics } from './HyperComplexMathematics';
 export { NaturalSpirals } from './NaturalSpirals';
 export { GeometricAlgebraIntegration } from './GeometricAlgebraIntegration';
+export { FractalTapeEquations } from './FractalTapeEquations';
 export { Chapter4Panel } from './Chapter4Panel';
