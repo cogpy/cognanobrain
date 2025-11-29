@@ -11,10 +11,11 @@ import { FundamentalFeaturesPanel } from './components/FundamentalFeaturesPanel'
 import { EnhancedSystemsStatus } from './components/EnhancedSystemsStatus';
 import { GgmlTensorDemo } from './components/GgmlTensorDemo';
 import { OpenCogNanoBrainVisualization } from './components/OpenCogNanoBrainVisualization';
+import { Chapter1Panel } from './components/Chapter1';
 import { Chapter3Panel } from './components/Chapter3';
 import { Chapter4Panel } from './components/Chapter4';
 import { Chapter5Panel } from './components/Chapter5';
-import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles, Calculator, Grid, Database } from 'lucide-react';
+import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles, Calculator, Grid, Database, BookOpen } from 'lucide-react';
 
 function App() {
   const { 
@@ -38,6 +39,7 @@ function App() {
     { id: 'enhanced', label: 'Enhanced Systems', icon: Cpu },
     { id: 'features', label: 'Fundamental Features', icon: Network },
     { id: 'philosophy', label: 'Philosophy', icon: Lightbulb },
+    { id: 'chapter1', label: 'Chapter 1: Philosophical Transformation', icon: BookOpen },
     { id: 'ppm', label: 'Phase Prime Metrics', icon: Calculator },
     { id: 'chapter4', label: 'Chapter 4: Fractal Mechanics', icon: Grid },
     { id: 'chapter5', label: 'Chapter 5: Universal Time Crystals', icon: Database },
@@ -229,6 +231,10 @@ function App() {
 
         {activeTab === 'philosophy' && (
           <PhilosophicalFramework consciousness={consciousness} isRunning={isRunning} />
+        )}
+
+        {activeTab === 'chapter1' && (
+          <Chapter1Panel />
         )}
 
         {activeTab === 'ppm' && (
