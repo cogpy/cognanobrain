@@ -4,7 +4,7 @@ import { usePhasePrimeMetrics } from '../../hooks/usePhasePrimeMetrics';
 
 // Section 3.15: Solution of a big data problem on diabetes using PPM
 export const DiabetesBigDataDemo: React.FC = () => {
-  const { ppmEngine, isActive, startPPMEngine } = usePhasePrimeMetrics();
+  const { isActive, startPPMEngine } = usePhasePrimeMetrics();
   const [processingStep, setProcessingStep] = useState<number>(0);
   const [compressionRatio, setCompressionRatio] = useState<number>(1.0);
   const [accuracy, setAccuracy] = useState<number>(0);

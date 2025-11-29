@@ -4,7 +4,7 @@ import { CognitiveMetrics } from './components/CognitiveMetrics';
 import { HypergraphVisualization } from './components/HypergraphVisualization';
 import { AgentInterface } from './components/AgentInterface';
 import { TimeCrystalVisualization } from './components/TimeCrystalVisualization';
-// import { FractalInformationPanel } from './components/FractalInformationPanel'; // Temporarily disabled due to pre-existing build error
+import { FractalInformationPanel } from './components/FractalInformationPanel';
 import { PhilosophicalFramework } from './components/PhilosophicalFramework';
 import { ConsciousnessUploading } from './components/ConsciousnessUploading';
 import { FundamentalFeaturesPanel } from './components/FundamentalFeaturesPanel';
