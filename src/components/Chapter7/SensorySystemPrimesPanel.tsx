@@ -308,7 +308,7 @@ export const SensorySystemPrimesPanel: React.FC = () => {
                   <div className="w-full bg-gray-800 rounded-full h-2">
                     <div
                       className="bg-gradient-to-r from-orange-600 to-amber-600 h-2 rounded-full"
-                      style={{ width: `${Math.random() * 50 + 50}%` }}
+                      style={{ width: `${60 + (idx * 7) % 40}%` }}
                     />
                   </div>
                 </div>

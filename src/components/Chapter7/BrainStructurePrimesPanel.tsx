@@ -26,26 +26,6 @@ export const BrainStructurePrimesPanel: React.FC = () => {
     },
   };
 
-  // Connectome structure details (unused in subcortical view but needed for potential future expansion)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const connectomeStructures = {
-    spinalCord: {
-      primes: [2, 3, 5, 7],
-      description: 'Prime segmentation: 31 spinal segments (prime)',
-      color: 'cyan',
-    },
-    amygdala: {
-      primes: [3, 5, 7, 11],
-      description: 'Emotional prime processing in 13 nuclei',
-      color: 'orange',
-    },
-    corticalColumn: {
-      primes: [2, 3, 5, 7, 11],
-      description: '6 layers with prime connectivity patterns',
-      color: 'pink',
-    },
-  };
-
   return (
     <div className="space-y-6">
       {/* Main Header */}

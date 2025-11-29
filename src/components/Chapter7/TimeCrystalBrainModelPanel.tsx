@@ -564,8 +564,9 @@ export const TimeCrystalBrainModelPanel: React.FC = () => {
                     <div className="bg-indigo-900/20 border border-indigo-700/30 rounded p-2">
                       <svg viewBox="0 0 50 50" className="w-full h-16">
                         {Array.from({ length: 20 }, (_, i) => {
-                          const x = Math.random() * 40 + 5;
-                          const y = Math.random() * 40 + 5;
+                          // Deterministic pseudo-random positioning based on index
+                          const x = ((i * 7 + 13) % 40) + 5;
+                          const y = ((i * 11 + 17) % 40) + 5;
                           return (
                             <circle
                               key={i}
