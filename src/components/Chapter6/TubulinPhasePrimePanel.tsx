@@ -9,8 +9,10 @@ export const TubulinPhasePrimePanel: React.FC = () => {
   const [helixAngle, setHelixAngle] = useState(0);
   const [activeRing, setActiveRing] = useState(0);
   
-  // Phase prime sequence for tubulin structure
-  const phasePrimes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
+  // Phase prime sequence for tubulin structure - memoized
+  const phasePrimes = React.useMemo(() => 
+    [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47], 
+  []);
   
   // Tubulin rings forming α-helix loops (6.1.1)
   const helixRings = 13; // 13 protofilaments in microtubule

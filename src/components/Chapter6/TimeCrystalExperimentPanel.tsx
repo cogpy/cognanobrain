@@ -9,9 +9,9 @@ export const TimeCrystalExperimentPanel: React.FC = () => {
   const [time, setTime] = useState(0);
   const [resonanceData, setResonanceData] = useState<number[]>([]);
   
-  // Triplet of triplet structure: 3 groups of 3 resonances
-  const tripletGroups = 3;
-  const resonancesPerTriplet = 3;
+  // Triplet of triplet structure: 3 groups of 3 resonances - memoized
+  const tripletGroups = React.useMemo(() => 3, []);
+  const resonancesPerTriplet = React.useMemo(() => 3, []);
   
   useEffect(() => {
     const interval = setInterval(() => {
