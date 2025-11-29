@@ -23,12 +23,17 @@ export const RemainingChapter1Sections: React.FC<{ section: string }> = ({ secti
             { title: "Prime Pattern Matching", desc: "PPM enables instant recognition without sequential search", color: "purple" },
             { title: "Fractal Decision Trees", desc: "Self-similar decision patterns at neuron, network, and brain levels", color: "orange" },
             { title: "Garden of Gardens", desc: "Multiple imaginary worlds evaluated simultaneously", color: "green" }
-          ].map((item, idx) => (
-            <div key={idx} className={`bg-${item.color}-900/20 border border-${item.color}-700/50 rounded-lg p-4`}>
-              <h3 className={`text-${item.color}-400 font-semibold mb-2`}>{item.title}</h3>
-              <p className="text-gray-300 text-sm">{item.desc}</p>
-            </div>
-          ))}
+          ].map((item, idx) => {
+            const bgColorClass = item.color === 'cyan' ? 'bg-cyan-900/20' : item.color === 'purple' ? 'bg-purple-900/20' : item.color === 'orange' ? 'bg-orange-900/20' : 'bg-green-900/20';
+            const borderColorClass = item.color === 'cyan' ? 'border-cyan-700/50' : item.color === 'purple' ? 'border-purple-700/50' : item.color === 'orange' ? 'border-orange-700/50' : 'border-green-700/50';
+            const textColorClass = item.color === 'cyan' ? 'text-cyan-400' : item.color === 'purple' ? 'text-purple-400' : item.color === 'orange' ? 'text-orange-400' : 'text-green-400';
+            return (
+              <div key={idx} className={`${bgColorClass} border ${borderColorClass} rounded-lg p-4`}>
+                <h3 className={`${textColorClass} font-semibold mb-2`}>{item.title}</h3>
+                <p className="text-gray-300 text-sm">{item.desc}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
     );

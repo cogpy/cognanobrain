@@ -105,14 +105,17 @@ export const TenResearchFields: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {fields.map((field) => {
           const Icon = field.icon;
+          const bgColorClass = field.color === 'cyan' ? 'bg-cyan-900/30' : field.color === 'purple' ? 'bg-purple-900/30' : field.color === 'orange' ? 'bg-orange-900/30' : field.color === 'green' ? 'bg-green-900/30' : field.color === 'blue' ? 'bg-blue-900/30' : field.color === 'pink' ? 'bg-pink-900/30' : field.color === 'yellow' ? 'bg-yellow-900/30' : field.color === 'red' ? 'bg-red-900/30' : field.color === 'indigo' ? 'bg-indigo-900/30' : 'bg-teal-900/30';
+          const textColorClass = field.color === 'cyan' ? 'text-cyan-400' : field.color === 'purple' ? 'text-purple-400' : field.color === 'orange' ? 'text-orange-400' : field.color === 'green' ? 'text-green-400' : field.color === 'blue' ? 'text-blue-400' : field.color === 'pink' ? 'text-pink-400' : field.color === 'yellow' ? 'text-yellow-400' : field.color === 'red' ? 'text-red-400' : field.color === 'indigo' ? 'text-indigo-400' : 'text-teal-400';
+          const borderColorClass = field.color === 'cyan' ? 'border-cyan-700/50 bg-cyan-900/20' : field.color === 'purple' ? 'border-purple-700/50 bg-purple-900/20' : field.color === 'orange' ? 'border-orange-700/50 bg-orange-900/20' : field.color === 'green' ? 'border-green-700/50 bg-green-900/20' : field.color === 'blue' ? 'border-blue-700/50 bg-blue-900/20' : field.color === 'pink' ? 'border-pink-700/50 bg-pink-900/20' : field.color === 'yellow' ? 'border-yellow-700/50 bg-yellow-900/20' : field.color === 'red' ? 'border-red-700/50 bg-red-900/20' : field.color === 'indigo' ? 'border-indigo-700/50 bg-indigo-900/20' : 'border-teal-700/50 bg-teal-900/20';
           return (
             <div 
               key={field.id}
               className="bg-gray-900/60 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:border-cyan-700 transition-all duration-300"
             >
               <div className="flex items-start space-x-4">
-                <div className={`p-3 bg-${field.color}-900/30 rounded-lg flex-shrink-0`}>
-                  <Icon className={`text-${field.color}-400`} size={28} />
+                <div className={`p-3 ${bgColorClass} rounded-lg flex-shrink-0`}>
+                  <Icon className={textColorClass} size={28} />
                 </div>
                 
                 <div className="flex-1 space-y-3">
@@ -130,7 +133,7 @@ export const TenResearchFields: React.FC = () => {
                       {field.keyPoints.map((point, idx) => (
                         <span 
                           key={idx}
-                          className={`px-2 py-1 bg-${field.color}-900/20 border border-${field.color}-700/50 rounded text-xs text-gray-300`}
+                          className={`px-2 py-1 ${borderColorClass} border rounded text-xs text-gray-300`}
                         >
                           {point}
                         </span>

@@ -70,14 +70,16 @@ export const DifferentTapes: React.FC = () => {
       <div className="space-y-4">
         {tapes.map((tape, index) => {
           const Icon = tape.icon;
+          const bgColorClass = tape.color === 'red' ? 'bg-red-900/30' : tape.color === 'green' ? 'bg-green-900/30' : tape.color === 'purple' ? 'bg-purple-900/30' : tape.color === 'cyan' ? 'bg-cyan-900/30' : 'bg-orange-900/30';
+          const textColorClass = tape.color === 'red' ? 'text-red-400' : tape.color === 'green' ? 'text-green-400' : tape.color === 'purple' ? 'text-purple-400' : tape.color === 'cyan' ? 'text-cyan-400' : 'text-orange-400';
           return (
             <div 
               key={index}
               className="bg-gray-900/60 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:border-cyan-700 transition-all duration-300"
             >
               <div className="flex items-start space-x-4">
-                <div className={`p-3 bg-${tape.color}-900/30 rounded-lg flex-shrink-0`}>
-                  <Icon className={`text-${tape.color}-400`} size={32} />
+                <div className={`p-3 ${bgColorClass} rounded-lg flex-shrink-0`}>
+                  <Icon className={textColorClass} size={32} />
                 </div>
                 
                 <div className="flex-1 space-y-3">

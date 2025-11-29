@@ -49,11 +49,13 @@ export const WorldviewDifference: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {differences.map((diff, index) => {
           const Icon = diff.icon;
+          const bgColorClass = diff.color === 'cyan' ? 'bg-cyan-900/30' : diff.color === 'purple' ? 'bg-purple-900/30' : diff.color === 'orange' ? 'bg-orange-900/30' : 'bg-green-900/30';
+          const textColorClass = diff.color === 'cyan' ? 'text-cyan-400' : diff.color === 'purple' ? 'text-purple-400' : diff.color === 'orange' ? 'text-orange-400' : 'text-green-400';
           return (
             <div key={index} className="bg-gray-900/60 backdrop-blur-sm border border-gray-700 rounded-xl p-6 space-y-4">
               <div className="flex items-center space-x-3 mb-4">
-                <div className={`p-2 bg-${diff.color}-900/30 rounded-lg`}>
-                  <Icon className={`text-${diff.color}-400`} size={24} />
+                <div className={`p-2 ${bgColorClass} rounded-lg`}>
+                  <Icon className={textColorClass} size={24} />
                 </div>
                 <h3 className="text-white font-bold">Paradigm Shift #{index + 1}</h3>
               </div>
