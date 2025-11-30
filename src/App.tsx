@@ -18,7 +18,8 @@ import { Chapter4Panel } from './components/Chapter4';
 import { Chapter5Panel } from './components/Chapter5';
 import { Chapter6Panel } from './components/Chapter6';
 import { Chapter7Panel } from './components/Chapter7';
-import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles, Calculator, Grid, Database, Music, BookOpen, Hexagon, CircleDot } from 'lucide-react';
+import { Chapter8Panel } from './components/Chapter8';
+import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles, Calculator, Grid, Database, Music, BookOpen, Hexagon, CircleDot, Magnet } from 'lucide-react';
 
 function App() {
   const { 
@@ -49,6 +50,7 @@ function App() {
     { id: 'chapter5', label: 'Chapter 5: Universal Time Crystals', icon: Database },
     { id: 'chapter6', label: 'Chapter 6: Unprecedented Technologies', icon: Hexagon },
     { id: 'chapter7', label: 'Chapter 7: Time Crystal Brain', icon: CircleDot },
+    { id: 'chapter8', label: 'Chapter 8: Hinductor (Magnetic Light)', icon: Magnet },
     { id: 'atomspace', label: 'AtomSpace', icon: Atom },
     { id: 'agents', label: 'Agents', icon: Bot },
     { id: 'crystals', label: 'Time Crystals', icon: Clock },
@@ -265,6 +267,10 @@ function App() {
 
         {activeTab === 'chapter7' && (
           <Chapter7Panel />
+        )}
+
+        {activeTab === 'chapter8' && (
+          <Chapter8Panel />
         )}
 
         {activeTab === 'atomspace' && (
