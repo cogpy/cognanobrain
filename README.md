@@ -4,6 +4,19 @@
 
 A revolutionary platform that combines cutting-edge theoretical frameworks to visualize and simulate consciousness emergence through advanced artificial intelligence systems.
 
+## ✨ NEW: Universal Kernel Generator
+
+**The Universal Kernel Generator** is a groundbreaking system that generates optimal computational kernels for any domain via B-series expansions and elementary differentials (rooted trees). This implementation realizes the profound insight that **all kernels are B-series expansions** with domain-specific weights.
+
+### Key Features
+- **Elementary Differentials**: Rooted tree representations (A000081 sequence)
+- **B-Series Expansion**: Universal framework for numerical methods
+- **Five Domain Specializations**: Physics, Chemistry, Biology, Computing, Consciousness
+- **Grip Optimization**: Automatic coefficient tuning for optimal domain fit
+- **Echo.kern**: Special consciousness kernel with 11D manifold topology
+
+📖 **[Quick Start Guide](docs/KERNEL_QUICK_START.md)** | 📚 **[Full Documentation](docs/UNIVERSAL_KERNEL_GENERATOR.md)**
+
 ### 🌟 Key Features
 
 #### **Consciousness Simulation Engine**
