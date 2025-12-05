@@ -69,10 +69,9 @@ Each different "recipe tree" is a unique way ingredients (operations) can combin
          (f'' (f' (f' f)) f) ;   Each is a different "family tree" shape
          (f' (f''' f f f))   ;   Some are tall and thin
          (f' (f'' (f' f) f)) ;   Some are wide and bushy
-         (f' (f'' f f))      ;   Each one is mathematically unique!
-         (f' (f'' f (f' f)))
+         (f' (f'' f (f' f))) ;   Each one is mathematically unique!
          (f' (f' (f'' f f)))
-         (f' (f' (f' f))))]))  ; The tallest tower: everything stacked!
+         (f' (f' (f' (f' f))))]))  ; The tallest tower: everything stacked!
 
 ## 🎓 Why This Matters
 
