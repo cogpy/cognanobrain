@@ -27,7 +27,7 @@ This is called the **OEIS A000081 sequence**, and it tells us:
 - Order 5: **9 ways** to arrange 5 things
 - Order 6: **20 ways** (and it keeps growing!)
 
-It's like asking: "How many different ways can I stack blocks where order matters?"
+It's like asking: "How many different tree shapes can you make with this many blocks?"
 
 ### Real-World Analogy 🎨
 
@@ -63,14 +63,14 @@ Each different "recipe tree" is a unique way ingredients (operations) can combin
          (f' (f'' f f))      ;   Each represents a unique branching pattern
          (f' (f' (f' f))))]  ;   Like different ways to organize your toys
     
-    [5 '((f'''' f f f f)     ; 🌴 Order 5: Nine trees (9 trees!)
-         (f''' (f' f) f f)   ; ELI5: Nine unique ways to arrange 5 blocks
-         (f'' (f'' f f) f)   ;   The patterns get more complex
-         (f'' (f' (f' f)) f) ;   Each is a different "family tree" shape
-         (f' (f''' f f f))   ;   Some are tall and thin
-         (f' (f'' (f' f) f)) ;   Some are wide and bushy
-         (f' (f'' f (f' f))) ;   Each one is mathematically unique!
-         (f' (f' (f'' f f)))
+    [5 '((f'''' f f f f)        ; 🌴 Order 5: Nine trees (9 trees!)
+         (f''' (f' f) f f)      ; ELI5: Nine unique ways to arrange 5 blocks
+         (f'' (f'' f f) f)      ;   The patterns get more complex
+         (f'' (f' (f' f)) f)    ;   Each is a different "family tree" shape
+         (f' (f''' f f f))      ;   Some are tall and thin
+         (f' (f'' (f' f) f))    ;   Some are wide and bushy
+         (f' (f'' f (f' f)))    ;   Each one is mathematically unique!
+         (f' (f' (f'' f f)))    
          (f' (f' (f' (f' f))))]))  ; The tallest tower: everything stacked!
 
 ## 🎓 Why This Matters
