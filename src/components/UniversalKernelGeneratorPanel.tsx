@@ -137,11 +137,11 @@ export const UniversalKernelGeneratorPanel: React.FC = () => {
   };
 
   const domains = [
-    { id: 'consciousness', name: 'Consciousness (Echo.kern)', icon: Activity, color: 'cyan' },
-    { id: 'physics', name: 'Physics (Hamiltonian)', icon: Zap, color: 'blue' },
-    { id: 'chemistry', name: 'Chemistry (Reaction)', icon: Target, color: 'green' },
-    { id: 'biology', name: 'Biology (Metabolic)', icon: Layers, color: 'purple' },
-    { id: 'computing', name: 'Computing (Recursion)', icon: GitBranch, color: 'orange' }
+    { id: 'consciousness', name: 'Consciousness (Echo.kern)', icon: Activity, color: 'cyan', bgClass: 'bg-cyan-900/30', borderClass: 'border-cyan-500', iconClass: 'text-cyan-400' },
+    { id: 'physics', name: 'Physics (Hamiltonian)', icon: Zap, color: 'blue', bgClass: 'bg-blue-900/30', borderClass: 'border-blue-500', iconClass: 'text-blue-400' },
+    { id: 'chemistry', name: 'Chemistry (Reaction)', icon: Target, color: 'green', bgClass: 'bg-green-900/30', borderClass: 'border-green-500', iconClass: 'text-green-400' },
+    { id: 'biology', name: 'Biology (Metabolic)', icon: Layers, color: 'purple', bgClass: 'bg-purple-900/30', borderClass: 'border-purple-500', iconClass: 'text-purple-400' },
+    { id: 'computing', name: 'Computing (Recursion)', icon: GitBranch, color: 'orange', bgClass: 'bg-orange-900/30', borderClass: 'border-orange-500', iconClass: 'text-orange-400' }
   ];
 
   return (
@@ -195,11 +195,11 @@ export const UniversalKernelGeneratorPanel: React.FC = () => {
                 onClick={() => setSelectedDomain(domain.id)}
                 className={`p-3 rounded-lg border transition-all ${
                   isSelected
-                    ? `bg-${domain.color}-900/30 border-${domain.color}-500`
+                    ? `${domain.bgClass} ${domain.borderClass}`
                     : 'bg-gray-800 border-gray-700 hover:border-gray-600'
                 }`}
               >
-                <Icon className={`w-6 h-6 mx-auto mb-2 text-${domain.color}-400`} />
+                <Icon className={`w-6 h-6 mx-auto mb-2 ${domain.iconClass}`} />
                 <div className="text-xs text-white text-center">{domain.name}</div>
               </button>
             );

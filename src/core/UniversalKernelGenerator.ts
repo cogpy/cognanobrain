@@ -373,7 +373,7 @@ export class UniversalKernelGenerator {
     for (let i = 0; i < stages; i++) {
       const row: number[] = [];
       for (let j = 0; j < stages; j++) {
-        if (j < i) {
+        if (j < i && i > 0) {
           row.push(c[i] / i);
         } else {
           row.push(0);

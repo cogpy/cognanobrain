@@ -257,8 +257,10 @@ export class UniversalKernelGeneratorTestSuite {
   private testButcherTableauProperties(): void {
     const tableau = this.generator.generateButcherTableau('rk4', 4);
     
-    // Check consistency conditions
-    const cSumMatches = tableau.c.every((ci, i) => {
+    // Check consistency conditions (row sum of A should equal c for explicit methods)
+    // Skip first row since c[0] = 0 and has no stages before it
+    const cSumMatches = tableau.c.slice(1).every((ci, idx) => {
+      const i = idx + 1;
       const rowSum = tableau.a[i].reduce((sum, val) => sum + val, 0);
       return Math.abs(ci - rowSum) < 1e-10;
     });
