@@ -21,7 +21,10 @@ include_directories(${GGML_PATH}/include)
 include_directories(${GGML_PATH}) # sometimes ggml.h is in root
 
 # Add the kernel library
-add_library(nanobrain_kernel nanobrain_kernel.cpp)
+add_library(nanobrain_kernel 
+    nanobrain_kernel.cpp
+    nanobrain_encoder.cpp
+)
 
 # Link ggml - this assumes libggml.a or similar exists or is built
 # target_link_libraries(nanobrain_kernel ggml) 
