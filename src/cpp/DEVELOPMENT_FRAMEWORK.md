@@ -529,13 +529,13 @@ The NanoBrain C++ implementation leverages [ggml](https://github.com/ggerganov/g
 
 | Chapter | Primary Files | Status |
 |---------|--------------|--------|
-| 1 | `nanobrain_atomese.cpp`, `nanobrain_unified.h` | 70% |
-| 2 | `nanobrain_time_crystal.cpp`, `nanobrain_kernel.cpp` | 80% |
-| 3 | `nanobrain_time_crystal.cpp`, `nanobrain_atomese.cpp` | 85% |
-| 4 | `nanobrain_kernel.cpp`, `nanobrain_time_crystal.cpp` | 60% |
-| 5 | `nanobrain_time_crystal.cpp`, `nanobrain_metacognitive.cpp` | 75% |
-| 6 | `nanobrain_atomese.cpp`, `nanobrain_attention.cpp` | 50% |
-| 7 | `nanobrain_reasoning.cpp`, `nanobrain_metacognitive.cpp` | 55% |
-| 8 | `nanobrain_kernel.cpp`, `nanobrain_time_crystal.cpp` | 30% |
+| 1 | `nanobrain_philosophical.h/.cpp` | ✅ 100% |
+| 2 | `nanobrain_fractal_tape.h/.cpp`, `nanobrain_wilczek.h/.cpp` | ✅ 100% |
+| 3 | `nanobrain_ppm.h/.cpp` | ✅ 100% |
+| 4 | `nanobrain_dodecanion.h/.cpp`, `nanobrain_fractal.h/.cpp` | ✅ 100% |
+| 5 | `nanobrain_gog.h/.cpp`, `nanobrain_tc_transform.h/.cpp`, `nanobrain_spontaneous.h/.cpp`, `nanobrain_turing_tests.h/.cpp`, `nanobrain_hardware_sim.h/.cpp` | ✅ 100% |
+| 6 | `nanobrain_singularity.h/.cpp` | ✅ 100% |
+| 7 | `nanobrain_brain_model.h/.cpp` | ✅ 100% |
+| 8 | `nanobrain_hinductor.h/.cpp` | ✅ 100% |
 | 9 | `nanobrain_brain_jelly.h/.cpp` | ✅ 100% |
 | 10 | `nanobrain_consciousness.h/.cpp` | ✅ 100% |
