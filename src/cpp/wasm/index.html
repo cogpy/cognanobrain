@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NanoBrain WebAssembly Demo</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --border: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+        }
+
+        .status-dot.active {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .output {
+            background: #0d0d12;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            min-height: 120px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric {
+            background: #0d0d12;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        input[type="text"], input[type="number"] {
+            background: #0d0d12;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #1a1a24;
+        }
+
+        .log-time {
+            color: var(--text-secondary);
+            margin-right: 0.5rem;
+        }
+
+        .log-success { color: var(--success); }
+        .log-info { color: var(--accent); }
+        .log-error { color: #ef4444; }
+
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 1rem; color: var(--text-secondary);">Loading NanoBrain WASM...</p>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🧠 NanoBrain</h1>
+            <p class="subtitle">Cognitive Architecture in WebAssembly</p>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-dot" id="wasm-status"></span>
+                    <span>WASM Module</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-dot" id="kernel-status"></span>
+                    <span>Kernel</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid">
+            <!-- Unified Kernel Card -->
+            <div class="card">
+                <h3>🔮 Unified Kernel</h3>
+                <div>
+                    <input type="text" id="atom-type" placeholder="Atom Type (e.g., ConceptNode)">
+                    <input type="text" id="atom-name" placeholder="Atom Name (e.g., Cat)">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="number" id="atom-strength" placeholder="Strength" value="0.9" step="0.1" min="0" max="1">
+                        <input type="number" id="atom-confidence" placeholder="Confidence" value="0.8" step="0.1" min="0" max="1">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button class="btn" onclick="createAtom()">Create Atom</button>
+                    <button class="btn" onclick="runCycles()">Run 10 Cycles</button>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-value" id="total-atoms">0</div>
+                        <div class="metric-label">Total Atoms</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="consciousness">0.00</div>
+                        <div class="metric-label">Consciousness</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="coherence">0.00</div>
+                        <div class="metric-label">Coherence</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="cycles">0</div>
+                        <div class="metric-label">Cycles</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TC Transform Card -->
+            <div class="card">
+                <h3>📊 TC Transform</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Prime-based signal analysis (alternative to FFT)
+                </p>
+                <button class="btn" onclick="runTCTransform()">Analyze Signal</button>
+                <div class="output" id="tc-output">
+                    Click "Analyze Signal" to see prime spectral decomposition...
+                </div>
+            </div>
+
+            <!-- PPM Coherence Card -->
+            <div class="card">
+                <h3>🔢 Phase Prime Metric</h3>
+                <input type="text" id="primes-input" placeholder="Enter primes (e.g., 2,3,5,7)">
+                <button class="btn" onclick="computePPM()" style="margin-top: 0.5rem;">Compute PPM</button>
+                <div class="output" id="ppm-output">
+                    Enter prime numbers to compute coherence...
+                </div>
+            </div>
+
+            <!-- Log Card -->
+            <div class="card">
+                <h3>📝 Activity Log</h3>
+                <div class="output" id="log-output">
+                    <div class="log-entry">
+                        <span class="log-time">[--:--:--]</span>
+                        <span class="log-info">Initializing NanoBrain...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NanoBrain WASM Module -->
+    <script src="nanobrain.js"></script>
+    <script>
+        let nb = null;
+        let kernel = null;
+        let tcTransform = null;
+
+        // Logging
+        function log(message, type = 'info') {
+            const output = document.getElementById('log-output');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${time}]</span><span class="log-${type}">${message}</span>`;
+            output.appendChild(entry);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Update metrics display
+        function updateMetrics() {
+            if (!kernel) return;
+            
+            const metrics = kernel.getMetrics();
+            document.getElementById('total-atoms').textContent = metrics.totalAtoms;
+            document.getElementById('consciousness').textContent = metrics.consciousnessEmergence.toFixed(4);
+            document.getElementById('coherence').textContent = metrics.quantumCoherence.toFixed(4);
+            document.getElementById('cycles').textContent = metrics.processingCycles;
+        }
+
+        // Create atom
+        function createAtom() {
+            if (!kernel) {
+                log('Kernel not initialized', 'error');
+                return;
+            }
+
+            const type = document.getElementById('atom-type').value || 'ConceptNode';
+            const name = document.getElementById('atom-name').value || 'Unknown';
+            const strength = parseFloat(document.getElementById('atom-strength').value) || 0.9;
+            const confidence = parseFloat(document.getElementById('atom-confidence').value) || 0.8;
+
+            const atomId = kernel.createAtom(type, name, strength, confidence);
+            log(`Created atom: ${type}:${name} -> ${atomId.substring(0, 8)}...`, 'success');
+            updateMetrics();
+        }
+
+        // Run cycles
+        function runCycles() {
+            if (!kernel) {
+                log('Kernel not initialized', 'error');
+                return;
+            }
+
+            kernel.runCycles(10);
+            log('Ran 10 processing cycles', 'success');
+            updateMetrics();
+        }
+
+        // TC Transform
+        function runTCTransform() {
+            if (!tcTransform) {
+                log('TCTransform not initialized', 'error');
+                return;
+            }
+
+            // Generate sample signal
+            const signal = new nb.VectorFloat();
+            for (let i = 0; i < 64; i++) {
+                signal.push_back(Math.sin(i * 0.5) + 0.5 * Math.cos(i * 0.3));
+            }
+
+            const result = tcTransform.transform(signal);
+            
+            let output = `<strong>Overall Coherence:</strong> ${result.overallCoherence.toFixed(4)}\n`;
+            output += `<strong>Signal Energy:</strong> ${result.signalEnergy.toFixed(4)}\n`;
+            output += `<strong>Dominant Primes:</strong> ${result.dominantPrimes.join(', ')}\n`;
+            output += `<strong>Spectrum (first 5):</strong>\n`;
+            
+            for (let i = 0; i < Math.min(5, result.primeSpectrum.length); i++) {
+                output += `  Prime[${i}]: ${result.primeSpectrum[i].toFixed(4)}\n`;
+            }
+
+            document.getElementById('tc-output').innerHTML = output.replace(/\n/g, '<br>');
+            log('TC Transform analysis complete', 'success');
+
+            signal.delete();
+        }
+
+        // PPM Coherence
+        function computePPM() {
+            if (!kernel) {
+                log('Kernel not initialized', 'error');
+                return;
+            }
+
+            const input = document.getElementById('primes-input').value;
+            const primes = input.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+
+            if (primes.length === 0) {
+                document.getElementById('ppm-output').textContent = 'Please enter valid prime numbers';
+                return;
+            }
+
+            const vec = new nb.VectorInt();
+            primes.forEach(p => vec.push_back(p));
+
+            const coherence = kernel.computeCoherence(vec);
+            
+            let output = `<strong>Input Primes:</strong> ${primes.join(', ')}\n`;
+            output += `<strong>PPM Coherence:</strong> ${coherence.toFixed(6)}\n`;
+            output += `<strong>Product:</strong> ${primes.reduce((a, b) => a * b, 1)}\n`;
+            output += `<strong>Sum:</strong> ${primes.reduce((a, b) => a + b, 0)}`;
+
+            document.getElementById('ppm-output').innerHTML = output.replace(/\n/g, '<br>');
+            log(`Computed PPM for [${primes.join(',')}] = ${coherence.toFixed(4)}`, 'success');
+
+            vec.delete();
+        }
+
+        // Initialize
+        async function init() {
+            try {
+                nb = await NanoBrain();
+                document.getElementById('wasm-status').classList.add('active');
+                log('WASM module loaded', 'success');
+
+                // Show fundamental primes
+                const primes = nb.getFundamentalPrimes();
+                log(`Fundamental primes: ${primes.join(', ')}`, 'info');
+
+                // Initialize kernel
+                kernel = new nb.UnifiedKernel();
+                kernel.initialize();
+                document.getElementById('kernel-status').classList.add('active');
+                log('Unified kernel initialized', 'success');
+
+                // Initialize TC Transform
+                tcTransform = new nb.TCTransform();
+                log('TC Transform ready', 'success');
+
+                updateMetrics();
+
+                // Hide loading
+                document.getElementById('loading').classList.add('hidden');
+
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+                document.getElementById('loading').innerHTML = `
+                    <p style="color: #ef4444;">Failed to load NanoBrain</p>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.9rem;">
+                        Make sure nanobrain.js and nanobrain.wasm are in the same directory.
+                    </p>
+                `;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

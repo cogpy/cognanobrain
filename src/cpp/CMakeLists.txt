@@ -72,6 +72,9 @@ add_library(nanobrain_kernel STATIC
     nanobrain_hardware_sim.cpp
     # Chapter 6: Singularity Geometry
     nanobrain_singularity.cpp
+    # Chapter 4: Fractal Mechanics & Geometric Algebra
+    nanobrain_dodecanion.cpp
+    nanobrain_fractal.cpp
 )
 
 set(NANOBRAIN_HEADERS
@@ -105,6 +108,9 @@ set(NANOBRAIN_HEADERS
     nanobrain_hardware_sim.h
     # Chapter 6: Singularity Geometry
     nanobrain_singularity.h
+    # Chapter 4: Fractal Mechanics & Geometric Algebra
+    nanobrain_dodecanion.h
+    nanobrain_fractal.h
 )
 
 # ================================================================
