@@ -33,6 +33,7 @@ struct NodeTensor {
   NanoBrainTensor *attention_weights;
   NanoBrainTensor *truth_value_tensor;
   NanoBrainTensor *symbolic_features;
+  std::vector<int64_t> shape; // Shape of embedding tensor
   // metadata...
 };
 

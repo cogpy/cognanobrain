@@ -2,7 +2,6 @@
 #include <cmath>
 #include <iostream>
 
-
 AtomSpaceTensorEncoder::AtomSpaceTensorEncoder(NanoBrainKernel *kernel)
     : kernel(kernel) {
   // Basic vocabulary initialization
@@ -73,6 +72,7 @@ NodeTensor *AtomSpaceTensorEncoder::encode_atom(const Atom &atom) {
   embed_data[1] = (hash % 1000) / 1000.0f;
 
   kernel->set_data(nodeTensor->embedding, embed_data);
+  nodeTensor->shape = {128}; // 1D embedding of size 128
 
   nodeTensor->truth_value_tensor = encode_truth_value(atom.truth_value);
   nodeTensor->attention_weights = encode_attention_value(atom.attention_value);
