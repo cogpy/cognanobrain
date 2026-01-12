@@ -45,22 +45,32 @@ message(STATUS "GGML Include Dirs: ${GGML_INCLUDE_DIRS}")
 add_library(nanobrain_kernel STATIC
     nanobrain_kernel.cpp
     nanobrain_encoder.cpp
+    nanobrain_encoder_full.cpp
     nanobrain_reasoning.cpp
     nanobrain_attention.cpp
     nanobrain_time_crystal.cpp
     nanobrain_metacognitive.cpp
     nanobrain_unified.cpp
+    nanobrain_atomese.cpp
+    nanobrain_persistence.cpp
+    nanobrain_serialization.cpp
+    nanobrain_llm_bridge.cpp
 )
 
 set(NANOBRAIN_HEADERS
     nanobrain_kernel.h
     nanobrain_encoder.h
+    nanobrain_encoder_full.h
     nanobrain_types.h
     nanobrain_time_crystal.h
     nanobrain_reasoning.h
     nanobrain_attention.h
     nanobrain_metacognitive.h
     nanobrain_unified.h
+    nanobrain_persistence.h
+    nanobrain_serialization.h
+    nanobrain_llm_bridge.h
+    nanobrain_atomese.h
 )
 
 # ================================================================

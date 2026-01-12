@@ -1,8 +1,10 @@
 #include "nanobrain_attention.h"
 #include "nanobrain_encoder.h"
 #include "nanobrain_kernel.h"
+#include "nanobrain_metacognitive.h"
 #include "nanobrain_reasoning.h"
 #include "nanobrain_time_crystal.h"
+#include "nanobrain_unified.h"
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -242,6 +244,121 @@ int main() {
       attention.update_attention_allocation(node_tensors, link_tensors);
   std::cout << "  ECAN Total Attention: " << ecan_stats.total_attention
             << std::endl;
+
+  // ================================================================
+  // Part 8: Meta-Cognitive Feedback Engine
+  // ================================================================
+  std::cout << "\n--- Part 8: Meta-Cognitive Feedback Engine ---" << std::endl;
+
+  MetaCognitiveConfig meta_config;
+  meta_config.meta_levels = 3;
+  meta_config.adaptation_learning_rate = 0.01f;
+  meta_config.feedback_damping = 0.9f;
+  meta_config.membrane_permeability = 0.5f;
+
+  MetaCognitiveFeedbackEngine metacog(&kernel, &attention, &reasoning,
+                                      meta_config);
+  metacog.initialize();
+
+  std::cout << "Meta-Cognitive Engine Initialized:" << std::endl;
+  std::cout << "  Meta Levels: " << meta_config.meta_levels << std::endl;
+  std::cout << "  Learning Rate: " << meta_config.adaptation_learning_rate
+            << std::endl;
+  std::cout << "  Feedback Damping: " << meta_config.feedback_damping
+            << std::endl;
+
+  // Update meta-cognitive state
+  MetaCognitiveMetrics meta_metrics = metacog.update_meta_cognitive(
+      node_tensors, link_tensors, attention_stats, stats);
+
+  std::cout << "\nMeta-Cognitive Metrics:" << std::endl;
+  std::cout << "  Self-Awareness Level: " << meta_metrics.self_awareness_level
+            << std::endl;
+  std::cout << "  Adaptation Rate: " << meta_metrics.adaptation_rate
+            << std::endl;
+  std::cout << "  System Coherence: " << meta_metrics.system_coherence
+            << std::endl;
+  std::cout << "  Feedback Stability: " << meta_metrics.feedback_loop_stability
+            << std::endl;
+  std::cout << "  Convergence Rate: " << meta_metrics.convergence_rate
+            << std::endl;
+
+  // Get feedback loops
+  auto feedback_loops = metacog.get_feedback_loops();
+  std::cout << "\nFeedback Loops: " << feedback_loops.size() << std::endl;
+  for (const auto &loop : feedback_loops) {
+    std::cout << "  " << loop.source_component << " -> "
+              << loop.target_component << " (" << loop.loop_type
+              << ", stability: " << loop.stability_measure << ")" << std::endl;
+  }
+
+  // Get meta-cognitive tensors
+  auto meta_tensors = metacog.get_meta_tensors();
+  std::cout << "\nMeta-Cognitive Tensors: " << meta_tensors.size() << " levels"
+            << std::endl;
+  for (const auto &mt : meta_tensors) {
+    std::cout << "  Level " << mt.level << ": coherence = " << mt.coherence
+              << std::endl;
+  }
+
+  // ================================================================
+  // Part 9: Unified NanoBrain Kernel
+  // ================================================================
+  std::cout << "\n--- Part 9: Unified NanoBrain Kernel ---" << std::endl;
+
+  UnifiedNanoBrainConfig unified_config;
+  unified_config.memory_size = 1024 * 1024 * 64; // 64 MB
+  unified_config.time_crystal_dimensions = 11;
+  unified_config.max_reasoning_depth = 5;
+  unified_config.attention_mechanism = AttentionMechanism::Hybrid;
+  unified_config.meta_levels = 3;
+
+  UnifiedNanoBrainKernel unified_kernel(unified_config);
+  unified_kernel.initialize();
+
+  std::cout << "Unified NanoBrain Kernel Initialized" << std::endl;
+  std::cout << "  Version: " << get_nanobrain_version() << std::endl;
+  std::cout << "  Active: " << (unified_kernel.is_active() ? "Yes" : "No")
+            << std::endl;
+
+  // Create some atoms
+  std::string cat_id =
+      unified_kernel.create_atom("ConceptNode", "Cat", 0.9f, 0.8f, {2, 3, 5});
+  std::string dog_id =
+      unified_kernel.create_atom("ConceptNode", "Dog", 0.85f, 0.75f, {2, 3, 7});
+  std::string pet_id =
+      unified_kernel.create_atom("ConceptNode", "Pet", 0.8f, 0.7f, {3, 5, 7});
+
+  std::cout << "\nCreated atoms:" << std::endl;
+  std::cout << "  Cat: " << cat_id << std::endl;
+  std::cout << "  Dog: " << dog_id << std::endl;
+  std::cout << "  Pet: " << pet_id << std::endl;
+
+  // Run processing cycles
+  std::cout << "\nRunning 5 cognitive cycles..." << std::endl;
+  UnifiedNanoBrainMetrics unified_metrics = unified_kernel.run_cycles(5);
+
+  std::cout << "Unified Kernel Metrics:" << std::endl;
+  std::cout << "  Total Atoms: " << unified_metrics.total_atoms << std::endl;
+  std::cout << "  Total Links: " << unified_metrics.total_links << std::endl;
+  std::cout << "  Quantum Coherence: " << unified_metrics.quantum_coherence
+            << std::endl;
+  std::cout << "  Temporal Stability: " << unified_metrics.temporal_stability
+            << std::endl;
+  std::cout << "  Prime Alignment: " << unified_metrics.prime_alignment
+            << std::endl;
+  std::cout << "  Consciousness: " << unified_metrics.consciousness_emergence
+            << std::endl;
+  std::cout << "  Self-Awareness: " << unified_metrics.self_awareness_level
+            << std::endl;
+
+  // Test coherence computation
+  float coherence = unified_kernel.compute_coherence({2, 3, 5, 7, 11});
+  std::cout << "\nPPM Coherence {2,3,5,7,11}: " << coherence << std::endl;
+
+  // Shutdown
+  unified_kernel.shutdown();
+  std::cout << "Unified kernel shutdown complete." << std::endl;
 
   // Cleanup mock tensors
   for (auto *node : node_tensors) {

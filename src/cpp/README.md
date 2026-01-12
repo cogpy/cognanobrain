@@ -23,11 +23,14 @@ This module implements the complete OpenCog NanoBrain ecosystem including:
 | `nanobrain_kernel.h/cpp` | Core tensor operations wrapper around ggml |
 | `nanobrain_types.h` | Shared data structures (Atom, NodeTensor, etc.) |
 | `nanobrain_encoder.h/cpp` | AtomSpace to tensor encoding |
-| `nanobrain_time_crystal.h/cpp` | Unified Time Crystal Kernel |
+| `nanobrain_time_crystal.h/cpp` | Unified Time Crystal Kernel with 11D quantum states |
 | `nanobrain_reasoning.h/cpp` | PLN recursive reasoning engine |
-| `nanobrain_attention.h/cpp` | Attention allocation subsystem |
-| `time_crystal_demo.cpp` | Comprehensive feature demonstration |
-| `main.cpp` | Basic tests |
+| `nanobrain_attention.h/cpp` | Softmax/ECAN attention allocation subsystem |
+| `nanobrain_metacognitive.h/cpp` | Meta-cognitive self-monitoring and adaptation |
+| `nanobrain_unified.h/cpp` | Unified integration kernel (high-level API) |
+| `main.cpp` | Basic component tests |
+| `time_crystal_demo.cpp` | Time Crystal feature demonstration |
+| `unified_demo.cpp` | Complete system demonstration |
 | `CMakeLists.txt` | Build configuration |
 
 ## Building
