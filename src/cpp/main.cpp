@@ -1,5 +1,8 @@
 #include "nanobrain_attention.h"
+#include "nanobrain_dodecanion.h"
 #include "nanobrain_encoder.h"
+#include "nanobrain_fractal.h"
+#include "nanobrain_hinductor.h"
 #include "nanobrain_kernel.h"
 #include "nanobrain_metacognitive.h"
 #include "nanobrain_reasoning.h"
@@ -359,6 +362,267 @@ int main() {
   // Shutdown
   unified_kernel.shutdown();
   std::cout << "Unified kernel shutdown complete." << std::endl;
+
+  // ================================================================
+  // Part 8: Hinductor & Magnetic Light (Chapter 8)
+  // ================================================================
+  std::cout << "\n--- Part 8: Hinductor & Magnetic Light ---" << std::endl;
+
+  // Test Hinductor vortex resistance
+  HinductorConfig hinductor_config;
+  hinductor_config.resistance_base = 1000.0f;
+  hinductor_config.oscillation_frequency = 1.0e9f;
+  hinductor_config.enable_hysteresis = true;
+
+  Hinductor hinductor(&kernel, hinductor_config);
+
+  std::cout << "Hinductor initialized with base resistance: "
+            << hinductor_config.resistance_base << " Ω" << std::endl;
+
+  // Test vortex resistance at different flux values
+  for (float flux = 0.0f; flux <= 2.0f; flux += 0.5f) {
+    float resistance = hinductor.vortex_resistance(flux);
+    std::cout << "  Flux=" << flux << " → Resistance=" << resistance << " Ω"
+              << std::endl;
+  }
+
+  // Test capacitance oscillation
+  hinductor.oscillate_capacitance(0.001f);
+  std::cout << "  Oscillating capacitance: " << hinductor.get_capacitance()
+            << " F" << std::endl;
+
+  // Test magnetic light generation
+  hinductor.generate_magnetic_light();
+  std::cout << "  Light intensity: " << hinductor.get_state().light_intensity
+            << std::endl;
+
+  // Test Magnetic Knot Generator
+  std::cout << "\n  Testing Magnetic Knot Generator..." << std::endl;
+
+  KnotGeneratorConfig knot_config;
+  knot_config.resolution = 128;
+  knot_config.compute_field = false; // Skip field computation for speed
+
+  MagneticKnotGenerator knot_gen(&kernel, knot_config);
+
+  // Generate different knot types
+  auto trefoil = knot_gen.generate_spin_knot(KnotType::Trefoil);
+  auto figure8 = knot_gen.generate_spin_knot(KnotType::FigureEight);
+  auto cinquefoil = knot_gen.generate_spin_knot(KnotType::Cinquefoil);
+
+  std::cout << "    " << trefoil.name
+            << ": crossings=" << trefoil.crossing_number
+            << ", length=" << trefoil.rope_length << std::endl;
+  std::cout << "    " << figure8.name
+            << ": crossings=" << figure8.crossing_number
+            << ", writhe=" << figure8.writhe << std::endl;
+  std::cout << "    " << cinquefoil.name
+            << ": crossings=" << cinquefoil.crossing_number << std::endl;
+
+  // Create vortex atom from knot
+  VortexAtom vortex = knot_gen.create_vortex_atom(trefoil);
+  std::cout << "    Vortex atom: circulation=" << vortex.circulation
+            << ", tc_coherence=" << vortex.tc_coherence << std::endl;
+
+  // Test super-coil synthesis
+  auto super_coil =
+      knot_gen.synthesize_super_coil({trefoil, figure8, cinquefoil});
+  std::cout << "    " << super_coil.name
+            << ": total crossings=" << super_coil.crossing_number << std::endl;
+
+  // Test Tomasch Oscillator
+  std::cout << "\n  Testing Tomasch Oscillator..." << std::endl;
+
+  TomaschConfig tomasch_config;
+  tomasch_config.harvest_efficiency = 0.3f;
+
+  TomaschOscillator tomasch(&kernel, tomasch_config);
+
+  // Harvest noise energy
+  float noise_levels[] = {0.1f, 0.5f, 1.0f, 2.0f};
+  for (float noise : noise_levels) {
+    float harvested = tomasch.harvest_noise_energy(noise);
+    std::cout << "    Noise=" << noise << " → Harvested=" << harvested
+              << ", SNR=" << tomasch.get_signal_to_noise() << std::endl;
+  }
+
+  // Process thermal waves
+  tomasch.process_thermal_waves(300.0f); // Room temperature
+  std::cout << "    Total harvested energy: " << tomasch.get_harvested_energy()
+            << std::endl;
+
+  // Test Phase Space Dynamics
+  std::cout << "\n  Testing Phase Space Dynamics (12 holes)..." << std::endl;
+
+  PhaseSpaceConfig phase_config;
+  phase_config.coupling_strength = 0.1f;
+  phase_config.damping = 0.01f;
+
+  PhaseSpaceDynamics phase_space(&kernel, phase_config);
+
+  std::cout << "    Initial state: " << phase_space.visualize_state()
+            << std::endl;
+  std::cout << "    Active holes: " << phase_space.count_active_holes()
+            << ", Resonant: " << (phase_space.is_resonant() ? "Yes" : "No")
+            << std::endl;
+
+  // Evolve phase space
+  for (int step = 0; step < 5; step++) {
+    phase_space.update_hole_states(0.01f);
+  }
+
+  std::cout << "    After evolution: " << phase_space.visualize_state()
+            << std::endl;
+  std::cout << "    Oscillation phase: " << phase_space.get_oscillation_phase()
+            << std::endl;
+  std::cout << "    Pattern coherence: "
+            << phase_space.compute_pattern_coherence() << std::endl;
+
+  // Test Magnonic Bridge
+  std::cout << "\n  Testing Magnonic Bridge..." << std::endl;
+
+  MagnonicBridgeConfig magnon_config;
+  magnon_config.transition_efficiency = 0.85f;
+  magnon_config.carrier_frequency = 10.0e9f;
+
+  MagnonicBridge magnon_bridge(&kernel, magnon_config);
+
+  // Test electron to magnon transition
+  MagnonPacket magnon = magnon_bridge.transition_electron_to_magnon(1.5f, 0.8f);
+  std::cout << "    Electron→Magnon: type="
+            << magnon_type_to_string(magnon.type)
+            << ", freq=" << magnon.frequency / 1.0e12f << " THz"
+            << ", amp=" << magnon.amplitude << std::endl;
+
+  // Test reverse transition
+  float electron_energy = magnon_bridge.transition_magnon_to_electron(magnon);
+  std::cout << "    Magnon→Electron: energy=" << electron_energy
+            << ", efficiency=" << magnon_bridge.get_transition_efficiency()
+            << std::endl;
+
+  // Create and split magnons
+  auto acoustic_magnon =
+      magnon_bridge.create_magnon(MagnonType::Acoustic, 1.0e9f, 1.0f);
+  auto split_magnons = magnon_bridge.split_magnon(acoustic_magnon, 4);
+  std::cout << "    Split magnon into " << split_magnons.size() << " parts"
+            << std::endl;
+
+  // Setup wireless (just activates)
+  magnon_bridge.setup_wireless_h_device();
+  std::cout << "    Wireless H-device active: "
+            << (magnon_bridge.is_wireless_active() ? "Yes" : "No") << std::endl;
+
+  std::cout << "\n  Hinductor & Magnetic Light tests complete!" << std::endl;
+
+  // ================================================================
+  // Part 10: Dodecanion Algebra (Chapter 4)
+  // ================================================================
+  std::cout << "\n--- Part 10: Dodecanion Algebra ---" << std::endl;
+
+  // Create unit dodecanion from quaternion
+  Dodecanion d1 = Dodecanion::from_quaternion(1.0f, 0.0f, 0.0f, 0.0f);
+  std::cout << "  d1 = Quaternion(1,0,0,0): " << d1.to_string() << std::endl;
+  std::cout << "  Norm: " << d1.norm() << std::endl;
+
+  // Create from octonion
+  std::array<float, 8> oct = {1.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+  Dodecanion d2 = Dodecanion::from_octonion(oct);
+  std::cout << "  d2 = Octonion(1,0.5,...): Norm = " << d2.norm() << std::endl;
+
+  // Dodecanion multiplication
+  Dodecanion d3 = d1 * d2;
+  std::cout << "  d1 * d2: Norm = " << d3.norm() << std::endl;
+
+  // Test conjugate
+  Dodecanion d1_conj = d1.conjugate();
+  std::cout << "  d1.conjugate(): " << d1_conj.to_string() << std::endl;
+
+  // Test inverse
+  Dodecanion d2_inv = d2.inverse();
+  Dodecanion identity = d2 * d2_inv;
+  std::cout << "  d2 * d2.inverse() ≈ 1: Real part = " << identity.real()
+            << std::endl;
+
+  // Project to 11D manifold
+  auto coords_11d = d2.project_to_11d();
+  std::cout << "  11D projection: [" << coords_11d[0] << ", " << coords_11d[1]
+            << ", " << coords_11d[2] << ", ...]" << std::endl;
+
+  // Convert to tensor
+  DodecanionAlgebra dod_algebra(&kernel);
+  std::vector<Dodecanion> batch = {d1, d2, d3};
+  auto *batch_tensor = dod_algebra.to_batch_tensor(batch);
+  std::cout << "  Batch tensor created for 3 dodecanions" << std::endl;
+
+  std::cout << "\n  Dodecanion tests complete!" << std::endl;
+
+  // ================================================================
+  // Part 11: Fractal Mechanics (Chapter 4)
+  // ================================================================
+  std::cout << "\n--- Part 11: Fractal Mechanics ---" << std::endl;
+
+  // Test CFGA 13-operation engine
+  CFGAOperator cfga(&kernel);
+  std::cout << "  CFGA Operator initialized with 13 operations" << std::endl;
+
+  auto *test_input = kernel.create_tensor({10});
+  std::vector<float> test_data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  kernel.set_data(test_input, test_data);
+
+  auto *diff_result = cfga.diff(test_input);
+  kernel.compute(diff_result);
+  std::cout << "  Diff operation: first value = "
+            << kernel.get_value(diff_result, 0) << std::endl;
+
+  auto *int_result = cfga.integrate(test_input);
+  kernel.compute(int_result);
+  std::cout << "  Integrate operation: last value = "
+            << kernel.get_value(int_result, 9) << std::endl;
+
+  // Test Fractal Harmonic Oscillator
+  FractalHarmonicOscillator fho(&kernel, 11);
+  fho.initialize(
+      {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+      {0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f});
+  std::cout << "  FractalHarmonicOscillator initialized (11D)" << std::endl;
+
+  // Evolve for several steps
+  for (int i = 0; i < 10; i++) {
+    fho.evolve(0.1f);
+  }
+  auto fho_state = fho.get_state();
+  std::cout << "  After 10 steps: Energy = " << fho_state.energy
+            << ", Phase = " << fho_state.phase << std::endl;
+
+  // Harvest singularities
+  auto singularities = fho.harvest_singularities();
+  std::cout << "  Singularities harvested: " << singularities.size()
+            << " (total energy: " << fho.get_harvested_energy() << ")"
+            << std::endl;
+
+  // Test Fractal Interference
+  FractalInterference interference(&kernel);
+  interference.simulate_microtubule(100);
+  auto tubulin = interference.get_tubulin_states();
+  std::cout << "  Microtubule simulation: " << tubulin.size() << " tubulins"
+            << std::endl;
+
+  auto comparison = interference.compare_models("default");
+  std::cout << "  Model comparison - Better: " << comparison.better_model
+            << " (fractal coherence: " << comparison.fractal_coherence << ")"
+            << std::endl;
+
+  // Test Regulatory Equations
+  RegulatoryEquations reg(&kernel);
+  auto proj_result = reg.project_from_infinity(test_input);
+  std::cout << "  Projection from infinity: factor = "
+            << proj_result.projection_factor << std::endl;
+
+  auto *full_reg = reg.apply_full_regulation(test_input);
+  kernel.compute(full_reg);
+  std::cout << "  Full 12-equation regulation applied" << std::endl;
+
+  std::cout << "\n  Fractal Mechanics tests complete!" << std::endl;
 
   // Cleanup mock tensors
   for (auto *node : node_tensors) {

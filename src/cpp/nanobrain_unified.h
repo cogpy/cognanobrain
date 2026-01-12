@@ -86,6 +86,11 @@ struct UnifiedNanoBrainMetrics {
   float self_awareness_level;
   float system_coherence;
   float adaptation_rate;
+
+  // Consciousness metrics (Chapter 10)
+  float consciousness_upload_ready;
+  float dimensional_coherence;
+  float evolution_fitness;
 };
 
 /**

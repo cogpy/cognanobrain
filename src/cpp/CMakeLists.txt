@@ -52,9 +52,26 @@ add_library(nanobrain_kernel STATIC
     nanobrain_metacognitive.cpp
     nanobrain_unified.cpp
     nanobrain_atomese.cpp
+    nanobrain_hinductor.cpp
     nanobrain_persistence.cpp
     nanobrain_serialization.cpp
     nanobrain_llm_bridge.cpp
+    nanobrain_consciousness.cpp
+    nanobrain_brain_jelly.cpp
+    nanobrain_philosophical.cpp
+    nanobrain_ppm.cpp
+    nanobrain_brain_model.cpp
+    # Chapter 2: Fractal Tape & GML
+    nanobrain_fractal_tape.cpp
+    nanobrain_wilczek.cpp
+    # Chapter 5: Universal Time Crystal & Big Data
+    nanobrain_gog.cpp
+    nanobrain_tc_transform.cpp
+    nanobrain_spontaneous.cpp
+    nanobrain_turing_tests.cpp
+    nanobrain_hardware_sim.cpp
+    # Chapter 6: Singularity Geometry
+    nanobrain_singularity.cpp
 )
 
 set(NANOBRAIN_HEADERS
@@ -71,6 +88,23 @@ set(NANOBRAIN_HEADERS
     nanobrain_serialization.h
     nanobrain_llm_bridge.h
     nanobrain_atomese.h
+    nanobrain_consciousness.h
+    nanobrain_hinductor.h
+    nanobrain_philosophical.h
+    nanobrain_ppm.h
+    nanobrain_brain_model.h
+    nanobrain_brain_jelly.h
+    # Chapter 2: Fractal Tape & GML
+    nanobrain_fractal_tape.h
+    nanobrain_wilczek.h
+    # Chapter 5: Universal Time Crystal & Big Data
+    nanobrain_gog.h
+    nanobrain_tc_transform.h
+    nanobrain_spontaneous.h
+    nanobrain_turing_tests.h
+    nanobrain_hardware_sim.h
+    # Chapter 6: Singularity Geometry
+    nanobrain_singularity.h
 )
 
 # ================================================================
@@ -105,6 +139,41 @@ target_link_libraries(time_crystal_demo nanobrain_kernel ${GGML_LIB_NAME})
 
 add_executable(unified_demo unified_demo.cpp)
 target_link_libraries(unified_demo nanobrain_kernel ${GGML_LIB_NAME})
+
+# ================================================================
+# Consciousness Demo Executable
+# ================================================================
+
+add_executable(consciousness_demo consciousness_demo.cpp)
+target_link_libraries(consciousness_demo nanobrain_kernel ${GGML_LIB_NAME})
+
+# ================================================================
+# PPM Demo Executable
+# ================================================================
+
+add_executable(ppm_demo ppm_demo.cpp)
+target_link_libraries(ppm_demo nanobrain_kernel ${GGML_LIB_NAME})
+
+# ================================================================
+# Philosophical Transformation Demo (Chapter 1)
+# ================================================================
+
+add_executable(philosophical_demo philosophical_demo.cpp)
+target_link_libraries(philosophical_demo nanobrain_kernel ${GGML_LIB_NAME})
+
+# ================================================================
+# Brain Jelly Demo (Chapter 9)
+# ================================================================
+
+add_executable(brain_jelly_demo brain_jelly_demo.cpp)
+target_link_libraries(brain_jelly_demo nanobrain_kernel ${GGML_LIB_NAME})
+
+# ================================================================
+# Singularity Geometry Demo (Chapter 6)
+# ================================================================
+
+add_executable(singularity_demo singularity_demo.cpp)
+target_link_libraries(singularity_demo nanobrain_kernel ${GGML_LIB_NAME})
 
 # ================================================================
 # Compiler Warnings and Optimizations

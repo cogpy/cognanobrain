@@ -1012,3 +1012,342 @@ void TimeCrystalKernel::process_cycle() {
 
   cycle_count++;
 }
+
+// ================================================================
+// GML Shape Tensor Operations (Task 2.1)
+// ================================================================
+
+int get_shape_complexity(GMLShape shape) {
+  // Complexity based on geometric properties
+  switch (shape) {
+  case GMLShape::Point:
+    return 1;
+  case GMLShape::Line:
+    return 2;
+  case GMLShape::Triangle:
+    return 3;
+  case GMLShape::Square:
+    return 4;
+  case GMLShape::Pentagon:
+    return 5;
+  case GMLShape::Hexagon:
+    return 6;
+  case GMLShape::Circle:
+    return 7;
+  case GMLShape::Tetrahedron:
+    return 8;
+  case GMLShape::Cube:
+    return 9;
+  case GMLShape::Octahedron:
+    return 10;
+  case GMLShape::Sphere:
+    return 11;
+  case GMLShape::Torus:
+    return 12;
+  case GMLShape::Helix:
+    return 13;
+  case GMLShape::Dodecahedron:
+    return 14;
+  case GMLShape::Icosahedron:
+    return 15;
+  case GMLShape::Mobius:
+    return 16;
+  case GMLShape::Simplex:
+    return 17;
+  case GMLShape::Hypercube:
+    return 18;
+  case GMLShape::Fractal:
+    return 19;
+  default:
+    return 1;
+  }
+}
+
+int get_shape_prime(GMLShape shape) {
+  // Map each shape to a prime number based on complexity
+  static const int primes[] = {2,  3,  5,  7,  11, 13, 17, 19, 23, 29,
+                               31, 37, 41, 43, 47, 53, 59, 61, 67};
+  int complexity = get_shape_complexity(shape);
+  return primes[std::min(complexity - 1, 18)];
+}
+
+std::vector<float> shape_to_tensor(GMLShape shape,
+                                   const ShapeTensorParams &params) {
+  int size = params.tensor_size;
+  std::vector<float> tensor(size, 0.0f);
+
+  int complexity = get_shape_complexity(shape);
+  int shape_prime = get_shape_prime(shape);
+
+  // Base encoding: shape type and complexity
+  tensor[0] = static_cast<float>(static_cast<int>(shape)) / 19.0f;
+  tensor[1] = static_cast<float>(complexity) / 19.0f;
+  tensor[2] = static_cast<float>(shape_prime) / 67.0f;
+
+  // Vertex encoding (if enabled)
+  if (params.include_vertices && size >= 32) {
+    // Generate vertex positions based on shape geometry
+    int num_vertices = 0;
+    switch (shape) {
+    case GMLShape::Point:
+      num_vertices = 1;
+      break;
+    case GMLShape::Line:
+      num_vertices = 2;
+      break;
+    case GMLShape::Triangle:
+      num_vertices = 3;
+      break;
+    case GMLShape::Square:
+      num_vertices = 4;
+      break;
+    case GMLShape::Pentagon:
+      num_vertices = 5;
+      break;
+    case GMLShape::Hexagon:
+      num_vertices = 6;
+      break;
+    case GMLShape::Circle:
+      num_vertices = 12;
+      break;
+    case GMLShape::Tetrahedron:
+      num_vertices = 4;
+      break;
+    case GMLShape::Cube:
+      num_vertices = 8;
+      break;
+    case GMLShape::Octahedron:
+      num_vertices = 6;
+      break;
+    case GMLShape::Dodecahedron:
+      num_vertices = 20;
+      break;
+    case GMLShape::Icosahedron:
+      num_vertices = 12;
+      break;
+    default:
+      num_vertices = complexity;
+    }
+
+    tensor[3] = static_cast<float>(num_vertices) / 20.0f;
+
+    // Encode vertex positions using trigonometric patterns
+    for (int i = 0; i < std::min(num_vertices, 12); i++) {
+      float angle = 2.0f * M_PI * i / num_vertices;
+      tensor[4 + i * 2] = std::cos(angle) * params.scale;
+      tensor[5 + i * 2] = std::sin(angle) * params.scale;
+    }
+  }
+
+  // Symmetry group encoding (if enabled)
+  if (params.include_symmetry && size >= 48) {
+    // Encode symmetry group based on shape
+    int symmetry_order = 1;
+    switch (shape) {
+    case GMLShape::Circle:
+    case GMLShape::Sphere:
+      symmetry_order = 360;
+      break;
+    case GMLShape::Triangle:
+    case GMLShape::Tetrahedron:
+      symmetry_order = 3;
+      break;
+    case GMLShape::Square:
+    case GMLShape::Cube:
+      symmetry_order = 4;
+      break;
+    case GMLShape::Pentagon:
+      symmetry_order = 5;
+      break;
+    case GMLShape::Hexagon:
+      symmetry_order = 6;
+      break;
+    case GMLShape::Octahedron:
+      symmetry_order = 8;
+      break;
+    case GMLShape::Dodecahedron:
+      symmetry_order = 12;
+      break;
+    case GMLShape::Icosahedron:
+      symmetry_order = 20;
+      break;
+    default:
+      symmetry_order = complexity;
+    }
+
+    tensor[32] = static_cast<float>(symmetry_order) / 360.0f;
+    tensor[33] =
+        std::log2(symmetry_order + 1) / 10.0f; // Log symmetry complexity
+  }
+
+  // Prime harmonic encoding
+  if (size >= 64) {
+    for (int i = 0; i < 15; i++) {
+      float harmonic =
+          std::sin(FUNDAMENTAL_PRIMES[i] * complexity * M_PI / 100.0f);
+      tensor[48 + i] = harmonic;
+    }
+  }
+
+  return tensor;
+}
+
+ComposedShape compose_shapes(GMLShape primary, GMLShape secondary,
+                             float blend_factor) {
+  ComposedShape result;
+  result.primary = primary;
+  result.secondary = secondary;
+  result.composition_strength = blend_factor;
+
+  // Get tensors for both shapes
+  ShapeTensorParams params;
+  params.tensor_size = 64;
+  std::vector<float> tensor_a = shape_to_tensor(primary, params);
+  std::vector<float> tensor_b = shape_to_tensor(secondary, params);
+
+  // Blend tensors
+  result.composition_tensor.resize(params.tensor_size);
+  for (int i = 0; i < params.tensor_size; i++) {
+    result.composition_tensor[i] =
+        tensor_a[i] * (1.0f - blend_factor) + tensor_b[i] * blend_factor;
+  }
+
+  // Combine primes
+  int prime_a = get_shape_prime(primary);
+  int prime_b = get_shape_prime(secondary);
+  result.combined_primes = {prime_a, prime_b};
+
+  // Add GCD and LCM primes
+  int gcd = prime_a;
+  int temp = prime_b;
+  while (temp != 0) {
+    int remainder = gcd % temp;
+    gcd = temp;
+    temp = remainder;
+  }
+  result.combined_primes.push_back(gcd);
+  result.combined_primes.push_back((prime_a * prime_b) / gcd);
+
+  return result;
+}
+
+std::vector<float> transform_shape(GMLShape shape, float rotation_angle,
+                                   float scale_factor) {
+  ShapeTensorParams params;
+  params.scale = scale_factor;
+  std::vector<float> tensor = shape_to_tensor(shape, params);
+
+  // Apply rotation to vertex positions
+  float cos_r = std::cos(rotation_angle);
+  float sin_r = std::sin(rotation_angle);
+
+  for (int i = 4; i < 28; i += 2) {
+    float x = tensor[i];
+    float y = tensor[i + 1];
+    tensor[i] = x * cos_r - y * sin_r;
+    tensor[i + 1] = x * sin_r + y * cos_r;
+  }
+
+  // Add rotation encoding
+  if (tensor.size() >= 64) {
+    tensor[34] = rotation_angle / (2.0f * M_PI);
+    tensor[35] = scale_factor;
+  }
+
+  return tensor;
+}
+
+ShapePrimeResonance
+calculate_shape_prime_resonance(GMLShape shape,
+                                const std::vector<int> &prime_set) {
+  ShapePrimeResonance result;
+  result.shape = shape;
+  result.resonance_strength = 0.0f;
+
+  int shape_prime = get_shape_prime(shape);
+  int complexity = get_shape_complexity(shape);
+
+  // Calculate resonance with each prime in the set
+  for (int prime : prime_set) {
+    // Resonance based on harmonic relationship
+    float harmonic_ratio =
+        static_cast<float>(shape_prime) / static_cast<float>(prime);
+
+    // Check for octave relationships (power of 2 ratios)
+    float log_ratio = std::log2(harmonic_ratio);
+    float octave_distance = std::abs(log_ratio - std::round(log_ratio));
+
+    // Resonance is stronger when ratio is close to integer
+    float resonance = 1.0f - octave_distance;
+
+    if (resonance > 0.5f) {
+      result.resonant_primes.push_back(prime);
+      result.resonance_strength += resonance;
+    }
+  }
+
+  // Normalize resonance
+  if (!prime_set.empty()) {
+    result.resonance_strength /= prime_set.size();
+  }
+
+  // Harmonic frequency based on shape complexity and prime
+  result.harmonic_frequency = shape_prime * complexity * 0.1f;
+
+  return result;
+}
+
+std::vector<std::pair<GMLShape, float>> get_shapes_for_prime(int prime) {
+  std::vector<std::pair<GMLShape, float>> result;
+
+  static const GMLShape all_shapes[] = {
+      GMLShape::Point,      GMLShape::Line,         GMLShape::Triangle,
+      GMLShape::Square,     GMLShape::Pentagon,     GMLShape::Hexagon,
+      GMLShape::Circle,     GMLShape::Tetrahedron,  GMLShape::Cube,
+      GMLShape::Octahedron, GMLShape::Sphere,       GMLShape::Torus,
+      GMLShape::Helix,      GMLShape::Dodecahedron, GMLShape::Icosahedron,
+      GMLShape::Mobius,     GMLShape::Simplex,      GMLShape::Hypercube,
+      GMLShape::Fractal};
+
+  for (GMLShape shape : all_shapes) {
+    int shape_prime = get_shape_prime(shape);
+
+    // Calculate resonance strength with the given prime
+    float harmonic_ratio =
+        static_cast<float>(shape_prime) / static_cast<float>(prime);
+    float log_ratio = std::log2(harmonic_ratio);
+    float octave_distance = std::abs(log_ratio - std::round(log_ratio));
+    float resonance = 1.0f - octave_distance;
+
+    if (resonance > 0.3f) {
+      result.push_back({shape, resonance});
+    }
+  }
+
+  // Sort by resonance strength
+  std::sort(result.begin(), result.end(),
+            [](const auto &a, const auto &b) { return a.second > b.second; });
+
+  return result;
+}
+
+float shape_harmonic_distance(GMLShape a, GMLShape b) {
+  if (a == b)
+    return 0.0f;
+
+  int prime_a = get_shape_prime(a);
+  int prime_b = get_shape_prime(b);
+  int complexity_a = get_shape_complexity(a);
+  int complexity_b = get_shape_complexity(b);
+
+  // Distance based on prime relationship
+  float prime_distance = std::abs(
+      std::log2(static_cast<float>(prime_a) / static_cast<float>(prime_b)));
+
+  // Distance based on complexity difference
+  float complexity_distance =
+      std::abs(static_cast<float>(complexity_a - complexity_b)) / 19.0f;
+
+  // Combined distance (weighted average)
+  return (prime_distance / 6.0f + complexity_distance) / 2.0f;
+}

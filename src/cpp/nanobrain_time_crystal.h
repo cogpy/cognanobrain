@@ -409,4 +409,103 @@ MusicalNote index_to_musical_note(int index);
 // Get shape name for index
 GMLShape index_to_gml_shape(int index);
 
+// ================================================================
+// GML Shape Tensor Operations (Task 2.1)
+// ================================================================
+
+/**
+ * Shape complexity level (determines tensor dimensions)
+ */
+int get_shape_complexity(GMLShape shape);
+
+/**
+ * Get prime number associated with shape
+ */
+int get_shape_prime(GMLShape shape);
+
+/**
+ * Shape-to-tensor conversion parameters
+ */
+struct ShapeTensorParams {
+  int tensor_size = 64;         // Base tensor dimension
+  bool include_vertices = true; // Include vertex positions
+  bool include_symmetry = true; // Include symmetry group info
+  float scale = 1.0f;           // Scale factor
+};
+
+/**
+ * Composed shape result
+ */
+struct ComposedShape {
+  GMLShape primary;
+  GMLShape secondary;
+  float composition_strength;
+  std::vector<float> composition_tensor;
+  std::vector<int> combined_primes;
+};
+
+/**
+ * Shape resonance with prime numbers
+ */
+struct ShapePrimeResonance {
+  GMLShape shape;
+  std::vector<int> resonant_primes;
+  float resonance_strength;
+  float harmonic_frequency;
+};
+
+/**
+ * Convert a GML shape to tensor representation
+ * @param shape The geometric shape to convert
+ * @param params Conversion parameters
+ * @return Vector of floats representing the shape tensor
+ */
+std::vector<float> shape_to_tensor(GMLShape shape,
+                                   const ShapeTensorParams &params = {});
+
+/**
+ * Compose two shapes into a combined representation
+ * @param primary Primary shape
+ * @param secondary Secondary shape
+ * @param blend_factor Blending weight (0.0 = primary only, 1.0 = secondary
+ * only)
+ * @return Composed shape result
+ */
+ComposedShape compose_shapes(GMLShape primary, GMLShape secondary,
+                             float blend_factor = 0.5f);
+
+/**
+ * Transform a shape by rotation/scaling
+ * @param shape Input shape
+ * @param rotation_angle Rotation in radians
+ * @param scale_factor Scaling multiplier
+ * @return Transformed shape tensor
+ */
+std::vector<float> transform_shape(GMLShape shape, float rotation_angle,
+                                   float scale_factor);
+
+/**
+ * Calculate prime resonance for a shape
+ * @param shape The geometric shape
+ * @param prime_set Set of primes to check resonance against
+ * @return Resonance data
+ */
+ShapePrimeResonance calculate_shape_prime_resonance(
+    GMLShape shape, const std::vector<int> &prime_set = {2, 3, 5, 7, 11, 13});
+
+/**
+ * Get all shapes that resonate with a given prime
+ * @param prime The prime number
+ * @return Vector of resonant shapes with strengths
+ */
+std::vector<std::pair<GMLShape, float>> get_shapes_for_prime(int prime);
+
+/**
+ * Calculate harmonic distance between two shapes
+ * @param a First shape
+ * @param b Second shape
+ * @return Distance metric (0.0 = identical, 1.0 = maximally different)
+ */
+float shape_harmonic_distance(GMLShape a, GMLShape b);
+
 #endif // NANOBRAIN_TIME_CRYSTAL_H
