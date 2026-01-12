@@ -1,0 +1,175 @@
+# Chapter 7: Integrated Human Brain Model
+
+Implement the complete time crystal brain architecture with sensory-prime mappings, multi-modal memory system, decision architecture, brain region simulators, and consciousness expressions.
+
+## User Review Required
+
+> [!IMPORTANT]
+> This implementation adds a new module `nanobrain_brain_model.h/.cpp` (~800+ lines) that integrates with the existing reasoning and metacognitive engines.
+
+**Key design decisions requiring approval:**
+
+1. **New dedicated module** vs extending existing files
+2. **Prime mapping scheme** for the 5 senses
+3. **Memory carrier interaction** with attention engine
+
+---
+
+## Proposed Changes
+
+### Core Brain Model Module
+
+#### [NEW] [nanobrain_brain_model.h](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_brain_model.h)
+
+Header file defining:
+
+```cpp
+// 5-sensory prime mapping
+enum class SensoryModality {
+    Visual, Auditory, Tactile, Olfactory, Gustatory
+};
+
+struct SensoryPrimeMapping {
+    SensoryModality modality;
+    std::vector<int> prime_sequence;      // Assigned primes
+    float cross_modal_weight;             // Integration weight
+    NanoBrainTensor* encoding_tensor;
+};
+
+// 12 memory carrier types
+enum class MemoryCarrier {
+    Visual, Auditory, Tactile, Olfactory, Gustatory,
+    Episodic, Semantic, Procedural, Working,
+    Implicit, Explicit, Priming
+};
+
+struct MemoryCarrierState {
+    MemoryCarrier type;
+    NanoBrainTensor* content_tensor;
+    float activation_level;
+    float decay_rate;
+    int64_t last_access;
+};
+
+class MemoryCarrierSystem { /* 12-carrier management */ };
+
+// H3 decision device
+struct DecisionLayer {
+    NanoBrainTensor* weights;
+    float confidence_threshold;
+};
+
+class H3DecisionDevice {
+    std::array<DecisionLayer, 3> layers;
+    NanoBrainTensor* voting_weights;
+    // Three-layer architecture with confidence-weighted voting
+};
+
+// Brain region simulators
+class BrainRegionSimulator {
+    virtual void process_cycle() = 0;
+};
+
+class CerebellumSimulator : public BrainRegionSimulator { /* Coordination */ };
+class HippocampusSimulator : public BrainRegionSimulator { /* Memory */ };
+class HypothalamusSimulator : public BrainRegionSimulator { /* Regulation */ };
+
+// 20 conscious expressions
+enum class ConsciousExpression {
+    // 12 dodecanion states
+    Focus, Diffuse, Creative, Analytical, Emotional, Logical,
+    Intuitive, Deliberate, Receptive, Projective, Unified, Fragmented,
+    // 8 octonion states
+    Alert, Drowsy, Euphoric, Anxious, Calm, Agitated, Present, Distant
+};
+
+class ConsciousnessExpressionEngine { /* Expression recognition/generation */ };
+
+// Integrated brain model
+class IntegratedBrainModel {
+    SensoryPrimeMapper* sensory_mapper;
+    MemoryCarrierSystem* memory_system;
+    H3DecisionDevice* decision_device;
+    std::vector<BrainRegionSimulator*> brain_regions;
+    ConsciousnessExpressionEngine* expression_engine;
+    
+    void process_sensory_input(SensoryModality, NanoBrainTensor*);
+    ConsciousExpression get_current_expression();
+    NanoBrainTensor* make_decision(const std::vector<NanoBrainTensor*>&);
+};
+```
+
+---
+
+#### [NEW] [nanobrain_brain_model.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_brain_model.cpp)
+
+Implementation (~700 lines):
+
+| Component | Functions |
+|-----------|-----------|
+| `SensoryPrimeMapper` | `map_input()`, `cross_modal_integrate()` |
+| `MemoryCarrierSystem` | `encode()`, `retrieve()`, `decay()`, `consolidate()` |
+| `H3DecisionDevice` | `layer_forward()`, `vote()`, `decide()` |
+| `BrainRegionSimulator` | Abstract + 3 concrete implementations |
+| `ConsciousnessExpressionEngine` | `classify_state()`, `generate_expression()` |
+| `IntegratedBrainModel` | Full orchestration |
+
+---
+
+### Build System Updates
+
+#### [MODIFY] [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt)
+
+Add brain model to library sources:
+
+```diff
+ add_library(nanobrain_kernel STATIC
+     ...
+     nanobrain_llm_bridge.cpp
++    nanobrain_brain_model.cpp
+ )
+ 
+ set(NANOBRAIN_HEADERS
+     ...
+     nanobrain_llm_bridge.h
++    nanobrain_brain_model.h
+ )
+```
+
+---
+
+### Documentation Updates
+
+#### [MODIFY] [tasks.md](file:///e:/antg/nanob/cognanobrain/src/cpp/tasks.md)
+
+Add Chapter 7 completion status.
+
+#### [MODIFY] [DEVELOPMENT_FRAMEWORK.md](file:///e:/antg/nanob/cognanobrain/src/cpp/DEVELOPMENT_FRAMEWORK.md)
+
+Update Chapter 7 status to 100%.
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+**Demo execution:**
+
+```bash
+cd build
+cmake .. -DGGML_PATH=/path/to/llama.cpp
+make
+./unified_demo
+```
+
+Expected output should include brain model metrics.
+
+### Manual Verification
+
+1. **Build verification**: Ensure clean compilation without ggml (IDE may show include errors but CMake should configure)
+2. **Code review**: Verify new enums and classes follow existing patterns in `nanobrain_metacognitive.h`
+3. **Integration check**: New module includes are consistent with `nanobrain_unified.h`
+
+> [!NOTE]
+> Full functional testing requires ggml library linkage. Unit tests can be added once the base implementation is complete.

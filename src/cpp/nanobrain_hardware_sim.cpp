@@ -1,524 +1,469 @@
 #include "nanobrain_hardware_sim.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
-#include <iostream>
 #include <random>
-#include <sstream>
 
 // ================================================================
-// Constructor / Destructor
+// HardwareSimulator Implementation
 // ================================================================
 
-HardwareSimulator::HardwareSimulator(NanoBrainKernel *kernel,
-                                     const HardwareSimConfig &config)
-    : kernel(kernel), config(config), active(false), cycle_count(0),
-      mt_counter(0) {}
-
-HardwareSimulator::~HardwareSimulator() { shutdown(); }
-
-std::string HardwareSimulator::generate_mt_id() {
-  std::stringstream ss;
-  ss << "mt_" << mt_counter++;
-  return ss.str();
+HardwareSimulator::HardwareSimulator(TimeCrystalKernel *tc,
+                                     const ThermalConfig &config)
+    : tc_kernel(tc), thermal_config(config), initialized(false),
+      simulation_time(0.0f), mt_counter(0) {
+  thermal_state.current_temperature = thermal_config.base_temperature;
+  thermal_state.heat_capacity = 4186.0f;     // J/(kg·K) like water
+  thermal_state.thermal_conductivity = 0.6f; // W/(m·K)
+  thermal_state.entropy = 0.0f;
+  thermal_state.free_energy = 0.0f;
 }
 
-// ================================================================
-// Initialization
-// ================================================================
+HardwareSimulator::~HardwareSimulator() = default;
 
 void HardwareSimulator::initialize() {
-  if (active)
-    return;
-
-  // Initialize thermal state
-  thermal_state.temperature = config.base_temperature;
-  thermal_state.breathing_phase = config.breathing_phase_offset;
-  thermal_state.energy_level = 1.0f;
-  thermal_state.entropy = 0.5f;
-  thermal_state.thermal_conductivity = 0.1f;
-  thermal_state.in_coherent_regime = true;
-
-  // Create initial microtubules
-  for (int i = 0; i < config.microtubule_count; i++) {
-    create_microtubule(config.tubulin_per_tubule);
-  }
-
-  // Create resonance links between nearby MTs
-  auto mt_ids = get_all_microtubule_ids();
-  for (size_t i = 0; i < mt_ids.size(); i++) {
-    for (size_t j = i + 1; j < std::min(i + 5, mt_ids.size()); j++) {
-      float coupling = 0.2f + (j - i) * 0.1f;
-      create_resonance_link(mt_ids[i], mt_ids[j], coupling);
-    }
-  }
-
-  active = true;
-  std::cout << "[HardwareSimulator] Initialized with " << microtubules.size()
-            << " microtubules" << std::endl;
+  microtubules.clear();
+  simulation_time = 0.0f;
+  mt_counter = 0;
+  thermal_state.current_temperature = thermal_config.base_temperature;
+  initialized = true;
 }
 
-void HardwareSimulator::shutdown() {
-  active = false;
+void HardwareSimulator::reset() {
   microtubules.clear();
-  resonance_links.clear();
-  std::cout << "[HardwareSimulator] Shutdown after " << cycle_count << " cycles"
-            << std::endl;
+  simulation_time = 0.0f;
+  initialized = false;
+}
+
+std::string HardwareSimulator::generate_mt_id() {
+  return "mt_" + std::to_string(++mt_counter);
 }
 
 // ================================================================
 // Thermal Breathing Model
 // ================================================================
 
-void HardwareSimulator::update_thermal_breathing(float delta_ms) {
-  // Update breathing phase
-  float phase_increment = (2.0f * PI * delta_ms) / BREATHING_PERIOD_MS;
-  thermal_state.breathing_phase += phase_increment;
-  while (thermal_state.breathing_phase >= 2.0f * PI) {
-    thermal_state.breathing_phase -= 2.0f * PI;
+void HardwareSimulator::set_thermal_config(const ThermalConfig &config) {
+  thermal_config = config;
+}
+
+ThermalState HardwareSimulator::get_thermal_state() const {
+  return thermal_state;
+}
+
+float HardwareSimulator::current_temperature() const {
+  return thermal_state.current_temperature;
+}
+
+void HardwareSimulator::update_thermal(float dt) {
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  std::normal_distribution<float> noise(0.0f, thermal_config.thermal_noise);
+
+  float phase = simulation_time * thermal_config.frequency * 2.0f * M_PI;
+  float base = thermal_config.base_temperature;
+  float amp = thermal_config.amplitude;
+
+  switch (thermal_config.mode) {
+  case BreathingMode::Constant:
+    thermal_state.current_temperature = base;
+    break;
+
+  case BreathingMode::Sinusoidal:
+    thermal_state.current_temperature = base + amp * std::sin(phase);
+    break;
+
+  case BreathingMode::Cardiac: {
+    // Heart rate ~1 Hz with sharp peaks
+    float cardiac =
+        std::exp(-0.5f * std::pow(std::fmod(phase, 2.0f * M_PI), 2));
+    thermal_state.current_temperature = base + amp * cardiac;
+  } break;
+
+  case BreathingMode::Respiratory: {
+    // Breathing ~0.2 Hz with asymmetric rise/fall
+    float breath = (std::sin(phase) + 0.3f * std::sin(2 * phase)) / 1.3f;
+    thermal_state.current_temperature = base + amp * breath;
+  } break;
+
+  case BreathingMode::Chaotic: {
+    // Simple Lorenz attractor approximation
+    static float x = 1.0f, y = 1.0f, z = 1.0f;
+    float sigma = 10.0f, rho = 28.0f, beta = 8.0f / 3.0f;
+    float dx = sigma * (y - x) * dt;
+    float dy = (x * (rho - z) - y) * dt;
+    float dz = (x * y - beta * z) * dt;
+    x += dx;
+    y += dy;
+    z += dz;
+    thermal_state.current_temperature = base + amp * z / 30.0f;
+  } break;
   }
 
-  // Temperature modulation with breathing
-  float breath_modulation = std::sin(thermal_state.breathing_phase);
-  thermal_state.temperature =
-      config.base_temperature + breath_modulation * config.temperature_variance;
+  // Add noise
+  thermal_state.current_temperature += noise(gen);
 
-  // Add thermal noise if enabled
-  if (config.enable_thermal_noise) {
-    static std::mt19937 rng(std::random_device{}());
-    static std::normal_distribution<float> noise(0.0f, 0.1f);
-    thermal_state.temperature +=
-        noise(rng) * config.temperature_variance * 0.1f;
-  }
-
-  // Energy follows breathing cycle
-  thermal_state.energy_level = 0.8f + 0.2f * breath_modulation;
-
-  // Entropy increases with temperature variation
-  thermal_state.entropy = 0.5f + 0.2f * std::abs(breath_modulation);
-
-  // Check coherent regime (temperature dependent)
-  thermal_state.in_coherent_regime =
-      (thermal_state.temperature >= config.base_temperature - 5.0f &&
-       thermal_state.temperature <= config.base_temperature + 5.0f);
+  // Update thermodynamic quantities
+  float T = thermal_state.current_temperature;
+  thermal_state.entropy = thermal_state.heat_capacity * std::log(T / 273.15f);
+  thermal_state.free_energy = thermal_state.heat_capacity * (T - 310.15f);
 }
 
-void HardwareSimulator::set_temperature(float temp_kelvin) {
-  thermal_state.temperature = temp_kelvin;
-}
-
-void HardwareSimulator::add_thermal_perturbation(float delta_temp) {
-  thermal_state.temperature += delta_temp;
-  thermal_state.entropy += std::abs(delta_temp) * 0.01f;
-}
-
-bool HardwareSimulator::in_coherent_regime() const {
-  return thermal_state.in_coherent_regime;
+float HardwareSimulator::thermal_decoherence_rate() const {
+  // Decoherence increases with temperature
+  float T = thermal_state.current_temperature;
+  float T0 = 310.15f; // Reference temperature
+  return std::exp((T - T0) / 10.0f) - 1.0f;
 }
 
 // ================================================================
 // Microtubule Dynamics
 // ================================================================
 
-std::string HardwareSimulator::create_microtubule(int tubulin_count) {
-  MicrotubuleDynamics mt;
+std::string HardwareSimulator::create_microtubule(float length,
+                                                  int protofilaments) {
+  Microtubule mt;
   mt.id = generate_mt_id();
-  mt.coherence = 0.5f;
-  mt.resonance_frequency = 8.0f + (mt_counter % 10); // 8-18 MHz range
-  mt.collective_dipole = 0.0f;
-  mt.polymerizing = true;
+  mt.protofilaments = protofilaments;
+  mt.length = length;
+  mt.bending_rigidity = 2.2e-23f;    // J·m
+  mt.oscillation_frequency = 8.0e6f; // ~8 MHz
 
-  // Initialize tubulin dimers
-  for (int i = 0; i < tubulin_count; i++) {
-    mt.tubulin_states.push_back(create_tubulin(i));
+  // Create dimers (8nm per dimer)
+  int num_dimers = static_cast<int>(length / 8.0f) * protofilaments;
+  mt.dimers.reserve(num_dimers);
+
+  for (int i = 0; i < num_dimers; i++) {
+    TubulinDimer dimer;
+    dimer.index = i;
+    dimer.alpha_state = 0.5f;
+    dimer.beta_state = 0.5f;
+    dimer.gtp_energy = 1.0f;
+    dimer.coherence = 0.8f;
+
+    // Position along cylinder
+    int row = i / protofilaments;
+    int col = i % protofilaments;
+    float angle = 2.0f * M_PI * col / protofilaments;
+    dimer.position = {12.5f * std::cos(angle), 12.5f * std::sin(angle),
+                      row * 8.0f};
+
+    mt.dimers.push_back(dimer);
   }
 
-  // Initialize protofilament phases
-  for (int pf = 0; pf < PROTOFILAMENTS_PER_TUBULE; pf++) {
-    mt.protofilament_phases[pf] = (2.0f * PI * pf) / PROTOFILAMENTS_PER_TUBULE;
-  }
+  // Initialize prime resonances
+  mt.prime_resonances = {2, 3, 5, 7, 11, 13};
 
-  microtubules[mt.id] = mt;
+  microtubules.push_back(mt);
   return mt.id;
 }
 
-TubulinState HardwareSimulator::create_tubulin(int index) {
-  static std::mt19937 rng(std::random_device{}());
-  static std::uniform_real_distribution<float> dist(0.0f, 1.0f);
-
-  TubulinState tubulin;
-  tubulin.index = index;
-  tubulin.alpha_state = dist(rng);
-  tubulin.beta_state = dist(rng);
-  tubulin.dipole_moment = (tubulin.alpha_state - tubulin.beta_state);
-  tubulin.gtp_bound = (dist(rng) > 0.3f); // 70% GTP, 30% GDP
-
-  return tubulin;
-}
-
-const MicrotubuleDynamics *
-HardwareSimulator::get_microtubule(const std::string &id) const {
-  auto it = microtubules.find(id);
-  if (it != microtubules.end()) {
-    return &it->second;
+Microtubule *HardwareSimulator::get_microtubule(const std::string &id) {
+  for (auto &mt : microtubules) {
+    if (mt.id == id)
+      return &mt;
   }
   return nullptr;
 }
 
-void HardwareSimulator::update_microtubule_dynamics(float delta_ms) {
-  for (auto &[id, mt] : microtubules) {
-    // Update each tubulin
-    for (auto &tubulin : mt.tubulin_states) {
-      update_tubulin(tubulin, delta_ms);
-    }
-
-    // Update protofilament phases
-    update_protofilament_phases(mt, delta_ms);
-
-    // Calculate collective dipole
-    mt.collective_dipole = compute_collective_dipole(mt);
-
-    // Calculate coherence
-    mt.coherence = calculate_mt_coherence(mt);
-
-    // Apply thermal noise
-    if (config.enable_thermal_noise) {
-      apply_thermal_noise(mt);
-    }
-
-    // Apply quantum effects
-    if (config.enable_quantum_effects && thermal_state.in_coherent_regime) {
-      apply_quantum_effects(mt);
-    }
+const Microtubule *
+HardwareSimulator::get_microtubule(const std::string &id) const {
+  for (const auto &mt : microtubules) {
+    if (mt.id == id)
+      return &mt;
   }
+  return nullptr;
 }
 
-std::vector<std::string> HardwareSimulator::get_all_microtubule_ids() const {
-  std::vector<std::string> ids;
-  ids.reserve(microtubules.size());
-  for (const auto &[id, _] : microtubules) {
-    ids.push_back(id);
-  }
-  return ids;
-}
-
-float HardwareSimulator::calculate_mt_coherence(const MicrotubuleDynamics &mt) {
-  if (mt.tubulin_states.empty()) {
-    return 0.0f;
-  }
-
-  // Measure alignment of dipole moments
-  float sum_dipole = 0.0f;
-  float sum_abs_dipole = 0.0f;
-
-  for (const auto &tubulin : mt.tubulin_states) {
-    sum_dipole += tubulin.dipole_moment;
-    sum_abs_dipole += std::abs(tubulin.dipole_moment);
-  }
-
-  if (sum_abs_dipole < 0.001f) {
-    return 0.5f;
-  }
-
-  // Coherence = alignment ratio
-  return std::abs(sum_dipole) / sum_abs_dipole;
-}
-
-void HardwareSimulator::set_polymerization_state(const std::string &mt_id,
-                                                 bool polymerizing) {
-  auto it = microtubules.find(mt_id);
+bool HardwareSimulator::remove_microtubule(const std::string &id) {
+  auto it = std::find_if(microtubules.begin(), microtubules.end(),
+                         [&id](const auto &mt) { return mt.id == id; });
   if (it != microtubules.end()) {
-    it->second.polymerizing = polymerizing;
+    microtubules.erase(it);
+    return true;
   }
+  return false;
 }
 
-void HardwareSimulator::update_tubulin(TubulinState &tubulin, float delta_ms) {
-  static std::mt19937 rng(std::random_device{}());
-  static std::uniform_real_distribution<float> dist(-0.01f, 0.01f);
+void HardwareSimulator::update_dimer(TubulinDimer &dimer, float dt) {
+  // Quantum oscillation
+  float omega = 8.0e6f; // 8 MHz tubulin frequency
+  dimer.alpha_state += 0.5f * std::sin(omega * simulation_time) * dt;
+  dimer.beta_state += 0.5f * std::cos(omega * simulation_time) * dt;
 
-  // Small random state changes
-  tubulin.alpha_state += dist(rng) * delta_ms / 10.0f;
-  tubulin.beta_state += dist(rng) * delta_ms / 10.0f;
+  // Normalize states to [0, 1]
+  dimer.alpha_state = std::max(0.0f, std::min(1.0f, dimer.alpha_state));
+  dimer.beta_state = std::max(0.0f, std::min(1.0f, dimer.beta_state));
 
-  // Clamp to [0, 1]
-  tubulin.alpha_state = std::max(0.0f, std::min(1.0f, tubulin.alpha_state));
-  tubulin.beta_state = std::max(0.0f, std::min(1.0f, tubulin.beta_state));
+  // GTP hydrolysis decay
+  dimer.gtp_energy *= (1.0f - 0.001f * dt);
 
-  // Update dipole
-  tubulin.dipole_moment = tubulin.alpha_state - tubulin.beta_state;
-
-  // GTP hydrolysis (slow process)
-  if (tubulin.gtp_bound && dist(rng) + 0.01f > 0.009f * delta_ms / 10.0f) {
-    // 1% chance per 100ms to hydrolyze
-    tubulin.gtp_bound = false;
-  }
+  // Thermal decoherence
+  float decoherence = thermal_decoherence_rate();
+  dimer.coherence *= (1.0f - 0.01f * decoherence * dt);
+  dimer.coherence = std::max(0.0f, dimer.coherence);
 }
 
-void HardwareSimulator::update_protofilament_phases(MicrotubuleDynamics &mt,
-                                                    float delta_ms) {
-  float phase_increment =
-      (2.0f * PI * mt.resonance_frequency * delta_ms) / 1000.0f;
-
-  for (int pf = 0; pf < PROTOFILAMENTS_PER_TUBULE; pf++) {
-    mt.protofilament_phases[pf] += phase_increment;
-    while (mt.protofilament_phases[pf] >= 2.0f * PI) {
-      mt.protofilament_phases[pf] -= 2.0f * PI;
+void HardwareSimulator::update_microtubules(float dt) {
+  for (auto &mt : microtubules) {
+    for (auto &dimer : mt.dimers) {
+      update_dimer(dimer, dt);
     }
   }
 }
 
-float HardwareSimulator::compute_collective_dipole(
-    const MicrotubuleDynamics &mt) {
-  float sum = 0.0f;
-  for (const auto &tubulin : mt.tubulin_states) {
-    sum += tubulin.dipole_moment;
-  }
-  return sum;
-}
+MicrotubuleMetrics
+HardwareSimulator::calculate_metrics(const std::string &id) const {
+  MicrotubuleMetrics metrics;
+  metrics.average_coherence = 0.0f;
+  metrics.collective_oscillation = 0.0f;
+  metrics.information_capacity = 0.0f;
+  metrics.active_dimers = 0;
+  metrics.quantum_effects_ratio = 0.0f;
 
-void HardwareSimulator::apply_thermal_noise(MicrotubuleDynamics &mt) {
-  static std::mt19937 rng(std::random_device{}());
+  auto mt = get_microtubule(id);
+  if (!mt || mt->dimers.empty())
+    return metrics;
 
-  float noise_amplitude =
-      (thermal_state.temperature - BODY_TEMPERATURE) * 0.01f;
-  std::normal_distribution<float> noise(0.0f, std::abs(noise_amplitude));
+  float sum_coh = 0.0f;
+  float sum_alpha = 0.0f;
+  int quantum_active = 0;
 
-  for (auto &tubulin : mt.tubulin_states) {
-    tubulin.dipole_moment += noise(rng);
-  }
-}
-
-void HardwareSimulator::apply_quantum_effects(MicrotubuleDynamics &mt) {
-  // Quantum coherence enhances synchronization
-  float avg_phase = 0.0f;
-  for (int pf = 0; pf < PROTOFILAMENTS_PER_TUBULE; pf++) {
-    avg_phase += mt.protofilament_phases[pf];
-  }
-  avg_phase /= PROTOFILAMENTS_PER_TUBULE;
-
-  // Pull phases toward average (quantum entanglement effect)
-  for (int pf = 0; pf < PROTOFILAMENTS_PER_TUBULE; pf++) {
-    float diff = avg_phase - mt.protofilament_phases[pf];
-    mt.protofilament_phases[pf] += diff * 0.1f; // 10% pull toward coherence
-  }
-}
-
-// ================================================================
-// Resonance Network
-// ================================================================
-
-void HardwareSimulator::create_resonance_link(const std::string &source_id,
-                                              const std::string &target_id,
-                                              float coupling_strength) {
-  ResonanceLink link;
-  link.source_mt = source_id;
-  link.target_mt = target_id;
-  link.coupling_strength = coupling_strength;
-  link.phase_difference = 0.0f;
-  link.synchronized = false;
-
-  resonance_links.push_back(link);
-}
-
-void HardwareSimulator::update_resonance_network(float delta_ms) {
-  for (auto &link : resonance_links) {
-    auto *source = get_microtubule(link.source_mt);
-    auto *target = get_microtubule(link.target_mt);
-
-    if (!source || !target)
-      continue;
-
-    // Calculate phase difference from protofilament 0
-    link.phase_difference = std::abs(source->protofilament_phases[0] -
-                                     target->protofilament_phases[0]);
-
-    // Synchronized if phase difference is small
-    link.synchronized = (link.phase_difference < 0.5f);
-
-    // Coupling affects coherence
-    if (link.synchronized) {
-      auto *source_mt = const_cast<MicrotubuleDynamics *>(source);
-      auto *target_mt = const_cast<MicrotubuleDynamics *>(target);
-
-      // Boost coherence of coupled MTs
-      source_mt->coherence += link.coupling_strength * 0.01f;
-      target_mt->coherence += link.coupling_strength * 0.01f;
-
-      source_mt->coherence = std::min(1.0f, source_mt->coherence);
-      target_mt->coherence = std::min(1.0f, target_mt->coherence);
-    }
-  }
-}
-
-std::vector<std::vector<std::string>>
-HardwareSimulator::find_synchronized_clusters() {
-  std::vector<std::vector<std::string>> clusters;
-
-  std::map<std::string, int> mt_to_cluster;
-  int cluster_id = 0;
-
-  for (const auto &link : resonance_links) {
-    if (!link.synchronized)
-      continue;
-
-    auto it_source = mt_to_cluster.find(link.source_mt);
-    auto it_target = mt_to_cluster.find(link.target_mt);
-
-    if (it_source == mt_to_cluster.end() && it_target == mt_to_cluster.end()) {
-      // Neither in a cluster, create new
-      mt_to_cluster[link.source_mt] = cluster_id;
-      mt_to_cluster[link.target_mt] = cluster_id;
-      cluster_id++;
-    } else if (it_source != mt_to_cluster.end() &&
-               it_target == mt_to_cluster.end()) {
-      // Source has cluster, add target
-      mt_to_cluster[link.target_mt] = it_source->second;
-    } else if (it_source == mt_to_cluster.end() &&
-               it_target != mt_to_cluster.end()) {
-      // Target has cluster, add source
-      mt_to_cluster[link.source_mt] = it_target->second;
-    }
-    // Both already clustered - could merge, but skip for simplicity
-  }
-
-  // Build cluster list
-  std::map<int, std::vector<std::string>> cluster_map;
-  for (const auto &[mt_id, cid] : mt_to_cluster) {
-    cluster_map[cid].push_back(mt_id);
-  }
-
-  for (const auto &[cid, members] : cluster_map) {
-    clusters.push_back(members);
-  }
-
-  return clusters;
-}
-
-std::vector<ResonanceLink>
-HardwareSimulator::get_resonance_links(const std::string &mt_id) const {
-  std::vector<ResonanceLink> result;
-  for (const auto &link : resonance_links) {
-    if (link.source_mt == mt_id || link.target_mt == mt_id) {
-      result.push_back(link);
-    }
-  }
-  return result;
-}
-
-// ================================================================
-// Information Processing
-// ================================================================
-
-void HardwareSimulator::inject_pattern(NanoBrainTensor *pattern,
-                                       const std::vector<std::string> &mt_ids) {
-  if (!pattern || !pattern->ggml_tensor)
-    return;
-
-  float *data = static_cast<float *>(pattern->ggml_tensor->data);
-  int64_t size = ggml_nelements(pattern->ggml_tensor);
-
-  for (const auto &mt_id : mt_ids) {
-    auto it = microtubules.find(mt_id);
-    if (it == microtubules.end())
-      continue;
-
-    auto &mt = it->second;
-
-    // Inject pattern into tubulin dipoles
-    for (size_t i = 0; i < mt.tubulin_states.size() && i < (size_t)size; i++) {
-      mt.tubulin_states[i].dipole_moment += data[i] * 0.1f;
-    }
-  }
-}
-
-NanoBrainTensor *HardwareSimulator::read_collective_state() {
-  std::vector<float> collective_state;
-  collective_state.reserve(microtubules.size());
-
-  for (const auto &[id, mt] : microtubules) {
-    collective_state.push_back(mt.collective_dipole * mt.coherence);
-  }
-
-  auto *tensor = kernel->create_tensor({(int64_t)collective_state.size()});
-  kernel->set_data(tensor, collective_state);
-
-  return tensor;
-}
-
-void HardwareSimulator::process_step() {
-  // One processing step: propagate information through resonance
-  for (const auto &link : resonance_links) {
-    if (!link.synchronized)
-      continue;
-
-    auto it_source = microtubules.find(link.source_mt);
-    auto it_target = microtubules.find(link.target_mt);
-
-    if (it_source == microtubules.end() || it_target == microtubules.end())
-      continue;
-
-    // Transfer dipole information
-    float transfer_amount =
-        it_source->second.collective_dipole * link.coupling_strength * 0.1f;
-    it_target->second.collective_dipole += transfer_amount;
-  }
-}
-
-// ================================================================
-// Full Simulation Cycle
-// ================================================================
-
-void HardwareSimulator::run_cycle(float delta_ms) {
-  if (!active)
-    return;
-
-  update_thermal_breathing(delta_ms);
-  update_microtubule_dynamics(delta_ms);
-  update_resonance_network(delta_ms);
-  process_step();
-
-  cycle_count++;
-}
-
-void HardwareSimulator::run_cycles(int count, float delta_ms) {
-  for (int i = 0; i < count; i++) {
-    run_cycle(delta_ms);
-  }
-}
-
-// ================================================================
-// Metrics
-// ================================================================
-
-HardwareMetrics HardwareSimulator::get_metrics() const {
-  HardwareMetrics metrics{};
-
-  metrics.average_temperature = thermal_state.temperature;
-
-  float total_coherence = 0.0f;
-  float total_dipole = 0.0f;
-  for (const auto &[id, mt] : microtubules) {
-    total_coherence += mt.coherence;
-    total_dipole += std::abs(mt.collective_dipole);
-  }
-
-  if (!microtubules.empty()) {
-    metrics.average_mt_coherence = total_coherence / microtubules.size();
-  }
-  metrics.total_dipole_moment = total_dipole;
-
-  // Count synchronized pairs
-  for (const auto &link : resonance_links) {
-    if (link.synchronized) {
-      metrics.synchronized_mt_pairs++;
+  for (const auto &dimer : mt->dimers) {
+    sum_coh += dimer.coherence;
+    sum_alpha += dimer.alpha_state;
+    if (dimer.coherence > 0.5f) {
+      metrics.active_dimers++;
+      quantum_active++;
     }
   }
 
-  // Estimate processing capacity (arbitrary)
-  metrics.processing_capacity =
-      metrics.average_mt_coherence * microtubules.size() * 1e6f;
+  int n = static_cast<int>(mt->dimers.size());
+  metrics.average_coherence = sum_coh / n;
+  metrics.collective_oscillation = sum_alpha / n;
+  metrics.quantum_effects_ratio = static_cast<float>(quantum_active) / n;
 
-  // Energy consumption
-  metrics.energy_consumption = thermal_state.energy_level * microtubules.size();
+  // Information capacity in bits (2 bits per coherent dimer)
+  metrics.information_capacity = 2.0f * metrics.active_dimers;
 
   return metrics;
+}
+
+// ================================================================
+// Quantum Effects
+// ================================================================
+
+float HardwareSimulator::calculate_network_coherence() const {
+  if (microtubules.empty())
+    return 0.0f;
+
+  float sum = 0.0f;
+  int count = 0;
+
+  for (const auto &mt : microtubules) {
+    for (const auto &dimer : mt.dimers) {
+      sum += dimer.coherence;
+      count++;
+    }
+  }
+
+  return (count > 0) ? sum / count : 0.0f;
+}
+
+bool HardwareSimulator::simulate_orchestrated_reduction(
+    const std::string &mt_id) {
+  auto mt = get_microtubule(mt_id);
+  if (!mt)
+    return false;
+
+  // Collapse superpositions to definite states
+  for (auto &dimer : mt->dimers) {
+    if (dimer.coherence > 0.5f) {
+      // Collapse to one of the states
+      dimer.alpha_state = (dimer.alpha_state > 0.5f) ? 1.0f : 0.0f;
+      dimer.beta_state = (dimer.beta_state > 0.5f) ? 1.0f : 0.0f;
+      dimer.coherence = 0.1f; // Reset coherence after collapse
+    }
+  }
+
+  return true;
+}
+
+std::vector<float> HardwareSimulator::get_quantum_state() const {
+  std::vector<float> state;
+  for (const auto &mt : microtubules) {
+    for (const auto &dimer : mt.dimers) {
+      state.push_back(dimer.alpha_state);
+      state.push_back(dimer.beta_state);
+      state.push_back(dimer.coherence);
+    }
+  }
+  return state;
+}
+
+// ================================================================
+// Time Crystal Integration
+// ================================================================
+
+void HardwareSimulator::couple_to_time_crystal() {
+  if (!tc_kernel)
+    return;
+
+  for (auto &mt : microtubules) {
+    // Get TC coherence for this MT's prime resonances
+    float tc_coherence = tc_kernel->compute_ppm_coherence(mt.prime_resonances);
+
+    // Transfer coherence to dimers
+    for (auto &dimer : mt.dimers) {
+      dimer.coherence = dimer.coherence * 0.9f + tc_coherence * 0.1f;
+    }
+  }
+}
+
+void HardwareSimulator::transfer_coherence(float amount) {
+  for (auto &mt : microtubules) {
+    for (auto &dimer : mt.dimers) {
+      dimer.coherence = std::min(1.0f, dimer.coherence + amount);
+    }
+  }
+}
+
+// ================================================================
+// Simulation Control
+// ================================================================
+
+void HardwareSimulator::simulate(float duration_ms, float timestep_ms) {
+  float dt = timestep_ms / 1000.0f; // Convert to seconds
+  int steps = static_cast<int>(duration_ms / timestep_ms);
+
+  for (int i = 0; i < steps; i++) {
+    update_thermal(dt);
+    update_microtubules(dt);
+    simulation_time += dt;
+  }
+}
+
+// ================================================================
+// Statistics
+// ================================================================
+
+size_t HardwareSimulator::total_dimers() const {
+  size_t total = 0;
+  for (const auto &mt : microtubules) {
+    total += mt.dimers.size();
+  }
+  return total;
+}
+
+float HardwareSimulator::average_coherence() const {
+  return calculate_network_coherence();
+}
+
+// ================================================================
+// OrchORModel Implementation
+// ================================================================
+
+OrchORModel::OrchORModel(HardwareSimulator *hw) : hw_sim(hw) {}
+
+void OrchORModel::initialize() { event_history.clear(); }
+
+float OrchORModel::calculate_collapse_time(int num_tubulins) const {
+  // Penrose formula: τ ≈ ℏ / E_G
+  // where E_G is gravitational self-energy
+  float mass = num_tubulins * TUBULIN_MASS_KG;
+  float size = 25.0e-9f; // ~25nm microtubule diameter
+  float G = 6.674e-11f;  // Gravitational constant
+
+  // Gravitational self-energy
+  float E_G = G * mass * mass / size;
+
+  // Planck's constant
+  float hbar = 1.054e-34f;
+
+  return hbar / E_G; // Returns time in seconds
+}
+
+bool OrchORModel::should_collapse(float superposition_mass) const {
+  float collapse_time = calculate_collapse_time(
+      static_cast<int>(superposition_mass / TUBULIN_MASS_KG));
+
+  // Compare with current simulation time
+  return hw_sim && (hw_sim->get_simulation_time() > collapse_time);
+}
+
+OrchOREvent OrchORModel::orchestrated_reduction(const std::string &mt_id) {
+  OrchOREvent event;
+  event.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count();
+  event.microtubule_id = mt_id;
+
+  if (!hw_sim) {
+    event.num_tubulins_collapsed = 0;
+    event.coherence_before = 0;
+    event.coherence_after = 0;
+    event.information_integrated = 0;
+    event.conscious_moment = false;
+    return event;
+  }
+
+  auto mt = hw_sim->get_microtubule(mt_id);
+  if (!mt) {
+    event.num_tubulins_collapsed = 0;
+    return event;
+  }
+
+  // Calculate before state
+  float coherence_sum = 0.0f;
+  int coherent_count = 0;
+  for (const auto &dimer : mt->dimers) {
+    if (dimer.coherence > 0.5f) {
+      coherence_sum += dimer.coherence;
+      coherent_count++;
+    }
+  }
+  event.coherence_before =
+      (coherent_count > 0) ? coherence_sum / coherent_count : 0.0f;
+  event.num_tubulins_collapsed = coherent_count;
+
+  // Perform reduction
+  hw_sim->simulate_orchestrated_reduction(mt_id);
+
+  // Calculate after state
+  coherence_sum = 0.0f;
+  int new_coherent = 0;
+  for (const auto &dimer : mt->dimers) {
+    if (dimer.coherence > 0.5f) {
+      coherence_sum += dimer.coherence;
+      new_coherent++;
+    }
+  }
+  event.coherence_after =
+      (new_coherent > 0) ? coherence_sum / new_coherent : 0.0f;
+
+  // Information integrated (bits)
+  event.information_integrated =
+      2.0f * event.num_tubulins_collapsed * event.coherence_before;
+
+  // Conscious moment if Φ exceeds threshold
+  event.conscious_moment = calculate_phi() > PHI_THRESHOLD;
+
+  event_history.push_back(event);
+  return event;
+}
+
+float OrchORModel::calculate_phi() const {
+  if (!hw_sim)
+    return 0.0f;
+
+  // Simplified IIT Φ using network coherence as proxy
+  float coherence = hw_sim->calculate_network_coherence();
+  size_t dimers = hw_sim->total_dimers();
+
+  // Φ scales with coherence and logarithm of network size
+  return coherence * std::log2(static_cast<float>(dimers) + 1);
+}
+
+std::vector<OrchOREvent> OrchORModel::get_event_history() const {
+  return event_history;
 }

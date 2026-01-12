@@ -2,306 +2,244 @@
 #define NANOBRAIN_HARDWARE_SIM_H
 
 /**
- * NanoBrain Hardware Architecture Simulator
+ * Hardware Architecture Simulation - Chapter 5, Task 5.5
  *
- * Chapter 5: Universal Time Crystal & Big Data
- *
- * Simulates bio-inspired hardware for time crystal computing:
- * - Thermal breathing model for oscillatory computation
- * - Microtubule dynamics for distributed processing
- * - Resonance-based information transfer
- *
- * This provides a computational model that mimics the
- * physical substrates theorized to support consciousness.
+ * Thermal breathing model and microtubule dynamics simulation
+ * for biologically-inspired time crystal hardware.
  */
 
-#include "nanobrain_kernel.h"
 #include "nanobrain_time_crystal.h"
 #include <array>
-#include <map>
-#include <string>
+#include <functional>
 #include <vector>
 
-// Physical constants
-constexpr float BODY_TEMPERATURE = 310.0f;     // Kelvin (37°C)
-constexpr float TUBULIN_DIAMETER = 25.0f;      // Nanometers
-constexpr int PROTOFILAMENTS_PER_TUBULE = 13;  // Standard MT structure
-constexpr float BREATHING_PERIOD_MS = 1000.0f; // 1 Hz breathing cycle
+// ================================================================
+// Hardware Component Types
+// ================================================================
 
-/**
- * Hardware simulator configuration
- */
-struct HardwareSimConfig {
-  float base_temperature = BODY_TEMPERATURE;
-  float temperature_variance = 2.0f;   // ±2K thermal noise
-  int microtubule_count = 100;         // Number of MTs to simulate
-  int tubulin_per_tubule = 100;        // Dimers per MT
-  float coherence_threshold = 0.5f;    // Min coherence for processing
-  float breathing_phase_offset = 0.0f; // Initial breathing phase
-  bool enable_thermal_noise = true;    // Add thermal fluctuations
-  bool enable_quantum_effects = true;  // Simulate quantum coherence
+enum class HardwareComponent {
+  Microtubule,       // Tubulin protein network
+  Membrane,          // Cell membrane oscillator
+  MitochondriaArray, // Energy production
+  SynapticCleft,     // Neurotransmitter dynamics
+  AxonHillock,       // Action potential initiation
+  DendriticSpine,    // Input integration
+  GlialNetwork       // Support cell coupling
 };
 
-/**
- * Thermal state of the system
- */
+enum class BreathingMode {
+  Constant,    // Steady state
+  Sinusoidal,  // Simple oscillation
+  Cardiac,     // Heart-rate coupled
+  Respiratory, // Breathing-coupled
+  Chaotic      // Strange attractor
+};
+
+// ================================================================
+// Thermal Dynamics
+// ================================================================
+
+struct ThermalConfig {
+  float base_temperature = 310.15f; // 37°C in Kelvin
+  float amplitude = 0.5f;           // Temperature swing
+  BreathingMode mode = BreathingMode::Sinusoidal;
+  float frequency = 0.1f; // Hz
+  float thermal_noise = 0.01f;
+};
+
 struct ThermalState {
-  float temperature;          // Current temperature (K)
-  float breathing_phase;      // Breathing cycle phase [0, 2π]
-  float energy_level;         // Metabolic energy available
-  float entropy;              // System entropy
-  float thermal_conductivity; // Heat transfer rate
-  bool in_coherent_regime;    // Temperature allows coherence
+  float current_temperature;
+  float heat_capacity;
+  float thermal_conductivity;
+  float entropy;
+  float free_energy;
 };
 
-/**
- * Single tubulin dimer state
- */
-struct TubulinState {
-  int index;           // Position along MT
-  float alpha_state;   // α-tubulin conformational state
-  float beta_state;    // β-tubulin conformational state
-  float dipole_moment; // Electric dipole
-  bool gtp_bound;      // GTP vs GDP bound state
+// ================================================================
+// Microtubule Model
+// ================================================================
+
+struct TubulinDimer {
+  int index;
+  float alpha_state; // α-tubulin conformation (0-1)
+  float beta_state;  // β-tubulin conformation (0-1)
+  float gtp_energy;  // GTP binding energy
+  float coherence;   // Quantum coherence level
+  std::array<float, 3> position;
 };
 
-/**
- * Microtubule state with tubulin array
- */
-struct MicrotubuleDynamics {
+struct Microtubule {
   std::string id;
-  std::vector<TubulinState> tubulin_states;   // Tubulin dimer array
-  float coherence;                            // MT-wide coherence
-  float resonance_frequency;                  // Collective oscillation
-  std::array<float, 13> protofilament_phases; // Phase per protofilament
-  float collective_dipole;                    // Net dipole moment
-  bool polymerizing;                          // Growing or shrinking
+  std::vector<TubulinDimer> dimers;
+  int protofilaments; // Usually 13
+  float length;       // In nanometers
+  float bending_rigidity;
+  float oscillation_frequency;
+  std::vector<int> prime_resonances;
 };
 
-/**
- * Resonance network between MTs
- */
-struct ResonanceLink {
-  std::string source_mt;
-  std::string target_mt;
-  float coupling_strength;
-  float phase_difference;
-  bool synchronized;
+struct MicrotubuleMetrics {
+  float average_coherence;
+  float collective_oscillation;
+  float information_capacity;
+  int active_dimers;
+  float quantum_effects_ratio;
 };
 
-/**
- * Hardware metrics
- */
-struct HardwareMetrics {
-  float average_temperature;
-  float average_mt_coherence;
-  float total_dipole_moment;
-  int synchronized_mt_pairs;
-  float processing_capacity; // Estimated ops/second
-  float energy_consumption;  // Arbitrary units
-};
+// ================================================================
+// Hardware Simulation Engine
+// ================================================================
 
-/**
- * Hardware Architecture Simulator
- *
- * Models bio-inspired computing substrate for NanoBrain.
- */
 class HardwareSimulator {
 public:
-  HardwareSimulator(NanoBrainKernel *kernel, const HardwareSimConfig &config);
+  HardwareSimulator(TimeCrystalKernel *tc_kernel,
+                    const ThermalConfig &thermal_config = {});
   ~HardwareSimulator();
 
-  // ================================================================
-  // Initialization
-  // ================================================================
-
-  /**
-   * Initialize the hardware simulation
-   */
   void initialize();
-
-  /**
-   * Shutdown simulation
-   */
-  void shutdown();
-
-  /**
-   * Check if simulation is running
-   */
-  bool is_active() const { return active; }
+  void reset();
+  bool is_initialized() const { return initialized; }
 
   // ================================================================
   // Thermal Breathing Model
   // ================================================================
 
-  /**
-   * Update thermal breathing cycle
-   * @param delta_ms Time step in milliseconds
-   */
-  void update_thermal_breathing(float delta_ms);
+  void set_thermal_config(const ThermalConfig &config);
+  ThermalState get_thermal_state() const;
 
-  /**
-   * Get current thermal state
-   */
-  ThermalState get_thermal_state() const { return thermal_state; }
+  // Update thermal state by one timestep
+  void update_thermal(float dt);
 
-  /**
-   * Set target temperature
-   */
-  void set_temperature(float temp_kelvin);
+  // Get temperature at current time
+  float current_temperature() const;
 
-  /**
-   * Add thermal perturbation (external heat)
-   */
-  void add_thermal_perturbation(float delta_temp);
-
-  /**
-   * Check if system is in coherent thermal regime
-   */
-  bool in_coherent_regime() const;
+  // Calculate thermal effects on coherence
+  float thermal_decoherence_rate() const;
 
   // ================================================================
   // Microtubule Dynamics
   // ================================================================
 
-  /**
-   * Create a new microtubule
-   * @param tubulin_count Number of tubulin dimers
-   * @return Microtubule ID
-   */
-  std::string create_microtubule(int tubulin_count = 100);
+  // Create a microtubule with given length (nm) and protofilament count
+  std::string create_microtubule(float length, int protofilaments = 13);
 
-  /**
-   * Get microtubule state
-   */
-  const MicrotubuleDynamics *get_microtubule(const std::string &id) const;
+  // Get microtubule by ID
+  Microtubule *get_microtubule(const std::string &id);
+  const Microtubule *get_microtubule(const std::string &id) const;
 
-  /**
-   * Update all microtubule dynamics
-   * @param delta_ms Time step in milliseconds
-   */
-  void update_microtubule_dynamics(float delta_ms);
+  // Remove microtubule
+  bool remove_microtubule(const std::string &id);
 
-  /**
-   * Get all microtubule IDs
-   */
-  std::vector<std::string> get_all_microtubule_ids() const;
+  // Update microtubule dynamics
+  void update_microtubules(float dt);
 
-  /**
-   * Calculate MT coherence
-   */
-  float calculate_mt_coherence(const MicrotubuleDynamics &mt);
-
-  /**
-   * Trigger polymerization/depolymerization
-   */
-  void set_polymerization_state(const std::string &mt_id, bool polymerizing);
+  // Calculate metrics for a microtubule
+  MicrotubuleMetrics calculate_metrics(const std::string &id) const;
 
   // ================================================================
-  // Resonance Network
+  // Quantum Effects
   // ================================================================
 
-  /**
-   * Create resonance link between MTs
-   */
-  void create_resonance_link(const std::string &source_id,
-                             const std::string &target_id,
-                             float coupling_strength);
+  // Calculate quantum coherence across all microtubules
+  float calculate_network_coherence() const;
 
-  /**
-   * Update resonance network
-   */
-  void update_resonance_network(float delta_ms);
+  // Simulate Orch-OR collapse event
+  bool simulate_orchestrated_reduction(const std::string &mt_id);
 
-  /**
-   * Find synchronized MT clusters
-   */
-  std::vector<std::vector<std::string>> find_synchronized_clusters();
-
-  /**
-   * Get resonance links for MT
-   */
-  std::vector<ResonanceLink>
-  get_resonance_links(const std::string &mt_id) const;
+  // Get quantum state of tubulin network
+  std::vector<float> get_quantum_state() const;
 
   // ================================================================
-  // Information Processing
+  // Time Crystal Integration
   // ================================================================
 
-  /**
-   * Inject pattern into MT network
-   * @param pattern Pattern tensor to inject
-   * @param mt_ids Target microtubules
-   */
-  void inject_pattern(NanoBrainTensor *pattern,
-                      const std::vector<std::string> &mt_ids);
+  // Couple microtubules to time crystal phases
+  void couple_to_time_crystal();
 
-  /**
-   * Read collective state from MT network
-   * @return State tensor
-   */
-  NanoBrainTensor *read_collective_state();
-
-  /**
-   * Perform distributed computation step
-   */
-  void process_step();
+  // Transfer coherence from TC to microtubules
+  void transfer_coherence(float amount);
 
   // ================================================================
-  // Full Simulation Cycle
+  // Simulation Control
   // ================================================================
 
-  /**
-   * Run one complete simulation cycle
-   * @param delta_ms Time step in milliseconds
-   */
-  void run_cycle(float delta_ms);
+  // Run simulation for given duration (ms)
+  void simulate(float duration_ms, float timestep_ms = 0.1f);
 
-  /**
-   * Run multiple cycles
-   */
-  void run_cycles(int count, float delta_ms = 1.0f);
+  // Get simulation time
+  float get_simulation_time() const { return simulation_time; }
 
   // ================================================================
-  // Metrics
+  // Statistics
   // ================================================================
 
-  /**
-   * Get hardware metrics
-   */
-  HardwareMetrics get_metrics() const;
-
-  /**
-   * Get cycle count
-   */
-  size_t get_cycle_count() const { return cycle_count; }
-
-  /**
-   * Get configuration
-   */
-  const HardwareSimConfig &get_config() const { return config; }
+  size_t microtubule_count() const { return microtubules.size(); }
+  size_t total_dimers() const;
+  float average_coherence() const;
 
 private:
-  NanoBrainKernel *kernel;
-  HardwareSimConfig config;
-
-  // State
-  bool active = false;
-  size_t cycle_count = 0;
-  int mt_counter = 0;
-
+  TimeCrystalKernel *tc_kernel;
+  ThermalConfig thermal_config;
   ThermalState thermal_state;
-  std::map<std::string, MicrotubuleDynamics> microtubules;
-  std::vector<ResonanceLink> resonance_links;
+  bool initialized = false;
+  float simulation_time = 0.0f;
+
+  // Microtubule storage
+  std::vector<Microtubule> microtubules;
+  int mt_counter = 0;
 
   // Private helpers
   std::string generate_mt_id();
-  TubulinState create_tubulin(int index);
-  void update_tubulin(TubulinState &tubulin, float delta_ms);
-  void update_protofilament_phases(MicrotubuleDynamics &mt, float delta_ms);
-  float compute_collective_dipole(const MicrotubuleDynamics &mt);
-  void apply_thermal_noise(MicrotubuleDynamics &mt);
-  void apply_quantum_effects(MicrotubuleDynamics &mt);
+  void update_dimer(TubulinDimer &dimer, float dt);
+  float calculate_dimer_energy(const TubulinDimer &dimer) const;
+};
+
+// ================================================================
+// Orch-OR Theory Model
+// ================================================================
+
+struct OrchOREvent {
+  int64_t timestamp;
+  std::string microtubule_id;
+  int num_tubulins_collapsed;
+  float coherence_before;
+  float coherence_after;
+  float information_integrated; // Bits
+  bool conscious_moment;        // Φ > threshold?
+};
+
+/**
+ * Orchestrated Objective Reduction model based on Penrose-Hameroff theory
+ */
+class OrchORModel {
+public:
+  OrchORModel(HardwareSimulator *hw_sim);
+
+  void initialize();
+
+  // Calculate time until next conscious moment
+  float calculate_collapse_time(int num_tubulins) const;
+
+  // Check if collapse should occur
+  bool should_collapse(float superposition_mass) const;
+
+  // Trigger orchestrated reduction
+  OrchOREvent orchestrated_reduction(const std::string &mt_id);
+
+  // Get Φ (integrated information) estimate
+  float calculate_phi() const;
+
+  // Get history of conscious moments
+  std::vector<OrchOREvent> get_event_history() const;
+
+private:
+  HardwareSimulator *hw_sim;
+  std::vector<OrchOREvent> event_history;
+
+  // Planck scale constants
+  static constexpr float PLANCK_TIME_S = 5.39e-44f;
+  static constexpr float TUBULIN_MASS_KG = 1.0e-22f;
+  static constexpr float PHI_THRESHOLD = 0.5f;
 };
 
 #endif // NANOBRAIN_HARDWARE_SIM_H

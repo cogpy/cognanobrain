@@ -1,0 +1,159 @@
+# Chapter 6: Harvesting Singularity Geometry - Implementation Plan
+
+> *Phase Prime Metric in tubulin proteins*
+
+## Goal
+
+Implement Chapter 6 of the NanoBrain development framework, focusing on modeling biological structures (tubulin proteins, neurons) using the Phase Prime Metric (PPM) and time crystal architectures.
+
+---
+
+## Proposed Changes
+
+### Singularity Geometry Module
+
+#### [NEW] [nanobrain_singularity.h](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_singularity.h)
+
+New header defining structures and classes for Chapter 6:
+
+```cpp
+// Core structures:
+struct TubulinRing;           // α-helix ring group encoding
+struct WaterChannel;          // Water channel geometry
+struct TripletResonance;      // Nested resonance bands (triplet-of-triplet)
+struct CellularAutomatonState; // CA state for parallel computing
+struct NeuronTimeCrystalMap;  // Axon triplet bands, scale-free transitions
+struct FilamentSignal;        // Pre-spike hidden communication
+
+// Main classes:
+class TubulinPPMModel;        // Task 6.1: Tubulin PPM structure
+class TripletResonanceCascade;// Task 6.2: Triplet resonance cascade
+class CellularAutomatonEngine;// Task 6.3: Cellular automaton engine
+class NeuronTimeCrystalMapper;// Task 6.4: Complete neuron time crystal map
+class FilamentCommunicator;   // Task 6.5: Hidden filament communication
+```
+
+---
+
+#### [NEW] [nanobrain_singularity.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_singularity.cpp)
+
+Implementation of singularity geometry module:
+
+**Task 6.1** - `TubulinPPMModel`:
+- `create_alpha_helix_ring()` - Model 13 tubulin protofilaments
+- `encode_water_channel()` - Model central water channel geometry
+- `verify_hyperspace_symmetry()` - Validate 11D symmetry properties
+- Uses PPM coherence from existing [TimeCrystalKernel](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_time_crystal.cpp#112-121)
+
+**Task 6.2** - `TripletResonanceCascade`:
+- `TripletResonance` struct with inner bands[3] and nested[3]
+- `cross_resonance()` - Calculate cross-band resonance
+- `cascade_update()` - Propagate resonance through nested levels
+- `get_band_harmonics()` - Extract harmonic frequencies
+
+**Task 6.3** - `CellularAutomatonEngine`:
+- `update_parallel()` - Massively parallel CA update
+- `explore_rule_space()` - Rule 110, fractal rules exploration
+- `apply_ppm_rules()` - PPM-derived cellular automaton rules
+- Uses [NanoBrainKernel](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_kernel.h#22-85) tensors for parallel state updates
+
+**Task 6.4** - `NeuronTimeCrystalMapper`:
+- `map_axon_triplet_bands()` - Model 3-level axon band structure
+- `add_scale_free_transitions()` - Band transition logic
+- `create_neuron_crystal_hierarchy()` - Full neuron mapping
+- Integrates with [TimeCrystalQuantumState](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_time_crystal.h#81-89)
+
+**Task 6.5** - `FilamentCommunicator`:
+- `detect_pre_spike_signal()` - Pre-spike signal detection
+- `predict_spike_timing()` - Timing prediction model
+- `encode_hidden_signal()` - Signal encoding/decoding
+- Uses attention from [AttentionAllocationEngine](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_attention.h#90-92)
+
+---
+
+### Demo Program
+
+#### [NEW] [singularity_demo.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/singularity_demo.cpp)
+
+Demonstration of Chapter 6 features:
+- Tubulin PPM structure visualization
+- Triplet resonance cascade simulation
+- Cellular automaton parallel execution
+- Neuron time crystal mapping
+- Hidden filament communication demo
+
+---
+
+### Build System Update
+
+#### [MODIFY] [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt)
+
+Add new singularity module:
+- Add `nanobrain_singularity.cpp` to library sources
+- Add `nanobrain_singularity.h` to headers
+- Add `singularity_demo` executable target
+
+---
+
+### Integration Updates
+
+#### [MODIFY] [nanobrain_atomese.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_atomese.cpp)
+
+Add knowledge base generator for Chapter 6:
+- `generate_tubulin_ppm_kb()` - Atomese representation of tubulin structure
+- Create ConceptNodes and links for biological structures
+
+#### [MODIFY] [nanobrain_attention.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_attention.cpp)
+
+Add hidden communication support:
+- `detect_pre_spike_attention()` - Detect attention changes before spike
+- Integration point for `FilamentCommunicator`
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+**Build Verification** (via existing demo pattern):
+```bash
+cd e:\antg\nanob\cognanobrain\src\cpp
+mkdir build && cd build
+cmake -DGGML_PATH=/path/to/ggml ..
+cmake --build .
+```
+
+**Singularity Demo Execution**:
+```bash
+./singularity_demo
+```
+
+Expected output:
+- Tubulin ring structure with 13 protofilaments
+- PPM coherence values for tubulin encodings
+- Triplet resonance cascade frequencies
+- Cellular automaton state evolution
+- Neuron time crystal map structure
+- Pre-spike signal detection results
+
+### Manual Verification
+
+1. **Code Review**: Review new structures match Chapter 6 theory from [DEVELOPMENT_FRAMEWORK.md](file:///e:/antg/nanob/cognanobrain/src/cpp/DEVELOPMENT_FRAMEWORK.md)
+
+2. **Integration Check**: Verify new module integrates with existing:
+   - [TimeCrystalKernel](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_time_crystal.cpp#112-121) for quantum states
+   - [NanoBrainKernel](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_kernel.h#22-85) for tensor operations
+   - [AttentionAllocationEngine](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_attention.h#90-92) for attention
+
+3. **Console Output**: Demo should print clear formatted output similar to existing [time_crystal_demo.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/time_crystal_demo.cpp)
+
+---
+
+## Implementation Order
+
+1. Create `nanobrain_singularity.h` with all structures and class declarations
+2. Create `nanobrain_singularity.cpp` with implementations
+3. Update [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt) to include new files
+4. Create `singularity_demo.cpp` 
+5. Modify [nanobrain_atomese.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_atomese.cpp) to add KB generator
+6. Build and test

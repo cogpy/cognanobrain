@@ -1,0 +1,74 @@
+# Chapter 4: Fractal Mechanics Implementation Walkthrough
+
+## Summary
+
+Implemented **Chapter 4: Fractal Mechanics & Geometric Algebra** for the NanoBrain C++ llama.cpp adaptation.
+
+## Files Created
+
+| File | Lines | Description |
+|------|-------|-------------|
+| [nanobrain_dodecanion.h](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_dodecanion.h) | ~210 | 12D hypercomplex number struct |
+| [nanobrain_dodecanion.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_dodecanion.cpp) | ~480 | Algebra operations, multiplication table |
+| [nanobrain_fractal.h](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_fractal.h) | ~320 | CFGA, oscillator, interference headers |
+| [nanobrain_fractal.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_fractal.cpp) | ~700 | Full implementation |
+
+## Key Components
+
+### Dodecanion Algebra
+- 12-dimensional extension of octonions
+- 12×12 multiplication table (non-commutative, non-associative)
+- Operations: `+`, `-`, `*`, `/`, conjugate, inverse, normalize
+- Tensor conversion and 11D manifold projection
+
+### CFGA 13-Operation Engine
+```
+Add, Sub, Mul, Div, Diff, Integrate, PartialDiff,
+Rotate, Scale, Project, Reflect, Compose, Decompose
+```
+
+### FractalHarmonicOscillator
+- 11D phase space evolution
+- Symplectic Euler integration
+- Singularity harvesting mechanism
+- Noise-to-signal conversion
+
+### FractalInterference
+- Microtubule interference simulation
+- Quantum vs fractal model comparison
+
+### RegulatoryEquations
+- 12 equations for projection from infinity
+- Future-to-present impact calculations
+- Time reversal operators
+
+## Tests Added to main.cpp
+
+- **Part 10**: Dodecanion algebra tests
+- **Part 11**: Fractal mechanics tests
+
+## Build Changes
+
+Updated [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt):
+```cmake
+nanobrain_dodecanion.cpp
+nanobrain_fractal.cpp
+nanobrain_dodecanion.h
+nanobrain_fractal.h
+```
+
+## Verification
+
+To verify the implementation:
+
+```bash
+cd e:\antg\nanob\cognanobrain\src\cpp
+mkdir build && cd build
+cmake -DGGML_PATH=/path/to/llama.cpp ..
+cmake --build .
+.\nanobrain_test.exe
+```
+
+Expected output includes:
+- "Part 10: Dodecanion Algebra" section
+- "Part 11: Fractal Mechanics" section

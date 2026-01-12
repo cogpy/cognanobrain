@@ -1,64 +1,54 @@
-# Chapter 6: Harvesting Singularity Geometry - Implementation Walkthrough
+# Chapter 6: Harvesting Singularity Geometry - Walkthrough
 
 ## Summary
 
-Implemented **Chapter 6** of the NanoBrain development framework, adding biological structure modeling using the Phase Prime Metric (PPM).
+Implemented **Chapter 6** of the NanoBrain framework, adding biological structure modeling using Phase Prime Metric (PPM).
 
 ## Files Created
 
-| File | Lines | Description |
-|------|-------|-------------|
-| [nanobrain_singularity.h](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_singularity.h) | ~500 | Header with all Chapter 6 structures and class declarations |
-| [nanobrain_singularity.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_singularity.cpp) | ~1000 | Complete implementation of 5 classes |
-| [singularity_demo.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/singularity_demo.cpp) | ~300 | Demo showcasing all Chapter 6 features |
+| File | LOC | Description |
+|------|-----|-------------|
+| `nanobrain_singularity.h` | ~500 | Header with structures and class declarations |
+| `nanobrain_singularity.cpp` | ~1000 | Complete implementation of 5 classes |
+| `singularity_demo.cpp` | ~300 | Demo showcasing all Chapter 6 features |
 
 ## Files Modified
 
-- [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt) - Added singularity module and demo executable
+- `CMakeLists.txt` - Added singularity module and demo executable
 
 ---
 
 ## Implemented Classes
 
-### Task 6.1: TubulinPPMModel
+### TubulinPPMModel (Task 6.1)
 
-Models microtubule structure with PPM encoding:
-
-- 13 protofilament architecture (standard microtubule)
-- α/β tubulin dimer rings
+- 13 protofilament microtubule architecture
+- α/β tubulin dimer rings with PPM encoding
 - Water channel geometry with coherence zones
-- Hyperspace (11D) symmetry verification
+- 11D hyperspace symmetry verification
 
-### Task 6.2: TripletResonanceCascade
+### TripletResonanceCascade (Task 6.2)
 
-Nested triplet-of-triplet resonance band structure:
-
-- 3-band inner structure with recursive nesting
-- `cross_resonance()` for inter-band harmonics
+- Nested 3-band resonance structure (triplet-of-triplet)
+- Cross-band harmonic calculations
 - Cascade propagation with damping
 - PPM weighting integration
 
-### Task 6.3: CellularAutomatonEngine
-
-Parallel cellular automaton with PPM rules:
+### CellularAutomatonEngine (Task 6.3)
 
 - 2D grid with configurable dimensions
-- Elementary CA rules (Rule 110, etc.)
+- Elementary CA rules (Rule 110, 30, 150)
 - PPM-derived rule generation
 - Pattern detection and entropy analysis
 
-### Task 6.4: NeuronTimeCrystalMapper
-
-Complete neuron → time crystal mapping:
+### NeuronTimeCrystalMapper (Task 6.4)
 
 - Soma, axon, dendrite segment modeling
-- Multi-scale triplet band hierarchy (5 levels)
+- 5-level multi-scale triplet band hierarchy
 - Scale-free band transitions
-- Integration with `TimeCrystalQuantumState`
+- TimeCrystalQuantumState integration
 
-### Task 6.5: FilamentCommunicator
-
-Hidden pre-spike signaling detection:
+### FilamentCommunicator (Task 6.5)
 
 - Attention derivative monitoring
 - Pre-spike signal detection (threshold-based)
@@ -67,34 +57,14 @@ Hidden pre-spike signaling detection:
 
 ---
 
-## Build Instructions
+## Build & Run
 
 ```bash
-cd e:\antg\nanob\cognanobrain\src\cpp
-mkdir build && cd build
-cmake -DGGML_PATH=/path/to/ggml ..
+cd build
 cmake --build .
 ./singularity_demo
 ```
 
----
-
-## Integration Architecture
-
-```
-┌─────────────────────────────────────────┐
-│          Singularity Module             │
-├─────────────────────────────────────────┤
-│ TubulinPPMModel ────► TimeCrystalKernel │
-│ TripletResonanceCascade ► NanoBrainKernel│
-│ CellularAutomatonEngine ► NanoBrainKernel│
-│ NeuronTimeCrystalMapper ► TimeCrystalKernel│
-│ FilamentCommunicator ► AttentionEngine  │
-└─────────────────────────────────────────┘
-```
-
----
-
 ## Status
 
-✅ All Chapter 6 tasks implemented and ready for testing
+✅ Chapter 6 complete - All 5 tasks implemented

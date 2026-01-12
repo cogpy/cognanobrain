@@ -2,194 +2,192 @@
 #define NANOBRAIN_TC_TRANSFORM_H
 
 /**
- * NanoBrain Time Crystal Transform Engine
+ * Time Crystal Transform - Chapter 5, Task 5.2
  *
- * Chapter 5: Universal Time Crystal & Big Data
- *
- * Implements Time Crystal Transform (TCT) as an alternative to FFT,
- * using prime-based harmonic analysis instead of Fourier decomposition.
- *
- * Key advantages:
- * - Pattern recognition without explicit frequency domain
- * - Prime-coherent signal decomposition
- * - Native support for fractal signals
+ * Signal analysis without Fourier - using time crystal synchronization
+ * for frequency decomposition and pattern recognition.
  */
 
 #include "nanobrain_kernel.h"
 #include "nanobrain_time_crystal.h"
-#include <string>
+#include <complex>
+#include <functional>
 #include <vector>
 
-/**
- * Time Crystal Transform configuration
- */
+// ================================================================
+// Transform Modes
+// ================================================================
+
+enum class TCTransformMode {
+  Signal1D, // 1D time series
+  Image2D,  // 2D image data
+  Sound,    // Audio analysis
+  Video,    // 3D video frames
+  Custom    // User-defined
+};
+
+enum class TCBasisType {
+  Prime,     // Prime number basis
+  Fibonacci, // Fibonacci sequence
+  Golden,    // Golden ratio based
+  Harmonic,  // Musical harmonics
+  Fractal    // Self-similar basis
+};
+
+// ================================================================
+// Transform Configuration
+// ================================================================
+
 struct TCTransformConfig {
-  int num_prime_components = 15;    // Number of prime frequency bins
-  int signal_resolution = 1024;     // Default signal length
-  float coherence_threshold = 0.5f; // Minimum coherence for component
-  bool normalize_output = true;     // Normalize spectrum to [0, 1]
-  bool use_golden_ratio = true;     // Apply golden ratio modulation
+  TCTransformMode mode = TCTransformMode::Signal1D;
+  TCBasisType basis = TCBasisType::Prime;
+  int num_crystals = 64;   // Number of TC oscillators
+  int max_frequency = 100; // Max frequency to analyze
+  float coherence_threshold = 0.5f;
+  bool use_gpu = false;
 };
 
-/**
- * Single component in the TC spectrum
- */
+// ================================================================
+// Transform Results
+// ================================================================
+
 struct TCSpectralComponent {
-  int prime;                    // Prime number for this component
-  float amplitude;              // Component amplitude
-  float phase;                  // Phase angle
-  float coherence;              // Coherence with signal
-  std::vector<float> harmonics; // Sub-harmonics
+  float frequency;
+  float amplitude;
+  float phase;
+  int prime_index; // Which prime resonated
+  float coherence;
 };
 
-/**
- * Time Crystal Transform result
- */
 struct TCTransformResult {
-  std::vector<TCSpectralComponent> components; // Prime spectral components
-  std::vector<float> prime_spectrum;           // Amplitude by prime index
-  std::vector<float> phase_values;             // Phase by prime index
-  float overall_coherence;                     // Global coherence score
-  float signal_energy;                         // Total signal energy
-  std::vector<int> dominant_primes;            // Most significant primes
+  std::vector<TCSpectralComponent> components;
+  float total_energy;
+  float reconstruction_error;
+  int64_t compute_time_us;
 };
 
-/**
- * Image analysis result
- */
-struct ImageAnalysisResult {
-  TCTransformResult row_transform;                   // Row-wise analysis
-  TCTransformResult col_transform;                   // Column-wise analysis
-  std::vector<std::vector<float>> spatial_coherence; // 2D coherence map
-  float dominant_scale;            // Dominant spatial frequency
-  std::vector<int> pattern_primes; // Primes describing pattern
+struct TCBenchmarkResult {
+  int signal_length;
+  float tc_time_ms;
+  float fft_time_ms;
+  float tc_accuracy;
+  float fft_accuracy;
+  float speedup_ratio;
+  std::string recommendation;
 };
 
-/**
- * Audio analysis result
- */
-struct AudioAnalysisResult {
-  TCTransformResult spectral;            // Spectral analysis
-  std::vector<float> temporal_coherence; // Coherence over time
-  float dominant_frequency;              // Dominant frequency in Hz
-  std::vector<int> rhythm_primes;        // Primes describing rhythm
-  float music_coherence;                 // Musical coherence score
-};
+// ================================================================
+// Time Crystal Transform Class
+// ================================================================
 
-/**
- * Time Crystal Transform Engine
- *
- * Provides signal analysis using prime-based decomposition
- * instead of traditional Fourier analysis.
- */
-class TCTransformEngine {
+class TimeCrystalTransform {
 public:
-  TCTransformEngine(NanoBrainKernel *kernel, const TCTransformConfig &config);
-  ~TCTransformEngine();
+  TimeCrystalTransform(NanoBrainKernel *kernel,
+                       const TCTransformConfig &config = {});
+  ~TimeCrystalTransform();
 
   // ================================================================
-  // Core Transform Operations
+  // Initialization
   // ================================================================
 
-  /**
-   * Forward Time Crystal Transform
-   * @param signal Input signal
-   * @return Transform result with prime spectrum
-   */
-  TCTransformResult transform(const std::vector<float> &signal);
-
-  /**
-   * Inverse Time Crystal Transform
-   * @param result Transform result
-   * @return Reconstructed signal
-   */
-  std::vector<float> inverse_transform(const TCTransformResult &result);
-
-  /**
-   * Compute single prime component
-   * @param signal Input signal
-   * @param prime Prime number for analysis
-   * @return Spectral component
-   */
-  TCSpectralComponent compute_prime_component(const std::vector<float> &signal,
-                                              int prime);
+  void initialize();
+  void reset();
+  bool is_initialized() const { return initialized; }
 
   // ================================================================
-  // Analysis Modes
+  // Forward Transform (Signal → Spectrum)
   // ================================================================
 
-  /**
-   * Analyze image using TC transform
-   * @param image 2D image data (row-major)
-   * @return Image analysis result
-   */
-  ImageAnalysisResult
-  analyze_image(const std::vector<std::vector<float>> &image);
+  // Transform 1D signal
+  TCTransformResult forward(const std::vector<float> &signal);
 
-  /**
-   * Analyze audio signal
-   * @param samples Audio samples
-   * @param sample_rate Sample rate in Hz
-   * @return Audio analysis result
-   */
-  AudioAnalysisResult analyze_audio(const std::vector<float> &samples,
-                                    int sample_rate);
+  // Transform 2D image
+  TCTransformResult forward_2d(const std::vector<std::vector<float>> &image);
 
-  /**
-   * Analyze pattern for prime encoding
-   * @param pattern Input pattern
-   * @return Vector of dominant primes describing pattern
-   */
-  std::vector<int> extract_prime_encoding(const std::vector<float> &pattern);
+  // Transform complex signal
+  TCTransformResult
+  forward_complex(const std::vector<std::complex<float>> &signal);
 
   // ================================================================
-  // Comparison with FFT
+  // Inverse Transform (Spectrum → Signal)
   // ================================================================
 
-  /**
-   * Compare TC Transform with FFT (for benchmarking)
-   * @param signal Input signal
-   * @return Comparison metrics
-   */
-  struct TransformComparison {
-    float tc_coherence;
-    float fft_energy;
-    float reconstruction_error_tc;
-    float reconstruction_error_fft;
-    float sparsity_tc;
-    float sparsity_fft;
-  };
-  TransformComparison compare_with_fft(const std::vector<float> &signal);
+  // Reconstruct 1D signal
+  std::vector<float> inverse(const TCTransformResult &spectrum);
+
+  // Reconstruct 2D image
+  std::vector<std::vector<float>> inverse_2d(const TCTransformResult &spectrum,
+                                             int width, int height);
 
   // ================================================================
-  // Utility Functions
+  // Analysis Functions
   // ================================================================
 
-  /**
-   * Get prime frequencies for analysis
-   */
-  std::vector<int> get_analysis_primes() const;
+  // Find dominant frequencies
+  std::vector<float> find_dominant_frequencies(const std::vector<float> &signal,
+                                               int top_k = 5);
 
-  /**
-   * Set custom prime set
-   */
-  void set_analysis_primes(const std::vector<int> &primes);
+  // Detect periodic patterns
+  std::vector<int> detect_periods(const std::vector<float> &signal);
 
-  /**
-   * Get configuration
-   */
+  // Calculate signal coherence
+  float calculate_coherence(const std::vector<float> &signal);
+
+  // ================================================================
+  // Filtering
+  // ================================================================
+
+  // Low-pass filter using TC
+  std::vector<float> lowpass(const std::vector<float> &signal, float cutoff);
+
+  // High-pass filter using TC
+  std::vector<float> highpass(const std::vector<float> &signal, float cutoff);
+
+  // Band-pass filter using TC
+  std::vector<float> bandpass(const std::vector<float> &signal, float low,
+                              float high);
+
+  // ================================================================
+  // Benchmarking
+  // ================================================================
+
+  // Compare with FFT
+  TCBenchmarkResult benchmark_vs_fft(const std::vector<float> &signal);
+
+  // ================================================================
+  // Configuration
+  // ================================================================
+
   const TCTransformConfig &get_config() const { return config; }
+  void update_config(const TCTransformConfig &new_config);
 
 private:
   NanoBrainKernel *kernel;
   TCTransformConfig config;
-  std::vector<int> analysis_primes;
+  bool initialized = false;
 
-  // Internal helpers
-  void initialize_primes();
-  float compute_prime_correlation(const std::vector<float> &signal, int prime);
-  float compute_phase_at_prime(const std::vector<float> &signal, int prime);
-  std::vector<float> generate_prime_basis(int prime, size_t length);
+  // Time crystal oscillators
+  std::vector<float> oscillator_phases;
+  std::vector<float> oscillator_frequencies;
+  std::vector<int> oscillator_primes;
+
+  // Private helpers
+  void initialize_oscillators();
+  float correlate_with_oscillator(const std::vector<float> &signal,
+                                  int osc_idx);
+  std::vector<float> generate_basis_function(int index, int length);
+  int64_t current_time_us() const;
 };
+
+// ================================================================
+// Utility Functions
+// ================================================================
+
+// Simple DFT for comparison (not optimized)
+std::vector<std::complex<float>> simple_dft(const std::vector<float> &signal);
+
+// Inverse DFT
+std::vector<float> simple_idft(const std::vector<std::complex<float>> &spectrum,
+                               int length);
 
 #endif // NANOBRAIN_TC_TRANSFORM_H

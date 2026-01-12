@@ -1,397 +1,402 @@
 #include "nanobrain_tc_transform.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
-#include <iostream>
 #include <numeric>
 
 // ================================================================
-// Constructor / Destructor
+// TimeCrystalTransform Implementation
 // ================================================================
 
-TCTransformEngine::TCTransformEngine(NanoBrainKernel *kernel,
-                                     const TCTransformConfig &config)
-    : kernel(kernel), config(config) {
-  initialize_primes();
+TimeCrystalTransform::TimeCrystalTransform(NanoBrainKernel *k,
+                                           const TCTransformConfig &cfg)
+    : kernel(k), config(cfg), initialized(false) {}
+
+TimeCrystalTransform::~TimeCrystalTransform() = default;
+
+void TimeCrystalTransform::initialize() {
+  initialize_oscillators();
+  initialized = true;
 }
 
-TCTransformEngine::~TCTransformEngine() {}
-
-void TCTransformEngine::initialize_primes() {
-  // Use fundamental primes from time crystal theory
-  analysis_primes.clear();
-  for (int i = 0;
-       i < config.num_prime_components && i < FUNDAMENTAL_PRIMES_COUNT; i++) {
-    analysis_primes.push_back(FUNDAMENTAL_PRIMES[i]);
-  }
+void TimeCrystalTransform::reset() {
+  oscillator_phases.clear();
+  oscillator_frequencies.clear();
+  oscillator_primes.clear();
+  initialized = false;
 }
 
-// ================================================================
-// Core Transform Operations
-// ================================================================
-
-TCTransformResult
-TCTransformEngine::transform(const std::vector<float> &signal) {
-  TCTransformResult result;
-  result.signal_energy = 0.0f;
-
-  // Compute signal energy
-  for (float s : signal) {
-    result.signal_energy += s * s;
-  }
-  result.signal_energy = std::sqrt(result.signal_energy);
-
-  // Compute each prime component
-  float total_coherence = 0.0f;
-  for (int prime : analysis_primes) {
-    TCSpectralComponent comp = compute_prime_component(signal, prime);
-    result.components.push_back(comp);
-    result.prime_spectrum.push_back(comp.amplitude);
-    result.phase_values.push_back(comp.phase);
-    total_coherence += comp.coherence;
-  }
-
-  // Overall coherence
-  result.overall_coherence =
-      analysis_primes.empty() ? 0.0f : total_coherence / analysis_primes.size();
-
-  // Find dominant primes
-  std::vector<std::pair<int, float>> prime_amps;
-  for (size_t i = 0; i < analysis_primes.size(); i++) {
-    prime_amps.push_back({analysis_primes[i], result.prime_spectrum[i]});
-  }
-  std::sort(prime_amps.begin(), prime_amps.end(),
-            [](const auto &a, const auto &b) { return a.second > b.second; });
-
-  for (size_t i = 0; i < std::min(size_t(5), prime_amps.size()); i++) {
-    result.dominant_primes.push_back(prime_amps[i].first);
-  }
-
-  // Normalize if requested
-  if (config.normalize_output && result.signal_energy > 0) {
-    for (auto &amp : result.prime_spectrum) {
-      amp /= result.signal_energy;
-    }
-    for (auto &comp : result.components) {
-      comp.amplitude /= result.signal_energy;
-    }
-  }
-
-  return result;
+int64_t TimeCrystalTransform::current_time_us() const {
+  return std::chrono::duration_cast<std::chrono::microseconds>(
+             std::chrono::high_resolution_clock::now().time_since_epoch())
+      .count();
 }
 
-std::vector<float>
-TCTransformEngine::inverse_transform(const TCTransformResult &result) {
-  if (result.components.empty()) {
-    return std::vector<float>();
-  }
+void TimeCrystalTransform::initialize_oscillators() {
+  oscillator_phases.resize(config.num_crystals);
+  oscillator_frequencies.resize(config.num_crystals);
+  oscillator_primes.resize(config.num_crystals);
 
-  size_t length = config.signal_resolution;
-  std::vector<float> reconstructed(length, 0.0f);
+  // Initialize based on basis type
+  for (int i = 0; i < config.num_crystals; i++) {
+    oscillator_phases[i] = 0.0f;
 
-  // Sum prime basis functions weighted by amplitude and phase
-  for (const auto &comp : result.components) {
-    auto basis = generate_prime_basis(comp.prime, length);
+    switch (config.basis) {
+    case TCBasisType::Prime:
+      oscillator_primes[i] = FUNDAMENTAL_PRIMES[i % 15];
+      oscillator_frequencies[i] = static_cast<float>(oscillator_primes[i]);
+      break;
 
-    for (size_t i = 0; i < length; i++) {
-      // Apply amplitude and phase shift
-      float phase_shifted = std::cos(basis[i] + comp.phase);
-      reconstructed[i] += comp.amplitude * phase_shifted;
+    case TCBasisType::Fibonacci: {
+      int fib_n = (i < 2) ? 1 : 0;
+      int fib_prev = 1, fib_curr = 1;
+      for (int j = 2; j <= i; j++) {
+        fib_n = fib_prev + fib_curr;
+        fib_prev = fib_curr;
+        fib_curr = fib_n;
+      }
+      oscillator_frequencies[i] = static_cast<float>(fib_n);
+      oscillator_primes[i] = fib_n;
+    } break;
+
+    case TCBasisType::Golden:
+      oscillator_frequencies[i] = std::pow(1.618033988749895f, i);
+      oscillator_primes[i] = static_cast<int>(oscillator_frequencies[i]);
+      break;
+
+    case TCBasisType::Harmonic:
+      oscillator_frequencies[i] = static_cast<float>(i + 1);
+      oscillator_primes[i] = i + 1;
+      break;
+
+    case TCBasisType::Fractal:
+      oscillator_frequencies[i] =
+          std::pow(2.0f, static_cast<float>(i) / 12.0f); // Octave divisions
+      oscillator_primes[i] = static_cast<int>(oscillator_frequencies[i] * 10);
+      break;
     }
   }
-
-  return reconstructed;
 }
 
-TCSpectralComponent
-TCTransformEngine::compute_prime_component(const std::vector<float> &signal,
-                                           int prime) {
-  TCSpectralComponent comp;
-  comp.prime = prime;
-
-  // Compute correlation with prime basis
-  float correlation = compute_prime_correlation(signal, prime);
-  comp.amplitude = std::abs(correlation);
-
-  // Compute phase
-  comp.phase = compute_phase_at_prime(signal, prime);
-
-  // Compute coherence using PPM formula
-  float sqrt_prime = std::sqrt(static_cast<float>(prime));
-  comp.coherence = 0.5f + 0.5f * std::sin(sqrt_prime * PI / prime);
-
-  // Compute sub-harmonics
-  comp.harmonics.clear();
-  for (int h = 2; h <= 5; h++) {
-    int sub_prime = prime / h;
-    if (sub_prime > 1) {
-      float sub_corr = compute_prime_correlation(signal, sub_prime);
-      comp.harmonics.push_back(std::abs(sub_corr));
-    }
-  }
-
-  return comp;
-}
-
-float TCTransformEngine::compute_prime_correlation(
-    const std::vector<float> &signal, int prime) {
-  if (signal.empty())
-    return 0.0f;
-
-  auto basis = generate_prime_basis(prime, signal.size());
-
-  // Dot product
-  float correlation = 0.0f;
-  for (size_t i = 0; i < signal.size(); i++) {
-    correlation += signal[i] * std::cos(basis[i]);
-  }
-
-  return correlation / signal.size();
-}
-
-float TCTransformEngine::compute_phase_at_prime(
-    const std::vector<float> &signal, int prime) {
-  if (signal.empty())
-    return 0.0f;
-
-  auto basis = generate_prime_basis(prime, signal.size());
-
-  // Compute real and imaginary parts
-  float real_part = 0.0f;
-  float imag_part = 0.0f;
-
-  for (size_t i = 0; i < signal.size(); i++) {
-    real_part += signal[i] * std::cos(basis[i]);
-    imag_part += signal[i] * std::sin(basis[i]);
-  }
-
-  return std::atan2(imag_part, real_part);
-}
-
-std::vector<float> TCTransformEngine::generate_prime_basis(int prime,
-                                                           size_t length) {
+std::vector<float> TimeCrystalTransform::generate_basis_function(int index,
+                                                                 int length) {
   std::vector<float> basis(length);
+  float freq = oscillator_frequencies[index];
+  float phase = oscillator_phases[index];
 
-  float frequency = 2.0f * PI * prime / length;
-
-  for (size_t i = 0; i < length; i++) {
-    // Prime-based frequency with golden ratio modulation
-    float base_angle = frequency * i;
-
-    if (config.use_golden_ratio) {
-      base_angle *= (1.0f + (GOLDEN_RATIO - 1.0f) * std::sin(i * PI / length));
-    }
-
-    basis[i] = base_angle;
+  for (int i = 0; i < length; i++) {
+    float t = static_cast<float>(i) / length;
+    basis[i] = std::cos(2.0f * M_PI * freq * t + phase);
   }
 
   return basis;
 }
 
+float TimeCrystalTransform::correlate_with_oscillator(
+    const std::vector<float> &signal, int osc_idx) {
+  if (signal.empty())
+    return 0.0f;
+
+  auto basis =
+      generate_basis_function(osc_idx, static_cast<int>(signal.size()));
+
+  float sum = 0.0f;
+  for (size_t i = 0; i < signal.size(); i++) {
+    sum += signal[i] * basis[i];
+  }
+
+  return sum / signal.size();
+}
+
 // ================================================================
-// Analysis Modes
+// Forward Transform
 // ================================================================
 
-ImageAnalysisResult
-TCTransformEngine::analyze_image(const std::vector<std::vector<float>> &image) {
-  ImageAnalysisResult result;
+TCTransformResult
+TimeCrystalTransform::forward(const std::vector<float> &signal) {
+  TCTransformResult result;
+  auto start = current_time_us();
 
-  if (image.empty() || image[0].empty()) {
-    return result;
-  }
+  result.components.reserve(config.num_crystals);
+  result.total_energy = 0.0f;
 
-  size_t rows = image.size();
-  size_t cols = image[0].size();
+  for (int i = 0; i < config.num_crystals; i++) {
+    float correlation = correlate_with_oscillator(signal, i);
 
-  // Row-wise analysis (average of all rows)
-  std::vector<float> avg_row(cols, 0.0f);
-  for (size_t r = 0; r < rows; r++) {
-    for (size_t c = 0; c < cols; c++) {
-      avg_row[c] += image[r][c];
-    }
-  }
-  for (size_t c = 0; c < cols; c++) {
-    avg_row[c] /= rows;
-  }
-  result.row_transform = transform(avg_row);
+    // Also compute phase using shifted basis
+    oscillator_phases[i] = M_PI / 2.0f;
+    float sin_correlation = correlate_with_oscillator(signal, i);
+    oscillator_phases[i] = 0.0f;
 
-  // Column-wise analysis (average of all columns)
-  std::vector<float> avg_col(rows, 0.0f);
-  for (size_t r = 0; r < rows; r++) {
-    for (size_t c = 0; c < cols; c++) {
-      avg_col[r] += image[r][c];
-    }
-    avg_col[r] /= cols;
-  }
-  result.col_transform = transform(avg_col);
+    float amplitude = std::sqrt(correlation * correlation +
+                                sin_correlation * sin_correlation) *
+                      2.0f;
+    float phase = std::atan2(sin_correlation, correlation);
 
-  // Spatial coherence map
-  result.spatial_coherence.resize(rows);
-  for (size_t r = 0; r < rows; r++) {
-    result.spatial_coherence[r].resize(cols);
-    for (size_t c = 0; c < cols; c++) {
-      // Local coherence based on neighborhood
-      float local_sum = image[r][c];
-      int count = 1;
-
-      if (r > 0) {
-        local_sum += image[r - 1][c];
-        count++;
-      }
-      if (r < rows - 1) {
-        local_sum += image[r + 1][c];
-        count++;
-      }
-      if (c > 0) {
-        local_sum += image[r][c - 1];
-        count++;
-      }
-      if (c < cols - 1) {
-        local_sum += image[r][c + 1];
-        count++;
-      }
-
-      float local_mean = local_sum / count;
-      float variance = std::abs(image[r][c] - local_mean);
-      result.spatial_coherence[r][c] = 1.0f / (1.0f + variance);
+    if (amplitude > config.coherence_threshold * 0.1f) {
+      TCSpectralComponent comp;
+      comp.frequency = oscillator_frequencies[i];
+      comp.amplitude = amplitude;
+      comp.phase = phase;
+      comp.prime_index = oscillator_primes[i];
+      comp.coherence = amplitude;
+      result.components.push_back(comp);
+      result.total_energy += amplitude * amplitude;
     }
   }
 
-  // Dominant scale from row/col transforms
-  result.dominant_scale = (result.row_transform.dominant_primes.empty()
-                               ? 1.0f
-                               : result.row_transform.dominant_primes[0]) *
-                          (result.col_transform.dominant_primes.empty()
-                               ? 1.0f
-                               : result.col_transform.dominant_primes[0]);
+  result.total_energy = std::sqrt(result.total_energy);
+  result.compute_time_us = current_time_us() - start;
 
-  // Combine pattern primes
-  result.pattern_primes = result.row_transform.dominant_primes;
-  for (int p : result.col_transform.dominant_primes) {
-    if (std::find(result.pattern_primes.begin(), result.pattern_primes.end(),
-                  p) == result.pattern_primes.end()) {
-      result.pattern_primes.push_back(p);
+  // Calculate reconstruction error
+  auto reconstructed = inverse(result);
+  float error = 0.0f;
+  for (size_t i = 0; i < std::min(signal.size(), reconstructed.size()); i++) {
+    float diff = signal[i] - reconstructed[i];
+    error += diff * diff;
+  }
+  result.reconstruction_error = std::sqrt(error / signal.size());
+
+  return result;
+}
+
+TCTransformResult
+TimeCrystalTransform::forward_2d(const std::vector<std::vector<float>> &image) {
+  // Flatten 2D to 1D and transform
+  std::vector<float> flat;
+  for (const auto &row : image) {
+    flat.insert(flat.end(), row.begin(), row.end());
+  }
+  return forward(flat);
+}
+
+TCTransformResult TimeCrystalTransform::forward_complex(
+    const std::vector<std::complex<float>> &signal) {
+  // Extract real part and transform
+  std::vector<float> real_part;
+  real_part.reserve(signal.size());
+  for (const auto &c : signal) {
+    real_part.push_back(c.real());
+  }
+  return forward(real_part);
+}
+
+// ================================================================
+// Inverse Transform
+// ================================================================
+
+std::vector<float>
+TimeCrystalTransform::inverse(const TCTransformResult &spectrum) {
+  // Determine length from first call or default
+  int length = 256;
+  std::vector<float> result(length, 0.0f);
+
+  for (const auto &comp : spectrum.components) {
+    for (int i = 0; i < length; i++) {
+      float t = static_cast<float>(i) / length;
+      result[i] += comp.amplitude *
+                   std::cos(2.0f * M_PI * comp.frequency * t + comp.phase);
     }
   }
 
   return result;
 }
 
-AudioAnalysisResult
-TCTransformEngine::analyze_audio(const std::vector<float> &samples,
-                                 int sample_rate) {
-  AudioAnalysisResult result;
+std::vector<std::vector<float>>
+TimeCrystalTransform::inverse_2d(const TCTransformResult &spectrum, int width,
+                                 int height) {
+  auto flat = inverse(spectrum);
+  flat.resize(width * height, 0.0f);
 
-  if (samples.empty()) {
-    return result;
-  }
-
-  // Spectral analysis
-  result.spectral = transform(samples);
-
-  // Temporal coherence (sliding window)
-  size_t window_size = sample_rate / 10; // 100ms windows
-  size_t num_windows = samples.size() / window_size;
-
-  result.temporal_coherence.reserve(num_windows);
-  for (size_t w = 0; w < num_windows; w++) {
-    std::vector<float> window(samples.begin() + w * window_size,
-                              samples.begin() + (w + 1) * window_size);
-    auto window_result = transform(window);
-    result.temporal_coherence.push_back(window_result.overall_coherence);
-  }
-
-  // Dominant frequency from dominant prime
-  if (!result.spectral.dominant_primes.empty()) {
-    int dominant_prime = result.spectral.dominant_primes[0];
-    result.dominant_frequency =
-        static_cast<float>(dominant_prime * sample_rate) / samples.size();
-  } else {
-    result.dominant_frequency = 0.0f;
-  }
-
-  // Rhythm primes from temporal pattern
-  if (!result.temporal_coherence.empty()) {
-    auto tempo_analysis = transform(result.temporal_coherence);
-    result.rhythm_primes = tempo_analysis.dominant_primes;
-  }
-
-  // Music coherence (average temporal coherence)
-  if (!result.temporal_coherence.empty()) {
-    float sum = 0.0f;
-    for (float c : result.temporal_coherence) {
-      sum += c;
+  std::vector<std::vector<float>> image(height, std::vector<float>(width));
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+      image[y][x] = flat[y * width + x];
     }
-    result.music_coherence = sum / result.temporal_coherence.size();
-  } else {
-    result.music_coherence = result.spectral.overall_coherence;
   }
 
-  return result;
+  return image;
+}
+
+// ================================================================
+// Analysis Functions
+// ================================================================
+
+std::vector<float> TimeCrystalTransform::find_dominant_frequencies(
+    const std::vector<float> &signal, int top_k) {
+  auto result = forward(signal);
+
+  // Sort by amplitude
+  std::sort(
+      result.components.begin(), result.components.end(),
+      [](const auto &a, const auto &b) { return a.amplitude > b.amplitude; });
+
+  std::vector<float> freqs;
+  for (int i = 0;
+       i < std::min(top_k, static_cast<int>(result.components.size())); i++) {
+    freqs.push_back(result.components[i].frequency);
+  }
+
+  return freqs;
 }
 
 std::vector<int>
-TCTransformEngine::extract_prime_encoding(const std::vector<float> &pattern) {
-  auto result = transform(pattern);
-  return result.dominant_primes;
+TimeCrystalTransform::detect_periods(const std::vector<float> &signal) {
+  auto freqs = find_dominant_frequencies(signal, 5);
+
+  std::vector<int> periods;
+  for (float f : freqs) {
+    if (f > 0.001f) {
+      periods.push_back(static_cast<int>(1.0f / f * signal.size()));
+    }
+  }
+
+  return periods;
+}
+
+float TimeCrystalTransform::calculate_coherence(
+    const std::vector<float> &signal) {
+  auto result = forward(signal);
+  return result.total_energy /
+         std::max(1.0f, static_cast<float>(signal.size()));
 }
 
 // ================================================================
-// Comparison with FFT
+// Filtering
 // ================================================================
 
-TCTransformEngine::TransformComparison
-TCTransformEngine::compare_with_fft(const std::vector<float> &signal) {
-  TransformComparison comparison = {};
+std::vector<float>
+TimeCrystalTransform::lowpass(const std::vector<float> &signal, float cutoff) {
+  auto spectrum = forward(signal);
 
-  // TC Transform
-  auto tc_result = transform(signal);
-  comparison.tc_coherence = tc_result.overall_coherence;
+  // Remove high frequency components
+  spectrum.components.erase(
+      std::remove_if(spectrum.components.begin(), spectrum.components.end(),
+                     [cutoff](const auto &c) { return c.frequency > cutoff; }),
+      spectrum.components.end());
 
-  auto tc_reconstructed = inverse_transform(tc_result);
+  auto result = inverse(spectrum);
+  result.resize(signal.size());
+  return result;
+}
 
-  // Reconstruction error for TC
-  if (!tc_reconstructed.empty() && tc_reconstructed.size() == signal.size()) {
-    float error = 0.0f;
-    for (size_t i = 0; i < signal.size(); i++) {
-      float diff = signal[i] - tc_reconstructed[i];
-      error += diff * diff;
-    }
-    comparison.reconstruction_error_tc = std::sqrt(error / signal.size());
+std::vector<float>
+TimeCrystalTransform::highpass(const std::vector<float> &signal, float cutoff) {
+  auto spectrum = forward(signal);
+
+  spectrum.components.erase(
+      std::remove_if(spectrum.components.begin(), spectrum.components.end(),
+                     [cutoff](const auto &c) { return c.frequency < cutoff; }),
+      spectrum.components.end());
+
+  auto result = inverse(spectrum);
+  result.resize(signal.size());
+  return result;
+}
+
+std::vector<float>
+TimeCrystalTransform::bandpass(const std::vector<float> &signal, float low,
+                               float high) {
+  auto spectrum = forward(signal);
+
+  spectrum.components.erase(
+      std::remove_if(spectrum.components.begin(), spectrum.components.end(),
+                     [low, high](const auto &c) {
+                       return c.frequency < low || c.frequency > high;
+                     }),
+      spectrum.components.end());
+
+  auto result = inverse(spectrum);
+  result.resize(signal.size());
+  return result;
+}
+
+// ================================================================
+// Benchmarking
+// ================================================================
+
+TCBenchmarkResult
+TimeCrystalTransform::benchmark_vs_fft(const std::vector<float> &signal) {
+  TCBenchmarkResult result;
+  result.signal_length = static_cast<int>(signal.size());
+
+  // Time TC transform
+  auto start_tc = current_time_us();
+  auto tc_result = forward(signal);
+  result.tc_time_ms =
+      static_cast<float>(current_time_us() - start_tc) / 1000.0f;
+  result.tc_accuracy = 1.0f - tc_result.reconstruction_error;
+
+  // Time simple DFT
+  auto start_fft = current_time_us();
+  auto dft_result = simple_dft(signal);
+  auto reconstructed = simple_idft(dft_result, static_cast<int>(signal.size()));
+  result.fft_time_ms =
+      static_cast<float>(current_time_us() - start_fft) / 1000.0f;
+
+  // Calculate FFT accuracy
+  float fft_error = 0.0f;
+  for (size_t i = 0; i < signal.size(); i++) {
+    float diff = signal[i] - reconstructed[i];
+    fft_error += diff * diff;
+  }
+  result.fft_accuracy = 1.0f - std::sqrt(fft_error / signal.size());
+
+  result.speedup_ratio =
+      result.fft_time_ms / std::max(0.001f, result.tc_time_ms);
+
+  if (result.speedup_ratio > 1.5f && result.tc_accuracy > 0.8f) {
+    result.recommendation = "TC Transform recommended";
+  } else if (result.fft_accuracy > result.tc_accuracy * 1.1f) {
+    result.recommendation = "FFT recommended for accuracy";
+  } else {
+    result.recommendation = "Both perform similarly";
   }
 
-  // Sparsity (percentage of components above threshold)
-  int significant_tc = 0;
-  for (const auto &comp : tc_result.components) {
-    if (comp.amplitude > 0.1f) {
-      significant_tc++;
-    }
-  }
-  comparison.sparsity_tc = tc_result.components.empty()
-                               ? 0.0f
-                               : 1.0f - static_cast<float>(significant_tc) /
-                                            tc_result.components.size();
+  return result;
+}
 
-  // For FFT comparison, we use simplified DFT-like calculation
-  // (Real FFT would require additional library)
-  float fft_energy = 0.0f;
-  for (float s : signal) {
-    fft_energy += s * s;
+void TimeCrystalTransform::update_config(const TCTransformConfig &new_config) {
+  config = new_config;
+  if (initialized) {
+    initialize_oscillators();
   }
-  comparison.fft_energy = std::sqrt(fft_energy);
-  comparison.reconstruction_error_fft = 0.0f; // Perfect reconstruction assumed
-  comparison.sparsity_fft = 0.5f;             // Typical FFT sparsity
-
-  return comparison;
 }
 
 // ================================================================
 // Utility Functions
 // ================================================================
 
-std::vector<int> TCTransformEngine::get_analysis_primes() const {
-  return analysis_primes;
+std::vector<std::complex<float>> simple_dft(const std::vector<float> &signal) {
+  int N = static_cast<int>(signal.size());
+  std::vector<std::complex<float>> result(N);
+
+  for (int k = 0; k < N; k++) {
+    std::complex<float> sum(0.0f, 0.0f);
+    for (int n = 0; n < N; n++) {
+      float angle = -2.0f * M_PI * k * n / N;
+      sum += signal[n] * std::complex<float>(std::cos(angle), std::sin(angle));
+    }
+    result[k] = sum;
+  }
+
+  return result;
 }
 
-void TCTransformEngine::set_analysis_primes(const std::vector<int> &primes) {
-  analysis_primes = primes;
+std::vector<float> simple_idft(const std::vector<std::complex<float>> &spectrum,
+                               int length) {
+  int N = length;
+  std::vector<float> result(N);
+
+  for (int n = 0; n < N; n++) {
+    float sum = 0.0f;
+    for (size_t k = 0; k < spectrum.size(); k++) {
+      float angle = 2.0f * M_PI * k * n / N;
+      sum += spectrum[k].real() * std::cos(angle) -
+             spectrum[k].imag() * std::sin(angle);
+    }
+    result[n] = sum / N;
+  }
+
+  return result;
 }

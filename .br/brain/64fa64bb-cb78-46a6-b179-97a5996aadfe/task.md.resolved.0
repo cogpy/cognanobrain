@@ -1,0 +1,53 @@
+# Chapter 9: Brain Jelly & Humanoid Avatar Implementation
+
+## Overview
+Implementing fractal condensation, programmable matter, and bio-morphic devices for the NanoBrain cognitive system.
+
+---
+
+## Tasks
+
+### Task 9.1: Bio-Morphic Device Types
+- [ ] Create `BioMorphicDevice` enum with 17 device types
+- [ ] Implement `BioMorphicDeviceRegistry` class for device management
+- [ ] Add inter-device communication protocol
+- [ ] Build collective response system
+- [ ] Integrate with [nanobrain_unified.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_unified.cpp)
+
+### Task 9.2: Fractal Condensation Engine
+- [ ] Create `FractalCondensation` class in `nanobrain_time_crystal.h/.cpp`
+- [ ] Implement `condense_everywhere()` method
+- [ ] Implement `apply_prime_pattern()` method
+- [ ] Create `CondensationPoint` structure
+- [ ] Add multi-point condensation logic
+
+### Task 9.3: Brain Jelly Simulator
+- [ ] Implement `BrainJellySimulator` class in `nanobrain_metacognitive.h/.cpp`
+- [ ] Create megamer resonance chain
+- [ ] Add EEG signal generation
+- [ ] Implement jelly-based prime writing
+
+### Task 9.4: Cortical Pen Freezer
+- [ ] Implement dynamics→time crystal conversion
+- [ ] Add problem capsule generation
+- [ ] Integrate with time crystal persistence
+
+### Task 9.5: Humanoid Avatar Interface
+- [ ] Create `HumanoidAvatarInterface` class in `nanobrain_llm_bridge.h/.cpp`
+- [ ] Implement 11D signal sensing
+- [ ] Add sensor-jelly-muscle-brain triad
+- [ ] Build time crystal neural net integration
+
+---
+
+## New Files to Create
+- [ ] `nanobrain_brain_jelly.h` - Header for brain jelly and avatar types
+- [ ] `nanobrain_brain_jelly.cpp` - Implementation of Chapter 9 features
+- [ ] `brain_jelly_demo.cpp` - Demo program for Chapter 9 validation
+
+## Files to Modify
+- [ ] `nanobrain_unified.h/.cpp` - Bio-morphic device integration
+- [ ] `nanobrain_time_crystal.h/.cpp` - Fractal condensation additions
+- [ ] `nanobrain_metacognitive.h/.cpp` - Brain jelly simulator
+- [ ] `nanobrain_llm_bridge.h/.cpp` - Humanoid avatar interface
+- [ ] [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt) - Add new source files and demo executable

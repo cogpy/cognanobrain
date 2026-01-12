@@ -176,6 +176,20 @@ add_executable(singularity_demo singularity_demo.cpp)
 target_link_libraries(singularity_demo nanobrain_kernel ${GGML_LIB_NAME})
 
 # ================================================================
+# Fractal Mechanics Demo (Chapter 4)
+# ================================================================
+
+add_executable(fractal_demo fractal_demo.cpp)
+target_link_libraries(fractal_demo nanobrain_kernel ${GGML_LIB_NAME})
+
+# ================================================================
+# Universal Time Crystal Demo (Chapter 5)
+# ================================================================
+
+add_executable(gog_demo gog_demo.cpp)
+target_link_libraries(gog_demo nanobrain_kernel ${GGML_LIB_NAME})
+
+# ================================================================
 # Compiler Warnings and Optimizations
 # ================================================================
 
