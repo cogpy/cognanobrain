@@ -1,0 +1,61 @@
+# Phase 3: PPM Implementation Tasks
+
+## Chapter 3: Phase Prime Metric (PPM)
+
+### Active Task
+- [x] Planning and design for 10 PPM metric classes
+- [/] Implementation of PPM metric classes
+
+### Task Breakdown
+
+#### 3.1 Implement 10 PPM Metric Classes
+
+- [ ] `PPMMetric1_GeometricShape` - Integer → Shape mapping
+- [ ] `PPMMetric2_OrderedFactor` - Product decomposition
+- [ ] `PPMMetric3_PhasePath` - CW/CCW 360° phase calculation
+- [ ] `PPMMetric4_DomainLimit` - Prime domain bounds
+- [ ] `PPMMetric5_HighOrderedFactor` - OF >> integer
+- [ ] `PPMMetric6_HoleFinder` - Empty space detection
+- [ ] `PPMMetric7_PrimeStatistics` - Silent/active primes
+- [ ] `PPMMetric8_PeriodicRipples` - Normalized periodicity
+- [ ] `PPMMetric9_PrimeLattice` - Twin/cousin/co-primes
+- [ ] `PPMMetric10_ImaginaryLayers` - Multi-layer operations
+
+#### 3.2 Prime Operator Chain
+
+- [ ] Define PPMOperator interface
+- [ ] Implement 10 operators in sequence
+- [ ] Create operator composition API
+- [ ] Benchmark operator performance
+
+#### 3.3 15-Prime Coherence Table
+
+- [ ] Precompute coherence for {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47}
+- [ ] Add SIMD-optimized lookup (optional)
+- [ ] Create coherence visualization
+
+#### 3.4 PPM Evolution for Time Crystals
+
+- [ ] Add `evolve_with_ppm()` method
+- [ ] Create phase plot export
+- [ ] Integrate with existing TimeCrystalKernel
+
+#### 3.5 Big Data Problem Solver
+
+- [ ] Port diabetes dataset analysis
+- [ ] Create PPM vs ML benchmark
+
+## Files to Create/Modify
+
+| File | Action | Description |
+|------|--------|-------------|
+| `nanobrain_ppm.h` | NEW | PPM metric class definitions |
+| `nanobrain_ppm.cpp` | NEW | PPM metric implementations |
+| [nanobrain_time_crystal.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_time_crystal.cpp) | MODIFY | Add `evolve_with_ppm()` |
+| [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt) | MODIFY | Add new source files |
+| `ppm_demo.cpp` | NEW | Demo for PPM functionality |
+
+## Dependencies
+
+- Existing `nanobrain_time_crystal.h/.cpp`
+- Existing `nanobrain_kernel.h/.cpp`

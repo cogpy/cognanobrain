@@ -1,0 +1,100 @@
+# Chapter 7: Integrated Human Brain Model - Walkthrough
+
+## Summary
+
+Implemented the complete time crystal brain architecture as specified in DEVELOPMENT_FRAMEWORK.md Chapter 7. Created new module `nanobrain_brain_model.h/.cpp` with ~1,650 lines of C++ code.
+
+## Components Implemented
+
+### 7.1 Five Sensory Prime Mapping
+
+| Modality | Prime Sequence | Resonance Freq | GML Shape |
+|----------|----------------|----------------|-----------|
+| Visual | 2, 7, 13, 31 | 440 Hz (A4) | Sphere |
+| Auditory | 3, 11, 17, 37 | 261.6 Hz (C4) | Torus |
+| Tactile | 5, 19, 29, 41 | 329.6 Hz (E4) | Cube |
+| Olfactory | 23, 43, 47, 53 | 392 Hz (G4) | Tetrahedron |
+| Gustatory | 59, 61, 67, 71 | 493.9 Hz (B4) | Octahedron |
+
+### 7.2 Twelve Memory Carriers
+
+```cpp
+enum class MemoryCarrier {
+    // Sensory (5)
+    Visual, Auditory, Tactile, Olfactory, Gustatory,
+    // Cognitive (4)
+    Episodic, Semantic, Procedural, Working,
+    // Implicit (3)
+    Implicit, Explicit, Priming
+};
+```
+
+Decay rates optimized per type (Procedural = 0.0001, Working = 0.1).
+
+### 7.3 H3 Decision Device
+
+Three-layer architecture with confidence-weighted voting:
+
+- Layer 1: input → 64 (threshold 0.3)
+- Layer 2: 64 → 32 (threshold 0.5)
+- Layer 3: 32 → actions (threshold 0.7)
+
+### 7.4 Brain Region Simulators
+
+| Region | Function |
+|--------|----------|
+| Cerebellum | Motor coordination, timing prediction |
+| Hippocampus | Episodic encoding, spatial mapping |
+| Hypothalamus | Homeostatic regulation |
+
+### 7.5 Twenty Conscious Expressions
+
+- **Dodecanion (12)**: Focus, Diffuse, Creative, Analytical, Emotional, Logical, Intuitive, Deliberate, Receptive, Projective, Unified, Fragmented
+- **Octonion (8)**: Alert, Drowsy, Euphoric, Anxious, Calm, Agitated, Present, Distant
+
+## Files Modified
+
+| File | Change |
+|------|--------|
+| [nanobrain_brain_model.h](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_brain_model.h) | NEW - Header with all interfaces |
+| [nanobrain_brain_model.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_brain_model.cpp) | NEW - Full implementation |
+| [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt) | Added new module |
+
+## API Usage
+
+```cpp
+// Create brain model
+IntegratedBrainConfig config;
+config.sensory_dim = 128;
+config.action_count = 10;
+
+IntegratedBrainModel brain(kernel, attention, reasoning, metacognitive, config);
+brain.initialize();
+
+// Process sensory input
+auto* visual = brain.process_sensory_input(SensoryModality::Visual, input_tensor);
+
+// Store and recall memory
+std::string mem_id = brain.store_memory(MemoryCarrier::Working, content);
+auto* recalled = brain.recall_memory(mem_id);
+
+// Make decision
+H3DecisionResult result = brain.make_decision(situation);
+std::cout << "Action: " << result.selected_action 
+          << " (conf: " << result.confidence << ")" << std::endl;
+
+// Get consciousness state
+auto expr = brain.get_current_expression();
+std::cout << "Expression: " 
+          << ConsciousnessExpressionEngine::get_expression_name(expr.primary_expression)
+          << std::endl;
+```
+
+## Build Notes
+
+IDE lint errors about missing `ggml/ggml.h` are expected. These resolve when building with:
+
+```bash
+cmake -DGGML_PATH=/path/to/llama.cpp ..
+make
+```

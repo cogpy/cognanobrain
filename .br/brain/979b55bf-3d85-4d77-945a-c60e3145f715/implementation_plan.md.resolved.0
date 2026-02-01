@@ -1,0 +1,50 @@
+# TLD Explorer Implementation Plan
+
+## Goal
+Create a modern, premium web application to explore the Top-Level Domain (TLD) categories and data provided in [TLD_Categories_Comprehensive_1.md](file:///g:/antigrav/tldx/TLD_Categories_Comprehensive_1.md).
+
+## User Review Required
+- None currently.
+
+## Proposed Changes
+### Project Structure
+- Initialize a new Vite + React project in the current directory.
+- Move [TLD_Categories_Comprehensive_1.md](file:///g:/antigrav/tldx/TLD_Categories_Comprehensive_1.md) to `src/data` (or keep as reference and generate a JSON).
+
+### Data Processing
+- Create a script or manual process to convert the Markdown data into a structured JSON format (`tlds.json`) to be imported by the app.
+- Structure:
+  ```json
+  [
+    {
+      "category": "Country Code TLDs (ccTLDs)",
+      "count": 238,
+      "subcategories": [
+        {
+          "name": "Europe",
+          "count": 51,
+          "tlds": [".at", ".ax", ...]
+        }
+      ]
+    }
+  ]
+  ```
+
+### UI Implementation
+- **Design**: Premium, dark mode aesthetic with vibrant accents.
+- **Components**:
+  - `App.jsx`: Main layout.
+  - `CategoryList.jsx`: Sidebar or grid of categories.
+  - `TLDGrid.jsx`: Display TLDs for selected category/subcategory.
+  - `Stats.jsx`: Visual representation of the summary data.
+- **Styling**: Vanilla CSS with CSS variables for theming.
+
+## Verification Plan
+### Automated Tests
+- Run `npm run dev` and verify the app loads.
+- Check console for errors.
+
+### Manual Verification
+- Verify all categories from the markdown file are present.
+- Verify TLD counts match the summary.
+- Test responsiveness and UI interactions.

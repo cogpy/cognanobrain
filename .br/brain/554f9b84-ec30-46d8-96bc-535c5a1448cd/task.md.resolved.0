@@ -1,0 +1,45 @@
+# Chapter 4: Fractal Mechanics & Geometric Algebra Implementation
+
+## Overview
+Implementing 5 core tasks from Chapter 4: "Beyond quantum mechanics with dodecanion brain"
+
+## Tasks
+
+### 4.1 Fractal Harmonic Oscillator
+- [ ] Create `FractalHarmonicOscillator` class in `nanobrain_fractal.h/.cpp`
+- [ ] Implement phase space evolution
+- [ ] Add singularity harvesting mechanism
+- [ ] Implement noise→signal conversion
+
+### 4.2 CFGA 13-Operation Engine
+- [ ] Create `CFGAOperator` class with 13 geometric algebra operations
+- [ ] Operations: add, sub, mul, div, diff, integrate, partial_diff, rotate, scale, project, reflect, compose, decompose
+- [ ] Add operator chaining API
+- [ ] Benchmark against standard tensor ops
+
+### 4.3 Dodecanion Algebra
+- [ ] Create `Dodecanion` struct for 12-dimensional numbers
+- [ ] Implement 12D multiplication table
+- [ ] Add dodecanion-to-tensor conversion
+- [ ] Create 11D manifold projection
+
+### 4.4 Fractal Interference Simulation
+- [ ] Port microtubule interference model
+- [ ] Implement quantum vs fractal comparison metrics
+- [ ] Add wave interference visualization export
+
+### 4.5 12 Regulatory Equations
+- [ ] Implement projection from infinity
+- [ ] Add future→present impact calculations
+- [ ] Create time-reversal operators
+
+## Current Progress
+- [/] Planning and design phase
+
+## Files to Create/Modify
+- `nanobrain_fractal.h` (NEW)
+- `nanobrain_fractal.cpp` (NEW)
+- `nanobrain_dodecanion.h` (NEW)
+- `nanobrain_dodecanion.cpp` (NEW)
+- [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt) (MODIFY)
+- [main.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/main.cpp) (MODIFY for tests)

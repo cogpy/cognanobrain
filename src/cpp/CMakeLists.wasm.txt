@@ -1,0 +1,137 @@
+# WebAssembly Build Configuration for NanoBrain
+#
+# Build with Emscripten:
+#   emcmake cmake -B build-wasm
+#   cmake --build build-wasm
+#
+# Output: nanobrain.js + nanobrain.wasm
+
+cmake_minimum_required(VERSION 3.16)
+project(nanobrain_wasm)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Emscripten-specific settings
+if(EMSCRIPTEN)
+    message(STATUS "Building for WebAssembly with Emscripten")
+    
+    # Optimization flags
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+    
+    # WASM specific
+    set(CMAKE_EXECUTABLE_SUFFIX ".js")
+else()
+    message(FATAL_ERROR "This CMakeLists.txt is for Emscripten only. Use CMakeLists.txt for native builds.")
+endif()
+
+# ================================================================
+# Source Files
+# ================================================================
+
+set(NANOBRAIN_SOURCES
+    nanobrain_kernel.cpp
+    nanobrain_encoder.cpp
+    nanobrain_time_crystal.cpp
+    nanobrain_reasoning.cpp
+    nanobrain_attention.cpp
+    nanobrain_metacognitive.cpp
+    nanobrain_unified.cpp
+    nanobrain_gog.cpp
+    nanobrain_tc_transform.cpp
+    nanobrain_spontaneous.cpp
+    nanobrain_turing_tests.cpp
+    nanobrain_hardware_sim.cpp
+    nanobrain_ppm.cpp
+    nanobrain_philosophical.cpp
+    nanobrain_fractal_tape.cpp
+    nanobrain_singularity.cpp
+    nanobrain_brain_model.cpp
+    nanobrain_consciousness.cpp
+    nanobrain_brain_jelly.cpp
+    nanobrain_hinductor.cpp
+)
+
+# JavaScript bindings
+set(WASM_SOURCES
+    wasm_bindings.cpp
+)
+
+# ================================================================
+# GGML Configuration
+# ================================================================
+
+# For WASM, we need a WASM-compiled ggml
+set(GGML_WASM_PATH "" CACHE PATH "Path to WASM-compiled ggml")
+
+if(GGML_WASM_PATH)
+    include_directories(${GGML_WASM_PATH}/include)
+    link_directories(${GGML_WASM_PATH}/lib)
+else()
+    # Try to find ggml in parent directories
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../ggml")
+        set(GGML_WASM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../ggml")
+        include_directories(${GGML_WASM_PATH}/include ${GGML_WASM_PATH})
+    endif()
+endif()
+
+# ================================================================
+# Build Target
+# ================================================================
+
+add_executable(nanobrain
+    ${NANOBRAIN_SOURCES}
+    ${WASM_SOURCES}
+)
+
+# Link ggml (must be WASM-compiled)
+if(EXISTS "${GGML_WASM_PATH}/lib/libggml.a")
+    target_link_libraries(nanobrain ${GGML_WASM_PATH}/lib/libggml.a)
+endif()
+
+# ================================================================
+# Emscripten Link Options
+# ================================================================
+
+target_link_options(nanobrain PRIVATE
+    # Memory settings
+    -sINITIAL_MEMORY=64MB
+    -sALLOW_MEMORY_GROWTH=1
+    -sMAXIMUM_MEMORY=512MB
+    
+    # Module settings
+    -sMODULARIZE=1
+    -sEXPORT_NAME="NanoBrain"
+    
+    # Function exports
+    -sEXPORTED_FUNCTIONS=['_malloc','_free','_main']
+    -sEXPORTED_RUNTIME_METHODS=['ccall','cwrap','UTF8ToString','stringToUTF8']
+    
+    # Enable WebAssembly features
+    -sWASM=1
+    -sWASM_BIGINT=1
+    
+    # ES6 module output
+    -sENVIRONMENT=web,worker
+    
+    # Async support
+    -sASYNCIFY=1
+    
+    # Debug (remove for production)
+    # -sASSERTIONS=1
+    # -g
+)
+
+# ================================================================
+# Output
+# ================================================================
+
+set_target_properties(nanobrain PROPERTIES
+    OUTPUT_NAME "nanobrain"
+)
+
+message(STATUS "WebAssembly build configured")
+message(STATUS "  Output: nanobrain.js, nanobrain.wasm")
+message(STATUS "  Run: emcmake cmake -B build && cmake --build build")

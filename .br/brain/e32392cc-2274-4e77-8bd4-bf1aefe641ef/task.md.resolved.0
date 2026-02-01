@@ -1,0 +1,53 @@
+# Chapter 8: Hinductor & Magnetic Light Implementation
+
+## Overview
+Implementing the Hinductor & Magnetic Light features from the NanoBrain development framework, focusing on vortex-based resistance models, magnetic knot synthesis, and magnonic interfaces.
+
+## Tasks
+
+### Planning
+- [x] Review DEVELOPMENT_FRAMEWORK.md for Chapter 8 requirements
+- [/] Create implementation plan for all 5 tasks
+- [ ] Get user approval on implementation plan
+
+### Implementation
+- [ ] **8.1** Implement Hinductor model in new file `nanobrain_hinductor.h/.cpp`
+  - [ ] Create `Hinductor` class with vortex resistance
+  - [ ] Implement capacitance oscillation
+  - [ ] Add magnetic light generation
+  - [ ] Create unit tests
+
+- [ ] **8.2** Build magnetic knot generator
+  - [ ] Implement spin-like knot patterns
+  - [ ] Add super-coil synthesis  
+  - [ ] Create vortex atom morphogenesis
+  - [ ] Integrate with TimeCrystalKernel
+
+- [ ] **8.3** Add Tomasch oscillation harvesting
+  - [ ] Implement noise-to-signal conversion
+  - [ ] Add thermal wave processing
+  - [ ] Create energy harvesting metrics
+
+- [ ] **8.4** Create phase space with 12 blinking holes
+  - [ ] Implement hole state dynamics
+  - [ ] Add periodic oscillation tracking
+  - [ ] Visualize phase space state
+
+- [ ] **8.5** Build magnonic interface bridge
+  - [ ] Create electron→magnon transition
+  - [ ] Add wireless H-device communication
+  - [ ] Integrate with LLM bridge
+
+### Verification
+- [ ] Run unit tests for new modules
+- [ ] Run time crystal demo with Hinductor integration
+- [ ] Verify coherence calculations still pass
+- [ ] Manual verification of magnetic knot patterns
+
+## Files to Create/Modify
+- **NEW**: `nanobrain_hinductor.h` - Header for Hinductor classes
+- **NEW**: `nanobrain_hinductor.cpp` - Implementation
+- **MODIFY**: `nanobrain_time_crystal.h/.cpp` - Add magnetic knot integration
+- **MODIFY**: `nanobrain_llm_bridge.h/.cpp` - Add magnonic interface
+- **MODIFY**: [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt) - Include new source files
+- **MODIFY**: [main.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/main.cpp) - Add Hinductor tests

@@ -1,0 +1,62 @@
+# Phase 3: PPM Implementation Tasks
+
+## Chapter 3: Phase Prime Metric (PPM)
+
+### Active Task
+
+- [x] Planning and design for 10 PPM metric classes
+- [x] Implementation of PPM metric classes
+
+### Task Breakdown
+
+#### 3.1 Implement 10 PPM Metric Classes
+
+- [x] [PPMMetric1_GeometricShape](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h#147-159) - Integer → Shape mapping
+- [x] [PPMMetric2_OrderedFactor](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h#164-176) - Prime factorization
+- [x] [PPMMetric3_PhasePath](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h#181-193) - 360° CW/CCW phase calculation
+- [x] [PPMMetric4_DomainLimit](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h#198-210) - Prime domain boundaries
+- [x] [PPMMetric5_HighOrderedFactor](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h#215-228) - OF >> integer
+- [x] [PPMMetric6_HoleFinder](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h#233-245) - Gap detection
+- [x] [PPMMetric7_PrimeStatistics](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h#250-262) - Silent/active ratios
+- [x] [PPMMetric8_PeriodicRipples](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h#267-279) - Normalized periodicity
+- [x] [PPMMetric9_PrimeLattice](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h#284-299) - Twin/cousin graph
+- [x] [PPMMetric10_ImaginaryLayers](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h#304-317) - Multi-layer operations
+
+#### 3.2 Prime Operator Chain
+
+- [ ] Define PPMOperator interface
+- [ ] Implement 10 operators in sequence
+- [ ] Create operator composition API
+- [ ] Benchmark operator performance
+
+#### 3.3 15-Prime Coherence Table
+
+- [ ] Precompute coherence for {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47}
+- [ ] Add SIMD-optimized lookup (optional)
+- [ ] Create coherence visualization
+
+#### 3.4 PPM Evolution for Time Crystals
+
+- [ ] Add `evolve_with_ppm()` method
+- [ ] Create phase plot export
+- [ ] Integrate with existing TimeCrystalKernel
+
+#### 3.5 Big Data Problem Solver
+
+- [ ] Port diabetes dataset analysis
+- [ ] Create PPM vs ML benchmark
+
+## Files to Create/Modify
+
+| File | Action | Description |
+|------|--------|-------------|
+| [nanobrain_ppm.h](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.h) | NEW | PPM metric class definitions |
+| [nanobrain_ppm.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_ppm.cpp) | NEW | PPM metric implementations |
+| [nanobrain_time_crystal.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/nanobrain_time_crystal.cpp) | MODIFY | Add `evolve_with_ppm()` |
+| [CMakeLists.txt](file:///e:/antg/nanob/cognanobrain/src/cpp/CMakeLists.txt) | MODIFY | Add new source files |
+| [ppm_demo.cpp](file:///e:/antg/nanob/cognanobrain/src/cpp/ppm_demo.cpp) | NEW | Demo for PPM functionality |
+
+## Dependencies
+
+- Existing `nanobrain_time_crystal.h/.cpp`
+- Existing `nanobrain_kernel.h/.cpp`
