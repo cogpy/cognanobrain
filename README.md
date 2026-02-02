@@ -4,6 +4,34 @@
 
 A revolutionary platform that combines cutting-edge theoretical frameworks to visualize and simulate consciousness emergence through advanced artificial intelligence systems.
 
+## 🎉 NEW: Pure Elixir Implementation
+
+**NanoBrain is now available in pure Elixir!** No C++ dependencies required.
+
+```elixir
+# Get started in seconds
+kernel = Nanobrain.Kernel.new() |> Nanobrain.Kernel.initialize()
+{:ok, id, kernel} = Nanobrain.Kernel.create_atom(kernel, "ConceptNode", "Cat", 0.9, 0.8)
+metrics = Nanobrain.Kernel.get_metrics(kernel)
+```
+
+### 🚀 Elixir Implementation Features
+- ✅ **Zero C++ Dependencies** - Pure Elixir implementation
+- ✅ **OTP Compliant** - GenServer-based AtomSpace with supervision
+- ✅ **Concurrent** - Native BEAM VM parallelism (no GIL)
+- ✅ **Functional** - Immutable data structures throughout
+- ✅ **Production Ready** - 23 tests, full documentation
+- ✅ **API Compatible** - Matches Python implementation
+
+📖 **[Elixir Quick Start](nanobrain_ex/README.md)** | 📚 **[Migration Guide](nanobrain_ex/MIGRATION.md)** | 🧪 **[Examples](nanobrain_ex/lib/nanobrain/examples.ex)**
+
+```bash
+cd nanobrain_ex
+./quickstart.sh  # Automated setup, compile, test, and run examples
+```
+
+---
+
 ## ✨ NEW: Enhanced CogNano Agent System
 
 **Enhanced CogNano Agent** integrates learnability embeddings with multi-language cognitive transformation capabilities, enabling adaptive learning and cross-paradigm idea implementation.
