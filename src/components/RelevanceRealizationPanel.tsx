@@ -126,7 +126,7 @@ export const RelevanceRealizationPanel: React.FC = () => {
     rrSystem.current = new RelevanceRealizationSystem({
       dt: 1 / 10, // 10 Hz for demo
       enableQuantumChangeDetection: true,
-      enableSelfDeceptionDetection: 1,
+      selfDeceptionDetectionRate: 1,
       salienceTopK: 7,
     });
     return () => {
@@ -517,7 +517,7 @@ export const RelevanceRealizationPanel: React.FC = () => {
                 },
                 {
                   label: 'Narrative — How things develop in time',
-                  sub: '→ Temporal RCP stream (agent\'s ongoing story)',
+                  sub: "→ Temporal RCP stream (agent's ongoing story)",
                   value: threeOrders?.orderScores.narrative ?? 0,
                   color: '#f97316',
                 },

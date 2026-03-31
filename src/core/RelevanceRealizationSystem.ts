@@ -55,7 +55,7 @@ export interface RRSystemConfig {
   /** Whether to probe for quantum change events each cycle */
   enableQuantumChangeDetection: boolean;
   /** Whether to run self-deception detection each cycle */
-  enableSelfDeceptionDetection: number; // 0 = off, 1 = on, values < 1 = probability
+  selfDeceptionDetectionRate: number; // 0 = off, 1 = every cycle, 0-1 = probability
   /** Number of top-k crystals in the salience window */
   salienceTopK: number;
 }
@@ -63,7 +63,7 @@ export interface RRSystemConfig {
 const DEFAULT_RR_CONFIG: RRSystemConfig = {
   dt: 1 / 60,  // 60 Hz
   enableQuantumChangeDetection: true,
-  enableSelfDeceptionDetection: 1,
+  selfDeceptionDetectionRate: 1,
   salienceTopK: 7,
 };
 
@@ -164,7 +164,7 @@ export class RelevanceRealizationSystem {
 
     // ── Self-deception detection ──────────────────────────────────────────
     let selfDeception: SelfDeceptionReport | null = null;
-    if (Math.random() < this.config.enableSelfDeceptionDetection) {
+    if (Math.random() < this.config.selfDeceptionDetectionRate) {
       selfDeception = this.deceptionDetector.evaluate(
         rrCycle.salienceSnapshot,
         this.environmentVector,

@@ -19,9 +19,9 @@ export const FUNDAMENTAL_PRIMES: readonly number[] = [
 
 /** How each knowing-type maps to a prime-group in the PPM */
 export const KNOWING_TYPE_PRIME_GROUPS = {
-  propositional: [2, 3, 5],          // Spatial Prime Metric  (Ch.7 dim 3)
+  propositional: [2, 3, 5],          // Spatial Prime Metric (Ch.7 dim 3)
   procedural:    [7, 11, 13],         // Temporal Prime Metric (Ch.7 dim 1)
-  perspectival:  [17, 19, 23],        // Phase Prime Metric    (Ch.7 dim 4)
+  perspectival:  [17, 19, 23],        // Phase Prime Metric (Ch.7 dim 4)
   participatory: [29, 31, 37, 41, 43, 47], // Consciousness Prime Metric (Ch.7 dim 11)
 } as const;
 
