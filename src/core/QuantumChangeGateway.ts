@@ -246,10 +246,14 @@ export class QuantumChangeGateway {
    */
   private _computeIncompressibility(vec: PrimeVector): number {
     const n = FUNDAMENTAL_PRIMES.length;
+    // Normalize to a probability distribution (L1-norm) before computing Shannon entropy
+    let l1Sum = 0;
+    for (let i = 0; i < n; i++) l1Sum += Math.abs(vec[i]);
+    if (l1Sum < 1e-9) return 0;
     let entropy = 0;
     for (let i = 0; i < n; i++) {
-      const v = Math.max(1e-9, Math.abs(vec[i]));
-      entropy -= v * Math.log2(v);
+      const p = Math.max(1e-9, Math.abs(vec[i]) / l1Sum);
+      entropy -= p * Math.log2(p);
     }
     // Normalize by maximum possible entropy (log2(n))
     return Math.min(1, entropy / Math.log2(n));
