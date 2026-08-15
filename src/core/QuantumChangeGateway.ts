@@ -237,7 +237,7 @@ export class QuantumChangeGateway {
     const all = this.landscape.getAllPrimitives();
     if (all.length === 0) return 1;
     const minDist = Math.min(...all.map(p => ppmDistance(p.primeVector, vec)));
-    return minDist; // distance ∈ [0,2]; novelty ∈ [0,1] since distances cluster < 1
+    return Math.min(1, minDist); // clamp to [0,1]
   }
 
   /**
