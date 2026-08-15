@@ -262,6 +262,7 @@ export class ThreeOrdersCoherenceMonitor {
    * Both must be high for cross-order coherence to be high.
    */
   private _crossCoherence(a: number, b: number): number {
-    return Math.sqrt(a * b);
+    return Math.sqrt(Math.max(0, a) * Math.max(0, b));
+  }
   }
 }
