@@ -264,5 +264,4 @@ export class ThreeOrdersCoherenceMonitor {
   private _crossCoherence(a: number, b: number): number {
     return Math.sqrt(Math.max(0, a) * Math.max(0, b));
   }
-  }
 }
