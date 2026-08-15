@@ -326,7 +326,7 @@ export class RelevanceRealizationEngine {
     this.stats.avgCoherence =
       (this.stats.avgCoherence * n + result.achievedCoherence) / (n + 1);
     this.stats.currentExploreBalance = result.salienceSnapshot.explorationScore;
-    this.stats.phaseDistribution['feed_back']++;
+    this.stats.phaseDistribution['filter']++;
   }
 
   // ─────────────────────────────────────────────────────────────────────────
