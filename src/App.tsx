@@ -23,7 +23,8 @@ import { Chapter8Panel } from './components/Chapter8';
 import { Chapter9Panel } from './components/Chapter9';
 import { Chapter10Panel } from './components/Chapter10';
 import { RelevanceRealizationPanel } from './components/RelevanceRealizationPanel';
-import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles, Calculator, Grid, Database, Music, BookOpen, Hexagon, CircleDot, Magnet, Droplet, Egg, TrendingUp, Focus } from 'lucide-react';
+import { Play, Pause, Brain, Atom, Clock, Layers, Bot, Zap, Lightbulb, Upload, Network, Cpu, Sparkles, Calculator, Grid, Database, Music, BookOpen, Hexagon, CircleDot, Magnet, Droplet, Egg, TrendingUp, Focus, Code2 } from 'lucide-react';
+import { EnhancedCogNanoVisualization } from './components/EnhancedCogNanoVisualization';
 
 function App() {
   const { 
@@ -42,6 +43,7 @@ function App() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Brain },
+    { id: 'cognano', label: 'Enhanced CogNano', icon: Code2 },
     { id: 'kernel', label: 'Universal Kernel Generator', icon: TrendingUp },
     { id: 'opencog', label: 'OpenCog NanoBrain', icon: Sparkles },
     { id: 'tensor', label: 'GGML Tensors', icon: Zap },
@@ -231,6 +233,10 @@ function App() {
 
         {activeTab === 'kernel' && (
           <UniversalKernelGeneratorPanel />
+        )}
+
+        {activeTab === 'cognano' && (
+          <EnhancedCogNanoVisualization />
         )}
 
         {activeTab === 'opencog' && (
