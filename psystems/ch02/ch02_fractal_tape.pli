@@ -1,0 +1,84 @@
+/* ============================================================================
+ * psystems/ch02/ch02_fractal_tape.pli
+ *
+ * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
+ * Issue #7 — P-Lingua specification (see psystems/README.md).
+ *
+ * Sections: 2.1 (incompleteness of current information theory),
+ *           2.1.1 (fractal tape and surgery of a 2D image to place it in a
+ *                  nested sphere)
+ * Functionality: The Turing tape is a linear chain of isolated cells; the
+ *   fractal tape keeps only ONE cell at the top level, but entering that cell
+ *   reveals a whole grid of cells inside, recursively ("a fractal tape has
+ *   only one cell in the grid, but if we enter in that cell we get millions
+ *   of grids"). Modeled as a self-similar NESTED membrane topology: three
+ *   concentric scale levels, each carrying the same cell grammar. The 2.1.1
+ *   surgery takes a flat 2D image, zooms a boundary point into a circle
+ *   (singularity), and wraps the image as the innermost nested sphere.
+ * Traceability: src/cpp/nanobrain_fractal_tape.h (FractalTape nested scale
+ *               levels), src/cpp/nanobrain_fractal.h
+ * Initial multiset: one flat image_2d(pic) in the skin plus cell-state tokens
+ *                   at every scale, so the simulator can run at least one
+ *                   evolution step at each nesting level.
+ * ==========================================================================*/
+
+@model<psystems_basic>
+
+/* --------------------------------------------------------------------------
+ * Membrane structure (2.1.1): the fractal tape is a tape WITHIN a tape.
+ *
+ *   skin (the single visible cell of the top-level grid)
+ *     '- scale_1  : first recursion — entering the tape's only cell opens a
+ *     |              whole grid; surgery happens on the way down
+ *     |    '- scale_2 : the grid within the grid
+ *     |         '- scale_3 : the finest grid
+ *     |              '- sphere : the nested sphere holding the surgery result
+ *
+ * Self-similarity: every scale level carries the SAME object grammar
+ * (cell, patch, sing) — the tape replicates its own structure at every depth
+ * instead of extending a linear chain (2.1: linear information theory is
+ * incomplete because it cannot address levels within levels).
+ * ------------------------------------------------------------------------*/
+@mu = [ [ [ [ []'sphere ]'scale_3 ]'scale_2 ]'scale_1 ]'skin;
+
+/* Sample initial multiset: the flat image to be operated on, plus one
+ * cell-state token per scale so each level can evolve at least one step. */
+@mskin    = image_2d(pic);
+@mscale_1 = cell(s1);
+@mscale_2 = cell(s2);
+@mscale_3 = cell(s3);
+@msphere  = cell(core);
+
+/* --------------------------------------------------------------------------
+ * Evolution rules
+ * zoom_in      : surgery step 1 — the flat 2D image is pushed into the first
+ *                recursion level; entering a cell of the tape opens the grid
+ *                within (self-similar descent replaces head moves)
+ * cut_patch    : surgery step 2 — at scale_1 the image is cut into patches;
+ *                the core patch travels deeper, boundary patches stay local
+ * zoom_point   : surgery step 3 — a boundary point of the core patch is
+ *                zoomed into a circle (singularity), the seed of the sphere
+ * place_sphere : the zoomed circle is placed in the innermost membrane —
+ *                the 2D image now lives on a nested sphere
+ * selfsimilar  : each scale level regenerates the tape grammar one level
+ *                deeper, so the recursion never needs a new rule set (the
+ *                fractal tape replaces the infinitely LONG Turing tape by
+ *                an infinitely DEEP one)
+ * incomplete   : a linear bit string sent into the fractal tape is absorbed
+ *                and re-emitted as a nested object — Turing-complete bit
+ *                processing is a special case, not the foundation (2.1)
+ * report       : the surgery result propagates out to the skin
+ * ------------------------------------------------------------------------*/
+[zoom_in : image_2d(pic) --> (image_2d(pic))in_scale_1 ]'skin;
+[cut_patch : image_2d(pic) * cell(s1)
+         --> patch(pic,edge) * (patch(pic,core))in_scale_2 ]'scale_1;
+[zoom_point : patch(pic,core) * cell(s2) --> sing(circle(pic)) ]'scale_2;
+[place_sphere : sing(circle(pic)) --> (sphere_tc(pic))in_scale_3 ]'scale_2;
+[embed : sphere_tc(pic) * cell(s3) --> (image_on_sphere(pic))in_sphere ]'scale_3;
+
+[selfsimilar : cell(s1) --> cell(s1) * tape_within(s1) ]'scale_1;
+[selfsimilar : cell(s2) --> cell(s2) * tape_within(s2) ]'scale_2;
+[selfsimilar : cell(s3) --> cell(s3) * tape_within(s3) ]'scale_3;
+
+[incomplete : bit(b) --> nested(bit(b)) ]'scale_1;
+[report : image_on_sphere(pic) --> (surgery_done(pic))out ]'sphere;

@@ -1,0 +1,96 @@
+/* ============================================================================
+ * psystems/ch01/ch01_brain_models_kb.pli
+ *
+ * NanoBrain CH01: Philosophical transformation essential to reverse engineer consciousness
+ * Issue #6 — P-Lingua specification (see psystems/README.md).
+ *
+ * Sections: 1.4, 1.4.1-1.4.2
+ * Functionality: Ten popular human brain models as competing membrane configurations with selection rules; how information looks in nature; mutual understanding as membrane resonance.
+ * Traceability: src/cpp/nanobrain_philosophical.h, nanobrain_unified.h
+ * Initial multiset: sample objects in each membrane so the simulator can run
+ *                   at least one evolution step.
+ * ==========================================================================*/
+
+@model<psystems_basic>
+
+/* --------------------------------------------------------------------------
+ * Membrane structure: ten COMPETING membranes, one per brain model (1.4).
+ * The model names mirror the BrainModel enum in
+ * src/cpp/nanobrain_philosophical.h so the C++ realization stays traceable.
+ * ------------------------------------------------------------------------*/
+@mu = [ []'hodgkin_huxley []'integrate_fire []'connectome []'global_workspace
+        []'integrated_information []'predictive_coding []'free_energy
+        []'oscillatory []'quantum []'time_crystal ]'skin;
+
+/* Sample initial multiset: a seed token plus the ten candidate models. */
+@mskin = seed,
+         model(hodgkin_huxley), model(integrate_fire), model(connectome),
+         model(global_workspace), model(integrated_information),
+         model(predictive_coding), model(free_energy), model(oscillatory),
+         model(quantum), model(time_crystal);
+
+@mhodgkin_huxley         = fuel;
+@mintegrate_fire         = fuel;
+@mconnectome             = fuel;
+@mglobal_workspace       = fuel;
+@mintegrated_information = fuel;
+@mpredictive_coding      = fuel;
+@mfree_energy            = fuel;
+@moscillatory            = fuel;
+@mquantum                = fuel;
+@mtime_crystal           = fuel;
+
+/* --------------------------------------------------------------------------
+ * Evolution rules
+ * dispense_%s        : the skin sends each candidate model into its membrane
+ * evaluate_%s        : a model evaluates itself against an information
+ *                      probe, emitting fitness(M) = turing alignment vs.
+ *                      consciousness potential and marking itself evaluated
+ * info_in_nature     : 1.4.1 — how information looks in nature: not as bits
+ *                      on a tape but as a time-crystal object carrying a
+ *                      prime signature (see common/alphabet_primes.pli)
+ * select_time_crystal: selection rule — the model whose fitness covers the
+ *                      full 15-prime symmetry is selected; all competitors
+ *                      are collected as kb entries
+ * understand         : 1.4.2 — two individuals understand each other (or
+ *                      the universe) when their time crystals RESONATE:
+ *                      equal prime signatures merge into a shared token
+ * ------------------------------------------------------------------------*/
+[dispense : model(hodgkin_huxley)         --> (model(hodgkin_huxley))in_hodgkin_huxley ]'skin;
+[dispense : model(integrate_fire)         --> (model(integrate_fire))in_integrate_fire ]'skin;
+[dispense : model(connectome)             --> (model(connectome))in_connectome ]'skin;
+[dispense : model(global_workspace)       --> (model(global_workspace))in_global_workspace ]'skin;
+[dispense : model(integrated_information) --> (model(integrated_information))in_integrated_information ]'skin;
+[dispense : model(predictive_coding)      --> (model(predictive_coding))in_predictive_coding ]'skin;
+[dispense : model(free_energy)            --> (model(free_energy))in_free_energy ]'skin;
+[dispense : model(oscillatory)            --> (model(oscillatory))in_oscillatory ]'skin;
+[dispense : model(quantum)                --> (model(quantum))in_quantum ]'skin;
+[dispense : model(time_crystal)           --> (model(time_crystal))in_time_crystal ]'skin;
+
+[evaluate : model(hodgkin_huxley) * fuel * info_probe
+         --> (fitness(hodgkin_huxley))out ]'hodgkin_huxley;
+[evaluate : model(integrate_fire) * fuel * info_probe
+         --> (fitness(integrate_fire))out ]'integrate_fire;
+[evaluate : model(connectome) * fuel * info_probe
+         --> (fitness(connectome))out ]'connectome;
+[evaluate : model(global_workspace) * fuel * info_probe
+         --> (fitness(global_workspace))out ]'global_workspace;
+[evaluate : model(integrated_information) * fuel * info_probe
+         --> (fitness(integrated_information))out ]'integrated_information;
+[evaluate : model(predictive_coding) * fuel * info_probe
+         --> (fitness(predictive_coding))out ]'predictive_coding;
+[evaluate : model(free_energy) * fuel * info_probe
+         --> (fitness(free_energy))out ]'free_energy;
+[evaluate : model(oscillatory) * fuel * info_probe
+         --> (fitness(oscillatory))out ]'oscillatory;
+[evaluate : model(quantum) * fuel * info_probe
+         --> (fitness(quantum))out ]'quantum;
+[evaluate : model(time_crystal) * fuel * info_probe
+         --> (fitness(time_crystal))out ]'time_crystal;
+
+[info_in_nature : seed --> info_probe, info(time_crystal, primes(15)) ]'skin;
+[select_time_crystal : fitness(time_crystal) * info(time_crystal, primes(15))
+                    --> selected(time_crystal) ]'skin, 1;
+[understand : info(time_crystal, primes(15)) * info(time_crystal, primes(15))
+           --> shared_understanding(primes(15)) ]'skin;
+[collect : fitness(M) --> kb_entry(M) ]'skin;

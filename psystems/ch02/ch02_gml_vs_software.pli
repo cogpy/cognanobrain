@@ -1,0 +1,96 @@
+/* ============================================================================
+ * psystems/ch02/ch02_gml_vs_software.pli
+ *
+ * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
+ * Issue #7 — P-Lingua specification (see psystems/README.md).
+ *
+ * Sections: 2.8 (a comparison between GML and software algorithm),
+ *           2.8.1 (historical background on hypercomputing and the
+ *                  super-Turing hypothesis),
+ *           2.9 (creation of a non-argument)
+ * Functionality: GML and software algorithms process the SAME query in two
+ *   side-by-side membranes to make the table of Figure 2.12 executable:
+ *   - software_side: a linear flow of if-then arguments over bits; static,
+ *     complete, nothing inside; superposition of arguments impossible;
+ *     halting set by instructions.
+ *   - gml_side: a closed loop of clocks over time crystals; every argument
+ *     has structure inside; shapes superpose and compose; the drive to
+ *     symmetry transforms logic; 10D data needs fractal hardware.
+ *   - hyper: the hypercomputing / super-Turing claim (2.8.1): a query that
+ *     makes the linear side LOOP forever (no rule can halt it) is answered
+ *     by the geometric side in one resonance step — output exceeds input,
+ *     addressing Turing's automaton concern.
+ *   Section 2.9 (non-argument): the skin can compose a decision whose
+ *   justification is a geometry, not a chain of premises — modeled as a
+ *   decision object emitted with NO argument token on its lhs.
+ * Traceability: src/cpp/nanobrain_fractal_tape.h, src/cpp/nanobrain_fractal.h
+ * Initial multiset: one query(q) and one halting_probe in the skin; each
+ *                   side holds its native working objects.
+ * ==========================================================================*/
+
+@model<psystems_basic>
+
+/* --------------------------------------------------------------------------
+ * Membrane structure (2.8, Figure 2.12): the two architectures side by side.
+ *
+ *   skin (the benchmark and the non-argument foundry, 2.9)
+ *     '- gml_side      : closed loop of clocks — time-crystal processing
+ *     '- software_side : linear flow of if-then switches over bits
+ *     '- hyper         : the super-Turing test rig (2.8.1)
+ * ------------------------------------------------------------------------*/
+@mu = [ []'gml_side []'software_side []'hyper ]'skin;
+
+/* Sample initial multiset. */
+@mskin = query(q), halting_probe;
+@mgml_side      = clock(c1), clock(c2), shape_seed;
+@msoftware_side = bit(0), instruction(i1);
+@mhyper         = omega_task;
+
+/* --------------------------------------------------------------------------
+ * Evolution rules
+ * dispatch     : the same query enters both architectures
+ * sw_step      : software — one instruction consumes one bit and produces
+ *                the next instruction: a LINEAR flow of arguments, each
+ *                static and complete, nothing inside
+ * sw_halt      : software halts when the instruction list is exhausted —
+ *                the boundary is set by instructions, not by topology
+ * gml_sync     : GML — two clocks synchronise and the synchrony itself
+ *                selects the answer; no instruction list is traversed
+ * gml_superpose: GML — a shape superposed on another shape composes a NEW
+ *                shape (linearity does not bind simultaneity)
+ * gml_answer   : the answer is a geometry: a QA couplet on a clocking
+ *                sphere, delivered perpetually — every state is a solution
+ * hyper_loop   : 2.8.1 — the software side cannot halt on an omega task:
+ *                the rule returns the task unchanged (an infinite loop in
+ *                one rule — no progress, no halt)
+ * hyper_supert : the GML side answers the same task by resonance in one
+ *                step: output is HIGHER than input (the super-Turing /
+ *                hypercomputing hypothesis, historically: Copeland's and
+ *                Siegelmann's super-Turing machines)
+ * nonargument  : 2.9 — a decision is emitted whose only support is a
+ *                geometry (shape), with NO premise chain: the creation of a
+ *                non-argument — nonsense/illogic that still decides, the
+ *                native logic of a geometric language
+ * verdict      : the benchmark records the Figure 2.12 outcome
+ * ------------------------------------------------------------------------*/
+[dispatch : query(q) --> (query(q))in_gml_side
+                       * (query(q))in_software_side ]'skin;
+
+[sw_step : query(q) * instruction(i1) * bit(0) --> instruction(i2) * bit(1) ]'software_side;
+[sw_halt : instruction(i2) * bit(1) --> answer(q,if_then_chain) ]'software_side;
+[sw_out  : answer(q,if_then_chain) --> (answer(q,if_then_chain))out ]'software_side;
+
+[gml_sync : query(q) * clock(c1) * clock(c2) --> sync(q,c1,c2) ]'gml_side;
+[gml_superpose : shape_seed * sync(q,c1,c2) --> shape(q) ]'gml_side;
+[gml_answer : shape(q) --> (qa_couplet(q))out ]'gml_side;
+
+[hyper_route : halting_probe --> (omega_task)in_hyper ]'skin;
+[hyper_loop : omega_task --> omega_task ]'software_side;
+[hyper_supert : omega_task --> answered(omega) ]'hyper;
+[hyper_out : answered(omega) --> (answered(omega))out ]'hyper;
+
+[nonargument : shape(q) --> decision(q) ]'skin;
+[nonargument : answered(omega) --> decision(omega) ]'skin;
+
+[verdict : answer(q,if_then_chain) * qa_couplet(q)
+        --> comparison(gml_geometry_vs_linear_logic) ]'skin;

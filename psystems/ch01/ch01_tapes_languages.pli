@@ -1,0 +1,61 @@
+/* ============================================================================
+ * psystems/ch01/ch01_tapes_languages.pli
+ *
+ * NanoBrain CH01: Philosophical transformation essential to reverse engineer consciousness
+ * Issue #6 — P-Lingua specification (see psystems/README.md).
+ *
+ * Sections: 1.5
+ * Functionality: Different kinds of tapes (Turing, fractal, GML) to recreate nature, modeled as alternative multiset-encoding schemes.
+ * Traceability: src/cpp/nanobrain_philosophical.h, nanobrain_unified.h
+ * Initial multiset: one raw signal(a) in the skin plus one tape-state
+ *                   object per tape membrane (head/branch/phrase), so the
+ *                   simulator can run at least one encode step.
+ * ==========================================================================*/
+
+@model<psystems_basic>
+
+/* --------------------------------------------------------------------------
+ * Membrane structure: skin with one membrane per tape/encoding scheme (1.5).
+ * Each tape is an ALTERNATIVE multiset-encoding of the same signal: nature
+ * can be recreated in different languages, and the skin benchmark decides
+ * which encoding reproduces the pattern most faithfully.
+ * ------------------------------------------------------------------------*/
+@mu = [ []'turing_tape []'fractal_tape []'gml_tape ]'skin;
+
+/* Sample initial multiset: one raw signal to be encoded by every tape. */
+@mskin = signal(a);
+@mturing_tape = head(h0);
+@mfractal_tape = branch(1);
+@mgml_tape = phrase(p0);
+
+/* --------------------------------------------------------------------------
+ * Evolution rules
+ * dispense     : the same signal is broadcast into all three tapes
+ * encode_bit   : Turing tape — one bit at a time, sequential head moves
+ * encode_fractal : fractal tape — one token encodes the whole self-similar
+ *                family (writes the same token at every scale level)
+ * encode_gml   : GML tape — one geometric shape encodes the pattern as a
+ *                time crystal (see common/gml_shapes.pli)
+ * read_bit     : decoding a Turing tape consumes one step PER BIT
+ * read_fractal : decoding a fractal tape regenerates all scales at once
+ * read_gml     : decoding a GML tape regenerates the pattern by resonance
+ * benchmark    : recreate(nature) fires when an encoding reproduces the
+ *                original signal — fractal/GML tapes halt first because
+ *                they encode the pattern in a single object
+ * ------------------------------------------------------------------------*/
+[dispense : signal(a) --> (signal(a))in_turing_tape
+                        * (signal(a))in_fractal_tape
+                        * (signal(a))in_gml_tape ]'skin;
+
+[encode_bit     : signal(a) * head(h0) --> bit(0) * bit(1) * head(h1) ]'turing_tape;
+[encode_fractal : signal(a) * branch(1) --> token(a,1) * token(a,2) * token(a,4) ]'fractal_tape;
+[encode_gml     : signal(a) * phrase(p0) --> shape(time_crystal(a)) ]'gml_tape;
+
+[read_bit     : bit(0) * bit(1) * head(h1) --> tape_out(a) ]'turing_tape;
+[read_fractal : token(a,1) * token(a,2) * token(a,4) --> tape_out(a) ]'fractal_tape;
+[read_gml     : shape(time_crystal(a)) --> tape_out(a) ]'gml_tape;
+
+[benchmark : tape_out(a) --> (recreated(a))out ]'turing_tape;
+[benchmark : tape_out(a) --> (recreated(a))out ]'fractal_tape;
+[benchmark : tape_out(a) --> (recreated(a))out ]'gml_tape;
+[report    : recreated(a) * recreated(a) --> recreated_all(a) ]'skin;

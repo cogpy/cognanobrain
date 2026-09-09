@@ -1,0 +1,80 @@
+/* ============================================================================
+ * psystems/ch01/ch01_worldview_config.pli
+ *
+ * NanoBrain CH01: Philosophical transformation essential to reverse engineer consciousness
+ * Issue #6 — P-Lingua specification (see psystems/README.md).
+ *
+ * Sections: 1.1-1.3
+ * Functionality: Parameter membranes selecting the worldview; the 'universe within and above, not side by side' as a nested membrane topology.
+ * Traceability: src/cpp/nanobrain_philosophical.h, nanobrain_unified.h
+ * Initial multiset: seed, worldview(turing), worldview(nanobrain) in the
+ *                   skin; one fuel object per nested universe membrane.
+ * ==========================================================================*/
+
+@model<psystems_basic>
+
+/* --------------------------------------------------------------------------
+ * Membrane structure
+ *
+ * 1.3 "The universe within and above, not side by side": the universe is NOT
+ * a flat row of sibling compartments (side by side) but a NESTED topology —
+ * the observable universe holds the universe WITHIN, which itself holds a
+ * universe within, and it is embraced from ABOVE by the world above, which
+ * is embraced by the world above-above (the recursion may extend forever).
+ *
+ *   observable_universe : the universe we observe
+ *     '- universe_within   : the universe within it
+ *          '- world_within    : the universe within the universe within
+ *   world_above          : the universe above the observable universe
+ *     '- world_above_above  : the universe above the universe above
+ *
+ * The worldview selection in the skin (1.1-1.2) parameterises every nested
+ * universe membrane; parameters diffuse one nesting level per step.
+ * ------------------------------------------------------------------------*/
+@mu = [ [ []'world_within ]'universe_within [ []'world_above_above ]'world_above ]'skin;
+
+/* Sample initial multiset: two competing worldviews plus a request token. */
+@mskin            = seed, worldview(turing), worldview(nanobrain);
+@muniverse_within = fuel;
+@mworld_within    = fuel;
+@mworld_above     = fuel;
+@mworld_above_above = fuel;
+
+/* --------------------------------------------------------------------------
+ * Evolution rules
+ * select_nanobrain : the NanoBrain worldview dominates the legacy Turing
+ *                    worldview (priority 1 beats the default priority 0)
+ * select_turing    : fallback when only the Turing worldview remains
+ * configure        : the selected worldview parameterises the immediate
+ *                    universes (within and above)
+ * configure_deeper : each universe passes the parameters one nesting level
+ *                    further in its own direction (within -> world_within,
+ *                    above -> world_above_above)
+ * step_%s          : each universe evolves its configured worldview
+ * report_%s        : the processed worldview propagates UP the nesting
+ *                    hierarchy — within -> observable -> skin — realising
+ *                    "within and above, not side by side" information flow
+ * ------------------------------------------------------------------------*/
+[select_nanobrain : worldview(turing) * worldview(nanobrain)
+                --> worldview(nanobrain) ]'skin, 1;
+[select_turing    : worldview(turing) --> worldview(selected_turing) ]'skin;
+[configure        : worldview(nanobrain)
+                --> (param(nanobrain))in_universe_within
+                  * (param(nanobrain))in_world_above ]'skin;
+[configure_deeper : param(nanobrain)
+                --> (param(nanobrain))in_world_within ]'universe_within;
+[configure_deeper : param(nanobrain)
+                --> (param(nanobrain))in_world_above_above ]'world_above;
+
+[step_within  : param(nanobrain) * fuel --> active(nanobrain) ]'universe_within;
+[step_world   : param(nanobrain) * fuel --> active(nanobrain) ]'world_within;
+[step_above   : param(nanobrain) * fuel --> active(nanobrain) ]'world_above;
+[step_above2  : param(nanobrain) * fuel --> active(nanobrain) ]'world_above_above;
+
+[report_world  : active(nanobrain) --> (echo(nanobrain))out ]'world_within;
+[report_within : active(nanobrain) * echo(nanobrain)
+              --> (resonance(nanobrain))out ]'universe_within;
+[report_above  : active(nanobrain) --> (echo(nanobrain))out ]'world_above_above;
+[report_over   : active(nanobrain) * echo(nanobrain)
+              --> (resonance(nanobrain))out ]'world_above;
+[report_skin   : resonance(nanobrain) --> universe_within_above ]'skin;

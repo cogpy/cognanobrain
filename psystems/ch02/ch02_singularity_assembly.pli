@@ -1,0 +1,75 @@
+/* ============================================================================
+ * psystems/ch02/ch02_singularity_assembly.pli
+ *
+ * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
+ * Issue #7 — P-Lingua specification (see psystems/README.md).
+ *
+ * Sections: 2.1.1-2.1.2 (self-assembly of geometric shapes and the concept
+ *           of singularity)
+ * Functionality: Singularity points are not defects to be avoided — they are
+ *   the SEEDS of construction. A singularity object on a membrane (a phase
+ *   point where the local clock is undefined) nucleates the self-assembly of
+ *   geometric shapes: edge pieces are attracted to a singularity and lock
+ *   pairwise into lines, lines fold around a second singularity into loops,
+ *   loops close into the 15 GML shapes (see common/gml_shapes.pli). The
+ *   assembled shape carries its singularity signature — every time crystal
+ *   "has only one system point" (singularity) at its core.
+ * Traceability: src/cpp/nanobrain_fractal_tape.h, src/cpp/nanobrain_fractal.h
+ *               (self-assembly, singularity detection)
+ * Initial multiset: two singularity seeds in the skin; raw edge pieces and
+ *                   one anchor in the assembly membrane.
+ * ==========================================================================*/
+
+@model<psystems_basic>
+
+/* --------------------------------------------------------------------------
+ * Membrane structure (2.1.2): a workshop membrane per assembly stage.
+ *
+ *   skin
+ *     '- nucleation : singularity seeds land and polarise the medium
+ *     '- assembly   : edge pieces lock around the seed into shapes
+ *     '- registry   : finished shapes are indexed by their singularity count
+ *
+ * The concept of singularity: a singularity is a point where the phase is
+ * UNDEFINED — the local rule cannot fire on it (guard: rules consume pieces,
+ * never the seed) — yet it ORGANISES everything around it, exactly like the
+ * singular point of a vortex organises the flow without itself flowing.
+ * ------------------------------------------------------------------------*/
+@mu = [ []'nucleation []'assembly []'registry ]'skin;
+
+/* Sample initial multiset. */
+@mskin       = sing(s1), sing(s2);
+@mnucleation = medium;
+@massembly   = edge(e1), edge(e2), edge(e3), edge(e4);
+@mregistry   = slot(empty);
+
+/* --------------------------------------------------------------------------
+ * Evolution rules
+ * seed_entry   : singularity objects enter the nucleation membrane — a
+ *                singularity is NEVER created by a rule, only seeded (2.1.2:
+ *                singularities are given by the topology, not computed)
+ * polarise     : a seed polarises the medium, emitting an attraction field
+ *                that the assembly stage can sense
+ * attract      : the field pulls raw edge pieces toward the seed
+ * lock_line    : two edges sharing the field lock into a line (1D shape)
+ * fold_loop    : two lines fold around the seed into a loop (2D closure)
+ * close_shape  : two loops close into a volume — one of the 15 GML shapes
+ *                (see common/gml_shapes.pli), tagged with its seed
+ * register     : the finished shape is sent to the registry; the singularity
+ *                count of a shape indexes it (one system point per crystal)
+ * persist_seed : the seed survives assembly (rules never consume sing(S)) —
+ *                the singularity remains as the shape's immortal system point
+ * ------------------------------------------------------------------------*/
+[seed_entry : sing(S) --> (sing(S))in_nucleation ]'skin;
+[polarise : sing(S) * medium --> sing(S) * (field(S))out ]'nucleation;
+[route_field : field(S) --> (field(S))in_assembly ]'skin;
+
+[attract : field(S) * edge(E) --> edge(E,S) ]'assembly;
+[lock_line : edge(E1,S) * edge(E2,S) --> line(E1,E2,S) ]'assembly;
+[fold_loop : line(E1,E2,S) * line(E3,E4,S) --> loop(E1,E2,E3,E4,S) ]'assembly;
+[close_shape : loop(L1,S) * loop(L2,S) --> shape15(L1,L2,S) ]'assembly;
+
+[register : shape15(L1,L2,S) --> (indexed(L1,L2,S))out ]'assembly;
+[file : indexed(L1,L2,S) * slot(empty) --> catalog(L1,L2,S) ]'registry;
+
+[persist_seed : field(S) --> field_used(S) ]'assembly;

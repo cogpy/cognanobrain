@@ -1,0 +1,104 @@
+/* ============================================================================
+ * psystems/ch02/ch02_time_crystal_variants.pli
+ *
+ * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
+ * Issue #7 — P-Lingua specification (see psystems/README.md).
+ *
+ * Sections: 2.5 (comparative studies between Winfree, Wilczek and the
+ *           universal time crystal)
+ * Functionality: The three time-crystal proposals as three variant membranes
+ *   fed by the SAME probe, so their structural differences become rule-level
+ *   differences (Figure 2.9):
+ *   - WINFREE: input white noise -> clocking wave; nested guest-host clocks,
+ *     phase singularity makes time; clocking never damps; self-assembly.
+ *   - WILCZEK: input a clocking signal -> modulated beating output; ONE
+ *     isolated clock, no singularity exploration, no self-assembly; the
+ *     original cycle returns after the perturbation.
+ *   - UNIVERSAL (UTC): input noise -> multiple output waves, more than two
+ *     clocks arranging into 1D/2D/3D shapes; singularities nest >= 12 deep
+ *     connected by imaginary layers; permanent under noise; PPM sets the
+ *     symmetry-linking rules.
+ *   The skin's verdict membrane collects the three behavioural signatures.
+ * Traceability: src/cpp/nanobrain_fractal_tape.h, src/cpp/nanobrain_fractal.h,
+ *               src/cpp/nanobrain_time_crystal.h
+ * Initial multiset: one probe(noise) and one probe(clock_signal) in the skin;
+ *                   each variant membrane holds its own initial state.
+ * ==========================================================================*/
+
+@model<psystems_basic>
+
+/* --------------------------------------------------------------------------
+ * Membrane structure (2.5): one membrane per time-crystal variant.
+ *
+ *   skin
+ *     '- winfree   : nested guest-host clocks around a phase singularity
+ *     |    '- guest  : the guest clock rides inside the host clock
+ *     '- wilczek   : a single isolated clock, perturbed and relaxing back
+ *     '- universal : an assembling lattice of many clocks
+ *          '- utc_core : nested singularities (>= 12 imaginary layers, here
+ *                        represented by the core within the lattice)
+ * ------------------------------------------------------------------------*/
+@mu = [ [ []'guest ]'winfree []'wilczek [ []'utc_core ]'universal ]'skin;
+
+/* Sample initial multiset: both probe types so every variant can fire. */
+@mskin      = probe(noise), probe(clk);
+@mwinfree   = host_clock;
+@mguest     = sing_point;
+@mwilczek   = single_clock;
+@muniversal = noise_stock;
+@mutc_core  = sing_point, sing_point;
+
+/* --------------------------------------------------------------------------
+ * Evolution rules
+ * feed_winfree / feed_wilczek / feed_universal
+ *             : each variant receives its defining input — noise for Winfree
+ *               and the UTC, a ready clocking signal for Wilczek
+ * wf_nest     : Winfree — the host clock takes the noise and grows a guest
+ *               clock INSIDE itself (guest-host phase cycle)
+ * wf_sing     : the guest's phase singularity makes time: it emits a tick
+ *               that organises the host; clocking never damps (no decay rule
+ *               exists in this membrane)
+ * wz_beat     : Wilczek — the lone clock beats against the input signal; the
+ *               output is a MODIFIED clocking (beating), one internal clock
+ * wz_relax    : after the perturbation the original cycle returns — the beat
+ *               relaxes back to the single clock; no singularity is explored
+ * wz_noasm    : Wilczek has no self-assembly: a second clock object is
+ *               expelled rather than integrated (rule emits it out)
+ * utc_multi   : Universal TC — noise becomes MULTIPLE waves; more than two
+ *               clocks arrange into a geometric lattice
+ * utc_assemble: clocks self-assemble into a 1D/2D/3D shape — the PPM
+ *               symmetry catalogue sets the linking rules
+ * utc_nest_sing: singularities nest within the core, connected by imaginary
+ *               layers (>= 12 deep in the full theory)
+ * utc_permanent: under noise the crystal is permanent — the noise object is
+ *               absorbed into a tick instead of damping the clocks
+ * verdict     : the three signatures are comparable objects in the skin
+ * ------------------------------------------------------------------------*/
+[feed_winfree : probe(noise) --> (probe(noise))in_winfree ]'skin;
+[feed_wilczek : probe(clk) --> (probe(clk))in_wilczek ]'skin;
+[feed_universal : probe(noise) --> (probe(noise))in_universal ]'skin;
+
+[wf_nest : probe(noise) * host_clock --> host_clock * (guest_clk)in_guest ]'winfree;
+[wf_sing : sing_point * guest_clk --> sing_point * tick ]'guest;
+[wf_out : tick --> (tick)out ]'guest;
+[wf_wave : tick * host_clock --> wave(clocking) ]'winfree;
+
+[wz_beat : probe(clk) * single_clock --> beat(clk) ]'wilczek;
+[wz_relax : beat(clk) --> single_clock * wave(beat_fades) ]'wilczek;
+[wz_noasm : guest_clk --> (guest_clk)out ]'wilczek;
+
+[utc_multi : probe(noise) * noise_stock --> wave(w1) * wave(w2)
+                                         * clk(c1) * clk(c2) * clk(c3) ]'universal;
+[utc_assemble : clk(c1) * clk(c2) * clk(c3) --> shape_clk(c1,c2,c3) ]'universal;
+[utc_seed : shape_clk(c1,c2,c3) --> (shape_clk(c1,c2,c3))in_utc_core ]'universal;
+[utc_nest_sing : sing_point * sing_point --> sing_point * nested(sing) ]'utc_core;
+[utc_permanent : shape_clk(c1,c2,c3) * nested(sing)
+              --> utc(c1,c2,c3) ]'utc_core;
+
+[verdict : wave(clocking) --> signature(winfree,nested_no_damp) ]'winfree;
+[verdict : wave(beat_fades) --> (signature(wilczek,single_relaxing))out ]'wilczek;
+[verdict : utc(c1,c2,c3) --> (signature(universal,assembled_permanent))out ]'utc_core;
+[compare : signature(winfree,nested_no_damp)
+        * signature(wilczek,single_relaxing)
+        * signature(universal,assembled_permanent)
+        --> comparison_done(utc_generalises) ]'skin;
