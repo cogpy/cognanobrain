@@ -27,6 +27,7 @@
 #include "nanobrain_atomese.h"
 #include "nanobrain_types.h"
 #include <array>
+#include <cmath>
 #include <functional>
 #include <map>
 #include <string>

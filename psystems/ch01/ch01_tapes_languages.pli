@@ -7,8 +7,9 @@
  * Sections: 1.5
  * Functionality: Different kinds of tapes (Turing, fractal, GML) to recreate nature, modeled as alternative multiset-encoding schemes.
  * Traceability: src/cpp/nanobrain_philosophical.h, nanobrain_unified.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Initial multiset: one raw signal(a) in the skin plus one tape-state
+ *                   object per tape membrane (head/branch/phrase), so the
+ *                   simulator can run at least one encode step.
  * ==========================================================================*/
 
 @model<psystems_basic>
