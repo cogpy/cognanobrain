@@ -4,31 +4,84 @@
  * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
  * Issue #7 — P-Lingua specification (see psystems/README.md).
  *
- * Sections: 2.2.3
- * Functionality: Converting waveforms into a time crystal; non-differentiability as rule-level discrete jumps.
- * Traceability: src/cpp/nanobrain_fractal_tape.h, nanobrain_fractal.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Sections: 2.2.3 (how to convert waveforms into a time crystal:
+ *           non-differentiability)
+ * Functionality: A waveform is converted into a time crystal by SAMPLING it
+ *   into discrete phase jumps. The key is non-differentiability: a P-system
+ *   rule is itself a non-differentiable event — the multiset changes by a
+ *   discrete jump, never by a continuous derivative — so rule-level jumps
+ *   are the native model of the sample-and-hold conversion. Each sample
+ *   point becomes a tick on a ring; rings for nested sampling periods stack
+ *   (one inside another) until the whole waveform is a nested clock, i.e.,
+ *   a time crystal. Points where the waveform changes slope sharply are
+ *   kept as singularity markers, the load-bearing corners of the crystal.
+ * Traceability: src/cpp/nanobrain_fractal_tape.h, src/cpp/nanobrain_fractal.h,
+ *               src/cpp/nanobrain_time_crystal.h
+ * Initial multiset: one waveform(sine) stream in the skin; sampler state and
+ *                   an empty crystal seed in the workshop membranes.
  * ==========================================================================*/
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'sampler []'crystal ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure (2.2.3): the conversion pipeline.
+ *
+ *   skin
+ *     '- sampler  : the incoming waveform is cut into discrete samples
+ *     '- crystal  : samples are welded into nested rings (the time crystal)
+ *          '- inner : the faster sampling rhythm nests inside the slower one
+ *
+ * Non-differentiability: there is NO differential operator anywhere — the
+ * only dynamics is rule firing (discrete jumps). A kink in the waveform is
+ * therefore representable exactly, as a singularity marker, instead of being
+ * approximated away by smooth basis functions.
+ * ------------------------------------------------------------------------*/
+@mu = [ []'sampler [ []'inner ]'crystal ]'skin;
 
-@mskin = seed;
-@msampler = unit(sampler), fuel;
-@mcrystal = unit(crystal), fuel;
+/* Sample initial multiset. */
+@mskin    = waveform(sine);
+@msampler = window(4);
+@mcrystal = ring(0);
+@minner   = ring(0);
 
 /* --------------------------------------------------------------------------
  * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * feed        : the waveform enters the sampler
+ * sample_jump : one sampling window consumes a waveform slice and emits a
+ *               sample object — a discrete jump replaces the local derivative
+ *               (non-differentiability is the rule granularity itself)
+ * kink_mark   : a sharp change inside the window is not smoothed; it is
+ *               preserved as a singularity marker kink — the corner of the
+ *               future crystal
+ * weld_ring   : four samples weld into one ring (one period of the slow
+ *               rhythm) — the ring carries the samples as phase ticks
+ * nest_ring   : the fast rhythm's ring nests inside the crystal (one ring
+ *               within another = nested rhythm = time crystal)
+ * keep_kink   : kink markers are embedded into the inner ring — singularities
+ *               survive the conversion and index the crystal's corners
+ * crystallise : ring(0) of the outer crystal plus the inner ring's report
+ *               closes the structure into a time_crystal object
+ * report      : the converted time crystal leaves the pipeline
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_sampler ]'skin;
-[seed_dispense : seed --> (work)in_crystal ]'skin;
-[step : work * unit(sampler) * fuel --> done(sampler) ]'sampler;
-[step : work * unit(crystal) * fuel --> done(crystal) ]'crystal;
-[report : done(sampler) --> (result(sampler))out ]'sampler;
-[report : done(crystal) --> (result(crystal))out ]'crystal;
+[feed : waveform(sine) --> (waveform(sine))in_sampler ]'skin;
+
+[sample_jump : waveform(sine) * window(4)
+           --> sample(s1) * sample(s2) * sample(s3) * sample(s4) ]'sampler;
+[kink_mark : window(4) --> kink(slope_break) ]'sampler;
+
+[send : sample(S) --> (sample(S))out ]'sampler;
+[send : kink(K) --> (kink(K))out ]'sampler;
+[admit : sample(S) --> (sample(S))in_crystal ]'skin;
+[admit_fast : sample(S) --> (fast_sample(S))in_crystal ]'skin, 1;
+[admit : kink(K) --> (kink(K))in_crystal ]'skin;
+[drop_fast : fast_sample(S) --> (fast_sample(S))in_inner ]'crystal;
+[drop_kink : kink(K) --> (kink(K))in_inner ]'crystal;
+
+[weld_ring : sample(s1) * sample(s2) * sample(s3) * sample(s4) * ring(0)
+         --> ring(1) ]'crystal;
+[weld_fast : fast_sample(S) * ring(0) --> tick(S) ]'inner;
+[keep_kink : kink(K) * tick(S) --> tick_kink(S,K) ]'inner;
+
+[nest_ring : tick_kink(S,K) --> (inner_ring(S,K))out ]'inner;
+[crystallise : ring(1) * inner_ring(S,K) --> (time_crystal(sine))out ]'crystal;
+[report : time_crystal(sine) --> converted(sine) ]'skin;

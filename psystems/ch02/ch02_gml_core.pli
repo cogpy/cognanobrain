@@ -4,27 +4,85 @@
  * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
  * Issue #7 — P-Lingua specification (see psystems/README.md).
  *
- * Sections: 2.2, 2.2.1
- * Functionality: Basics of the Geometric Musical Language: how a 3D structure becomes a time crystal / tensor.
- * Traceability: src/cpp/nanobrain_fractal_tape.h, nanobrain_fractal.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Sections: 2.2 (the basics of a Geometric Musical Language, GML),
+ *           2.2.1 (how a 3D structure becomes a time crystal or a tensor)
+ * Functionality: GML's core move: a static 3D structure becomes a time
+ *   crystal by replacing every VERTEX with a clock (a rotating phase cycle)
+ *   and every EDGE with a phase-locking relation — "nested rhythm = nested
+ *   clock = time crystal". Three relative time-fractals f(t), g(t), k(t) on
+ *   the corners of a triangle bond into a host time-fractal that represents
+ *   the triangle invariantly (rotation/translation independent, like a
+ *   melody). The same nesting applied tensorially stacks the structure into
+ *   a tensor rank object (3D structure -> clocks -> tensor of phase loops).
+ * Traceability: src/cpp/nanobrain_fractal_tape.h, src/cpp/nanobrain_fractal.h,
+ *               src/cpp/nanobrain_time_crystal.h (TimeCrystalQuantumState)
+ * Initial multiset: one 3D structure object struct3d(tet); a vertex membrane
+ *                   per corner holding a raw point, and the clock workshop.
  * ==========================================================================*/
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'grammar ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure (2.2.1): how a 3D structure becomes a time crystal.
+ *
+ *   skin
+ *     '- vertices : one sub-membrane per corner of the 3D structure
+ *     |    '- v_a, v_b, v_c, v_d : four corners (a tetrahedron here)
+ *     '- clockworks : points are converted into clocks (phase cycles)
+ *     '- tensor     : clocks are phase-locked edge-wise into the tensor form
+ *
+ * A 3D structure is a list of corners; a time crystal is the SAME structure
+ * where each corner ticks and each edge is a synchrony constraint. The
+ * tensor form is the time crystal read along its 4 independent phase axes.
+ * ------------------------------------------------------------------------*/
+@mu = [ [ []'v_a []'v_b []'v_c []'v_d ]'vertices
+        []'clockworks []'tensor ]'skin;
 
-@mskin = seed;
-@mgrammar = unit(grammar), fuel;
+/* Sample initial multiset: one tetrahedron to be converted. */
+@mskin       = struct3d(tet);
+@mvertices   = spawn;
+@mv_a = point(a); @mv_b = point(b); @mv_c = point(c); @mv_d = point(d);
+@mclockworks = phase_stock;
+@mtensor     = rank(0);
 
 /* --------------------------------------------------------------------------
  * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * dissect      : the 3D structure is dissected into its corner points, one
+ *                sent to each vertex membrane (GML reads geometry as a SET
+ *                of corners, not as coordinates)
+ * ignite_clock : each point is replaced by a clock — a self-sustaining
+ *                phase cycle; the vertex becomes a time ring (2.2.1: every
+ *                geometric point connects a circle)
+ * collect      : the ticking corners gather in the clock workshop
+ * lock_edge    : two clocks phase-lock into an edge of the time crystal;
+ *                the edge object records the RELATIVE phase (time fractal),
+ *                which is the rotation/translation invariant of GML
+ * bond_host    : three relative time-fractals on a triangle of corners fuse
+ *                into the host time-fractal — the triangle as a MELODY
+ * crystallise  : the fully edge-locked structure is a time crystal
+ * tensorify    : the time crystal read along its independent phase axes is
+ *                a tensor; rank(0) absorbs the crystal into a rank-4 tensor
+ *                (one axis per corner clock)
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_grammar ]'skin;
-[step : work * unit(grammar) * fuel --> done(grammar) ]'grammar;
-[report : done(grammar) --> (result(grammar))out ]'grammar;
+[dissect : struct3d(tet) --> (struct3d(tet))in_vertices ]'skin;
+[place : struct3d(tet) * spawn --> (point(a))in_v_a * (point(b))in_v_b
+                                * (point(c))in_v_c * (point(d))in_v_d ]'vertices;
+
+[ignite_clock : point(X) --> clock(X) ]'v_a;
+[ignite_clock : point(X) --> clock(X) ]'v_b;
+[ignite_clock : point(X) --> clock(X) ]'v_c;
+[ignite_clock : point(X) --> clock(X) ]'v_d;
+
+[export : clock(X) --> (clock(X))out ]'v_a;
+[export : clock(X) --> (clock(X))out ]'v_b;
+[export : clock(X) --> (clock(X))out ]'v_c;
+[export : clock(X) --> (clock(X))out ]'v_d;
+[collect : clock(X) --> (clock(X))out ]'vertices;
+[collect : clock(X) --> (clock(X))in_clockworks ]'skin;
+
+[lock_edge : clock(X) * clock(Y) * phase_stock --> edge_clk(X,Y) ]'clockworks;
+[bond_host : edge_clk(X,Y) * edge_clk(Y,Z) * edge_clk(Z,X)
+          --> host_fractal(X,Y,Z) ]'clockworks;
+[crystallise : host_fractal(X,Y,Z) --> (time_crystal(X,Y,Z))out ]'clockworks;
+[admit : time_crystal(X,Y,Z) --> (time_crystal(X,Y,Z))in_tensor ]'skin;
+[tensorify : time_crystal(X,Y,Z) * rank(0) --> tensor(X,Y,Z,rank4) ]'tensor;

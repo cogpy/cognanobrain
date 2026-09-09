@@ -4,35 +4,80 @@
  * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
  * Issue #7 — P-Lingua specification (see psystems/README.md).
  *
- * Sections: 2.3
- * Functionality: The basic concept of a time crystal: the garden of gardens nesting semantics.
- * Traceability: src/cpp/nanobrain_fractal_tape.h, nanobrain_fractal.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Sections: 2.3 (the basic concept of a time crystal: the garden of gardens)
+ * Functionality: A time crystal is a nested clock; a MEANDER FLOWER is the
+ *   polar plot of one time crystal (one system point plus two clocks); a
+ *   GARDEN is the family of all flowers of one symmetry (one PPM column);
+ *   the GARDEN OF GARDENS (GOG) is the composition of gardens: the brain
+ *   picks branches of flowers from several gardens and composes NEW flowers
+ *   for its own garden. Modeled as three garden membranes whose flowers can
+ *   be picked by the skin and grafted into composite flowers — the nesting
+ *   semantics is: crystal < flower < garden < garden-of-gardens.
+ * Traceability: src/cpp/nanobrain_fractal_tape.h, src/cpp/nanobrain_fractal.h,
+ *               src/cpp/nanobrain_time_crystal.h (TimeCrystalQuantumState),
+ *               src/cpp/nanobrain_gog.h (GardenOfGardens)
+ * Initial multiset: one seed crystal per garden membrane; the skin holds a
+ *                   composer token that starts the cross-garden grafting.
  * ==========================================================================*/
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'garden_0 []'garden_1 []'garden_2 ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure (2.3): the garden-of-gardens hierarchy.
+ *
+ *   skin (the GOG — composes flowers across gardens)
+ *     '- garden_1 : one garden = a symmetry column of meander flowers
+ *     |    '- bed_1 : the flowers of garden_1 grow here
+ *     '- garden_2 : a second garden with its own symmetry
+ *     |    '- bed_2
+ *     '- nursery  : picked flowers are grafted into NEW composite flowers
+ *
+ * Nesting semantics: a flower is INSIDE a bed, a bed is INSIDE a garden,
+ * gardens are INSIDE the garden of gardens — "the universe within and
+ * above, not side by side" applied to time crystals.
+ * ------------------------------------------------------------------------*/
+@mu = [ [ []'bed_1 ]'garden_1 [ []'bed_2 ]'garden_2 []'nursery ]'skin;
 
-@mskin = seed;
-@mgarden_0 = unit(garden_0), fuel;
-@mgarden_1 = unit(garden_1), fuel;
-@mgarden_2 = unit(garden_2), fuel;
+/* Sample initial multiset. */
+@mskin    = composer;
+@mbed_1   = crystal(tc_a), crystal(tc_b);
+@mbed_2   = crystal(tc_c);
+@mnursery = graft_stock;
 
 /* --------------------------------------------------------------------------
  * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * bloom       : a crystal blooms into a meander flower — one system point
+ *               plus two clocks plotted in polar form (2.3: each time crystal
+ *               has only one system point and two clocks, hence flowers)
+ * pick        : the GOG picks a flower branch out of a garden bed (the
+ *               garden keeps a ghost: picking copies the pattern, not the
+ *               crystal)
+ * offer       : picked flowers reach the skin and are offered to the nursery
+ * graft       : two flowers from DIFFERENT gardens fuse into a composite
+ *               flower — the garden of gardens builds flowers that no single
+ *               garden could grow (Figure 2.7e: active parts of different
+ *               gardens combine to make new flowers)
+ * silence     : parts of a source crystal not used by the graft go silent —
+ *               in a GOG, unused clocks do not vanish, they go quiet (Figure
+ *               2.7e: parts of time crystals get silent)
+ * replant     : the composite flower is replanted as a new crystal seed in a
+ *               garden bed — gardens enrich each other recursively
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_garden_0 ]'skin;
-[seed_dispense : seed --> (work)in_garden_1 ]'skin;
-[seed_dispense : seed --> (work)in_garden_2 ]'skin;
-[step : work * unit(garden_0) * fuel --> done(garden_0) ]'garden_0;
-[step : work * unit(garden_1) * fuel --> done(garden_1) ]'garden_1;
-[step : work * unit(garden_2) * fuel --> done(garden_2) ]'garden_2;
-[report : done(garden_0) --> (result(garden_0))out ]'garden_0;
-[report : done(garden_1) --> (result(garden_1))out ]'garden_1;
-[report : done(garden_2) --> (result(garden_2))out ]'garden_2;
+[bloom : crystal(T) --> flower(T) ]'bed_1;
+[bloom : crystal(T) --> flower(T) ]'bed_2;
+
+[pick : flower(T) --> flower(T) * (picked(T))out ]'bed_1;
+[pick : flower(T) --> flower(T) * (picked(T))out ]'bed_2;
+
+[offer : picked(T) --> (picked(T))out ]'garden_1;
+[offer : picked(T) --> (picked(T))out ]'garden_2;
+[admit : picked(T) --> (picked(T))in_nursery ]'skin;
+[admit : composer --> (composer)in_nursery ]'skin;
+
+[graft : picked(T1) * picked(T2) * composer * graft_stock
+      --> composite(T1,T2) ]'nursery;
+[silence : picked(T) --> quiet(T) ]'nursery;
+
+[replant : composite(T1,T2) --> (new_seed(T1,T2))out ]'nursery;
+[plant : new_seed(T1,T2) --> (crystal(T1,T2))in_garden_1 ]'skin;
+[root : crystal(T1,T2) --> (crystal(T1,T2))in_bed_1 ]'garden_1;

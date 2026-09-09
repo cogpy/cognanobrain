@@ -4,35 +4,107 @@
  * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
  * Issue #7 — P-Lingua specification (see psystems/README.md).
  *
- * Sections: 2.4, 2.4.1-2.4.3
- * Functionality: Sensor for acquiring 11D data: why Fourier transform fails, nerve-bundle engineering, operational chart of a sensor.
- * Traceability: src/cpp/nanobrain_fractal_tape.h, nanobrain_fractal.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Sections: 2.4 (how to design a sensor for acquiring 11D data),
+ *           2.4.1 (why Fourier transform does not work),
+ *           2.4.2 (the engineering of a nerve bundle in acquiring hidden data),
+ *           2.4.3 (operational chart of a sensor)
+ * Functionality: The e-pi-phi sensor. Three resonance channels (electrical,
+ *   mechanical, magnetic) are coupled by the quadratic relation
+ *   e^2 + phi^2 = pi^2, so noise of one kind feeds the clocks of the other
+ *   two kinds — three-way feedback makes one-way energy transfer stable.
+ *   FFT is modeled as a membrane that FAILS: it flattens a signal into
+ *   isolated peaks and provably loses group shifts, singularities and
+ *   relative phase (2.4.1). The nerve bundle instead keeps each channel as
+ *   a nested-clock cable whose silent/active bursts carry the 11D hidden
+ *   data (2.4.2). The operational chart (2.4.3): acquire -> tri-channel
+ *   convert -> bundle -> integrate side-by-side and one-inside-another.
+ * Traceability: src/cpp/nanobrain_fractal_tape.h, src/cpp/nanobrain_fractal.h,
+ *               src/cpp/nanobrain_time_crystal.h (11D quantum manifold)
+ * Initial multiset: one raw11d(sig) stream in the skin; channel tokens and a
+ *                   nerve-bundle cable ready in the workshop membranes.
  * ==========================================================================*/
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'acquire []'bundle []'chart ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure (2.4): the e-pi-phi sensor.
+ *
+ *   skin
+ *     '- fft_trap   : the Fourier path — a membrane where 11D structure dies
+ *     '- channels   : the three resonance channels
+ *     |    '- ch_e, ch_m, ch_phi : electrical (pi), mechanical (e),
+ *     |                             magnetic (phi) clocks
+ *     '- bundle     : the nerve bundle — parallel nested-clock cables
+ *     '- integrator : operational chart — side-by-side and one-inside-
+ *                     another integration of the acquired shapes
+ * ------------------------------------------------------------------------*/
+@mu = [ []'fft_trap
+        [ []'ch_e []'ch_m []'ch_phi ]'channels
+        []'bundle []'integrator ]'skin;
 
-@mskin = seed;
-@macquire = unit(acquire), fuel;
-@mbundle = unit(bundle), fuel;
-@mchart = unit(chart), fuel;
+/* Sample initial multiset. */
+@mskin       = raw11d(sig), probe_fft(sig);
+@mfft_trap   = basis(exp);
+@mch_e       = noise(th); @mch_m = noise(th); @mch_phi = noise(th);
+@mbundle     = cable(1), cable(2);
+@mintegrator = qa_slot;
 
 /* --------------------------------------------------------------------------
  * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * fft_flatten  : 2.4.1 — FFT converts the stream into isolated peaks; the
+ *                object it emits carries NO group, NO singularity, NO
+ *                relative phase — hierarchical geometric information is
+ *                structurally absent from the Fourier basis
+ * fft_fail     : a group-shift probe (two peaks moving together) cannot be
+ *                answered from peaks — the rule simply has no lhs match for
+ *                rel_phase objects, modelling the failure as a missing rule
+ * route_e/m/phi: 2.4 — the raw 11D stream is split into the three resonance
+ *                channels; each channel's noise feeds the OTHER two (the
+ *                quadratic relation e^2+phi^2=pi^2 canalises three forms of
+ *                noise into a signal of another kind)
+ * quadrature   : noise harvested in one channel stabilises the clocks of the
+ *                other two — three-way feedback ensures one-way transfer
+ * burst_code   : 2.4.2 — a nerve-bundle cable encodes its channel clock as a
+ *                pattern of silent/active bursts; the duration of silence
+ *                carries the hidden data of the imaginary worlds
+ * carry_hidden : two cables bind their bursts into one carrier — the bundle
+ *                transmits 11D by nesting the 3 channel rhythms within its
+ *                own clock
+ * integrate_sb : 2.4.3 — geometric shapes integrate SIDE BY SIDE (corners
+ *                break, a shape is inserted) ...
+ * integrate_in : ... and ONE INSIDE ANOTHER (nesting) — the two composition
+ *                modes of the operational chart
+ * sense_done   : the integrated QA couplet is the sensor's 11D reading
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_acquire ]'skin;
-[seed_dispense : seed --> (work)in_bundle ]'skin;
-[seed_dispense : seed --> (work)in_chart ]'skin;
-[step : work * unit(acquire) * fuel --> done(acquire) ]'acquire;
-[step : work * unit(bundle) * fuel --> done(bundle) ]'bundle;
-[step : work * unit(chart) * fuel --> done(chart) ]'chart;
-[report : done(acquire) --> (result(acquire))out ]'acquire;
-[report : done(bundle) --> (result(bundle))out ]'bundle;
-[report : done(chart) --> (result(chart))out ]'chart;
+[fft_flatten : probe_fft(sig) * basis(exp) --> peak(f1) * peak(f2) ]'fft_trap;
+[fft_fail : peak(f1) * peak(f2) --> lost(group_shift) * lost(rel_phase)
+                                  * lost(singularity) ]'fft_trap;
+
+[route : raw11d(sig) --> (stream(sig))in_channels ]'skin;
+[route_e   : stream(sig) --> (stream(sig))in_ch_e ]'channels;
+[route_m   : stream(sig) --> (stream(sig))in_ch_m ]'channels;
+[route_phi : stream(sig) --> (stream(sig))in_ch_phi ]'channels;
+
+[quadrature : stream(sig) * noise(th) --> clock_e(pi) * feed(m) * feed(phi) ]'ch_e;
+[quadrature : stream(sig) * noise(th) --> clock_m(e) * feed(e) * feed(phi) ]'ch_m;
+[quadrature : stream(sig) * noise(th) --> clock_phi(phi) * feed(e) * feed(m) ]'ch_phi;
+
+[export_clk : clock_e(P) --> (clock_e(P))out ]'ch_e;
+[export_clk : clock_m(P) --> (clock_m(P))out ]'ch_m;
+[export_clk : clock_phi(P) --> (clock_phi(P))out ]'ch_phi;
+[load : clock_e(P) --> (clock_e(P))out ]'channels;
+[load : clock_m(P) --> (clock_m(P))out ]'channels;
+[load : clock_phi(P) --> (clock_phi(P))out ]'channels;
+[load : clock_e(P) --> (clock_e(P))in_bundle ]'skin;
+[load : clock_m(P) --> (clock_m(P))in_bundle ]'skin;
+[load : clock_phi(P) --> (clock_phi(P))in_bundle ]'skin;
+
+[burst_code : cable(N) * clock_e(P) --> burst(N,active) * burst(N,silent) ]'bundle;
+[carry_hidden : burst(N,active) * burst(N,silent) * clock_m(Q) * clock_phi(R)
+             --> (carrier11d(N))out ]'bundle;
+
+[admit11 : carrier11d(N) --> (carrier11d(N))in_integrator ]'skin;
+[integrate_sb : carrier11d(N) * qa_slot --> qa_couplet(N,side_by_side) ]'integrator;
+[integrate_in : qa_couplet(N,side_by_side)
+             --> qa_couplet(N,one_inside_another) ]'integrator;
+[sense_done : qa_couplet(N,one_inside_another) --> (reading11d(N))out ]'integrator;
