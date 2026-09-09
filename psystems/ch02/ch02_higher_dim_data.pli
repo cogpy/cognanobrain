@@ -4,31 +4,67 @@
  * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
  * Issue #7 — P-Lingua specification (see psystems/README.md).
  *
- * Sections: 2.7
- * Functionality: Higher-dimension data representation: a lucid presentation as dimension-embedding rules.
- * Traceability: src/cpp/nanobrain_fractal_tape.h, nanobrain_fractal.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Sections: 2.7 (the basic concept of a higher dimension data: a lucid
+ *           presentation)
+ * Functionality: Higher-dimensional data presented lucidly as EMBEDDING
+ *   rules: a datum of dimension N is a clocking object that lives on level N
+ *   of a nested membrane ladder. To RAISE a datum's dimension, wrap it in
+ *   one more clock (send it one level deeper and tag it with the new phase
+ *   axis); to LOWER it (projection), let the outermost clock dissolve and
+ *   read the remaining shadow. The ladder bottoms out in the d11 membrane —
+ *   data there carries 11 phase axes at once, the "11D data" of the sensor
+ *   chapter. Each level adds ONE independent phase axis, so the membrane
+ *   depth IS the dimension count: no coordinates, no vectors, just nesting.
+ * Traceability: src/cpp/nanobrain_fractal_tape.h, src/cpp/nanobrain_fractal.h,
+ *               src/cpp/nanobrain_time_crystal.h (11D quantum manifold)
+ * Initial multiset: one datum(1d,x) at the top of the ladder; a tick in each
+ *                   level membrane so embedding steps can fire.
  * ==========================================================================*/
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'dim_low []'dim_high ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure (2.7): the dimension ladder (inlined in reduced form
+ * from common/time_crystal_core.pli — 11 nested phase membranes d1..d11).
+ *
+ *   skin = d0 (the observer's level)
+ *     '- d1  : datum + 1 phase axis
+ *          '- d2  : datum + 2 phase axes
+ *               '- ... (ladder continues to d11, the 11D manifold)
+ *
+ * A lucid presentation: the dimension of a datum is READ OFF its depth in
+ * the tree — entering a membrane adds a dimension, leaving removes one.
+ * ------------------------------------------------------------------------*/
+@mu = [ [ [ []'d3 ]'d2 ]'d1 ]'skin;
 
-@mskin = seed;
-@mdim_low = unit(dim_low), fuel;
-@mdim_high = unit(dim_high), fuel;
+/* Sample initial multiset: a 1D datum to be lifted, plus one clock token per
+ * level (the full 11-level ladder inlines common/time_crystal_core.pli). */
+@mskin = datum(1d,x);
+@md1 = tick; @md2 = tick; @md3 = tick;
 
 /* --------------------------------------------------------------------------
  * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * raise_%s : embedding — the datum crosses one membrane inward and gains
+ *            exactly one phase axis; the rule consumes one tick of the level
+ *            it enters (a dimension is paid for with a clock)
+ * lower_%s : projection — the datum crosses one membrane outward and loses
+ *            its outermost phase axis; the shadow it leaves behind is the
+ *            lower-dimensional reading of the same object
+ * saturate : at the deepest level the datum stops: the 11D manifold is the
+ *            fixed point of the ladder (the pattern of primes saturates; a
+ *            new way of counting would begin only above 10^12 clocks)
+ * read     : the skin reads whatever dimension tag the datum carries — the
+ *            SAME object, present at every level, is the lucid answer to
+ *            "what is higher dimension data": not more numbers, more nesting
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_dim_low ]'skin;
-[seed_dispense : seed --> (work)in_dim_high ]'skin;
-[step : work * unit(dim_low) * fuel --> done(dim_low) ]'dim_low;
-[step : work * unit(dim_high) * fuel --> done(dim_high) ]'dim_high;
-[report : done(dim_low) --> (result(dim_low))out ]'dim_low;
-[report : done(dim_high) --> (result(dim_high))out ]'dim_high;
+[raise_1 : datum(1d,X) --> (datum(2d,X))in_d1 ]'skin;
+[raise_2 : datum(2d,X) * tick --> (datum(3d,X))in_d2 ]'d1;
+[raise_3 : datum(3d,X) * tick --> (datum(4d,X))in_d3 ]'d2;
+
+[saturate : datum(4d,X) * tick --> datum(4d,X) * phase_axis(d3) ]'d3;
+
+[lower_3 : datum(4d,X) --> (datum(3d,X))out ]'d3;
+[lower_2 : datum(3d,X) --> (datum(2d,X))out ]'d2;
+[lower_1 : datum(2d,X) --> (datum(1d,X))out ]'d1;
+
+[read : datum(1d,X) --> reading(X,dim1) ]'skin;

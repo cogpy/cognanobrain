@@ -4,27 +4,75 @@
  * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
  * Issue #7 — P-Lingua specification (see psystems/README.md).
  *
- * Sections: 2.6
- * Functionality: Definitions of quaternion, octonion and dodecanion (inlines common/hypernumbers.pli).
- * Traceability: src/cpp/nanobrain_fractal_tape.h, nanobrain_fractal.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Sections: 2.6 (the definition of a quaternion, octonion, and dodecanion)
+ *           — inlines common/hypernumbers.pli by convention.
+ * Functionality: Hypernumber algebras as nested imaginary worlds. A
+ *   QUATERNION q = (1,i,j,k) is a sphere of 3 imaginary units over the real
+ *   axis; an OCTONION o = (1,e1..e7) nests a second imaginary world whose
+ *   multiplication is non-associative; a DODECANION d = (1,a1..a11) nests a
+ *   third, giving the 11D + 1 algebra of the dodecanion brain. Each algebra
+ *   lives in its own membrane so that the loss of properties (commutativity
+ *   at q, associativity at o) is visible as rule annotations; dodecanion
+ *   products route through the 11 nested dimension membranes of the time
+ *   crystal (cf. common/time_crystal_core.pli).
+ * Traceability: src/cpp/nanobrain_fractal_tape.h, src/cpp/nanobrain_fractal.h,
+ *               src/cpp/nanobrain_dodecanion.h (Dodecanion algebra)
+ * Initial multiset: basis elements of each algebra in its own membrane, so
+ *                   one multiplication step can fire per algebra.
  * ==========================================================================*/
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'hyper ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure (2.6): one membrane per nested imaginary world.
+ *
+ *   skin (the real axis)
+ *     '- q_world : quaternion world — 3 imaginary units i, j, k
+ *     |    '- o_world : octonion world — 7 imaginary units e1..e7 living
+ *     |       |         INSIDE the quaternion world (first nesting)
+ *     |       '- d_world : dodecanion world — 11 imaginary units a1..a11
+ *     |                  INSIDE the octonion world (second nesting)
+ *
+ * (Inlined from common/hypernumbers.pli: q(A), o(A), d(A) objects with
+ * q_mul / o_mul / d_mul product rules; octonion products are tagged
+ * nonassoc; imaginary quaternion units square to -1.)
+ * ------------------------------------------------------------------------*/
+@mu = [ [ [ []'d_world ]'o_world ]'q_world ]'skin;
 
-@mskin = seed;
-@mhyper = unit(hyper), fuel;
+/* Sample initial multiset: basis elements to multiply in each world. */
+@mskin    = real(1);
+@mq_world = q(1), q(i), q(j), q(k);
+@mo_world = o(1), o(e1), o(e2), o(e3), o(e4), o(e5), o(e6), o(e7);
+@md_world = d(1), d(a1), d(a2), d(a3), d(a4), d(a5),
+            d(a6), d(a7), d(a8), d(a9), d(a10), d(a11);
 
 /* --------------------------------------------------------------------------
  * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * q_mul   : (common/hypernumbers.pli) quaternion product — associative;
+ *           the 4D algebra of a sphere of unit vectors over one real axis
+ * q_imag  : the imaginary quaternion units square to -1 (i^2 = j^2 = k^2 = -1)
+ * q_to_o  : a quaternion promoted into the octonion world acquires 4 more
+ *           imaginary directions — the second imaginary world opens WITHIN
+ *           the first (2.6: spheres of unit vectors from different imaginary
+ *           worlds)
+ * o_mul   : octonion product — tagged nonassoc: (A*B)*C =/= A*(B*C); the
+ *           lost associativity is the price of the second imaginary world
+ * o_to_d  : an octonion promoted into the dodecanion world acquires the full
+ *           11 imaginary directions of the dodecanion brain (11D = 12D with
+ *           no real world, cf. section 2.4)
+ * d_mul   : dodecanion product across the 12 generators — the algebra that
+ *           matches the 11 nested phase membranes of the time crystal
+ * d_clock : a dodecanion unit used as a clock: each imaginary direction is
+ *           one clock of the nested-clock manifold
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_hyper ]'skin;
-[step : work * unit(hyper) * fuel --> done(hyper) ]'hyper;
-[report : done(hyper) --> (result(hyper))out ]'hyper;
+[q_mul  : q(A) * q(B) --> q(prod(A,B)) ]'q_world;
+[q_imag : q(i)*2 --> q(minus1) ]'q_world;
+[q_imag : q(j)*2 --> q(minus1) ]'q_world;
+[q_imag : q(k)*2 --> q(minus1) ]'q_world;
+
+[q_to_o : q(A) --> (o(A))in_o_world ]'q_world;
+[o_mul  : o(A) * o(B) --> o(prod(A,B)) * nonassoc ]'o_world;
+[o_to_d : o(A) --> (d(A))in_d_world ]'o_world;
+
+[d_mul  : d(A) * d(B) --> d(prod(A,B)) ]'d_world;
+[d_clock : d(A) --> d(A) * clock_of(A) ]'d_world;

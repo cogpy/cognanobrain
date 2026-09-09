@@ -4,35 +4,107 @@
  * NanoBrain CH02: Replacing Turing tape with a Fractal tape: FIT & GML
  * Issue #7 — P-Lingua specification (see psystems/README.md).
  *
- * Sections: 2.10-2.12
- * Functionality: FIT and GML summary charts as consolidated rule sets; Russell's paradox and higher-order logic in a geometric language.
- * Traceability: src/cpp/nanobrain_fractal_tape.h, nanobrain_fractal.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Sections: 2.10 (Fractal Information Theory, FIT — summary in a single
+ *           chart), 2.11 (Geometric Musical Language, GML — summary in a
+ *           single chart), 2.12 (conclusion: Russell's paradox and
+ *           higher-order logic in a geometric language)
+ * Functionality: The two summary charts as consolidated rule sets.
+ *   FIT chart (2.10): information is not a bit stream but a nested-sphere
+ *   object; its four chart rows — fractal tape, singularity addressing,
+ *   PPM metric, projection from infinity — are four rules that every FIT
+ *   object must be able to fire.
+ *   GML chart (2.11): the language's four chart rows — 15 shapes, clock
+ *   assignment, phase cross-sections as letters, compositions as phrases —
+ *   as four rules over the shape alphabet (inline common/gml_shapes.pli).
+ *   Russell (2.12): a set that contains the properties OF its properties as
+ *   an element — here, a time crystal whose system point is a smaller copy
+ *   of the whole crystal — cannot be flattened into first-order logic; the
+ *   rules let orders of logic coexist as nested membranes (order k lives at
+ *   depth k) instead of being reduced one to another.
+ * Traceability: src/cpp/nanobrain_fractal_tape.h, src/cpp/nanobrain_fractal.h,
+ *               src/cpp/nanobrain_time_crystal.h, src/cpp/nanobrain_ppm.h
+ * Initial multiset: one raw_info object for the FIT chart, one waveform for
+ *                   the GML chart, and one russell_set in the logic membrane.
  * ==========================================================================*/
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'fit_chart []'gml_chart []'logic ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure: the two charts plus the higher-order logic ladder.
+ *
+ *   skin
+ *     '- fit_chart : FIT summary — 4 chart rows as 4 rules (2.10)
+ *     '- gml_chart : GML summary — 4 chart rows as 4 rules (2.11)
+ *     '- logic     : Russell's paradox arena (2.12)
+ *          '- order_2 : second-order logic lives one level within
+ *               '- order_3 : third-order one level further — orders coexist
+ *                  as nesting depths, none reducible to another
+ * ------------------------------------------------------------------------*/
+@mu = [ []'fit_chart []'gml_chart [ [ []'order_3 ]'order_2 ]'logic ]'skin;
 
-@mskin = seed;
-@mfit_chart = unit(fit_chart), fuel;
-@mgml_chart = unit(gml_chart), fuel;
-@mlogic = unit(logic), fuel;
+/* Sample initial multiset. */
+@mskin = raw_info(blob), waveform(w1);
+@mfit_chart = cell_seed;
+@mgml_chart = shape(1), shape(6), shape(11);
+@mlogic = russell_set;
+@morder_2 = predicate(p);
+@morder_3 = predicate(q);
 
 /* --------------------------------------------------------------------------
- * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * FIT chart rules (2.10 — the single chart of fractal information theory)
+ * fit_tape   : row 1 — information lives on a fractal tape: one cell, grids
+ *              within the cell, recursively (cf. ch02_fractal_tape.pli)
+ * fit_sing   : row 2 — addresses are singularities, not positions: an object
+ *              is found by its phase singularity signature
+ * fit_ppm    : row 3 — content is measured by the Phase Prime Metric: 15
+ *              primes cover 99.99% of patterns (cf. common/alphabet_primes)
+ * fit_proj   : row 4 — the future impacts the present: a projection object
+ *              from the deepest level rewrites the top-level reading
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_fit_chart ]'skin;
-[seed_dispense : seed --> (work)in_gml_chart ]'skin;
-[seed_dispense : seed --> (work)in_logic ]'skin;
-[step : work * unit(fit_chart) * fuel --> done(fit_chart) ]'fit_chart;
-[step : work * unit(gml_chart) * fuel --> done(gml_chart) ]'gml_chart;
-[step : work * unit(logic) * fuel --> done(logic) ]'logic;
-[report : done(fit_chart) --> (result(fit_chart))out ]'fit_chart;
-[report : done(gml_chart) --> (result(gml_chart))out ]'gml_chart;
-[report : done(logic) --> (result(logic))out ]'logic;
+[fit_enter : raw_info(blob) --> (raw_info(blob))in_fit_chart ]'skin;
+[fit_tape : raw_info(blob) * cell_seed --> fit_obj(blob) * tape_within(blob) ]'fit_chart;
+[fit_sing : fit_obj(blob) --> fit_obj(blob) * addressed_by(sing(blob)) ]'fit_chart;
+[fit_ppm  : fit_obj(blob) --> fit_obj(blob) * metric(primes(15)) ]'fit_chart;
+[fit_proj : fit_obj(blob) --> (chart_row(fit,blob))out ]'fit_chart;
+
+/* --------------------------------------------------------------------------
+ * GML chart rules (2.11 — the single chart of the geometric musical language)
+ * gml_alpha  : row 1 — the alphabet is 15 shapes: 5 lines, 5 areas, 5
+ *              volumes (inlined from common/gml_shapes.pli)
+ * gml_clock  : row 2 — every letter is a pair of clocks; the shape is READ
+ *              by the relative phase of its corner clocks
+ * gml_phrase : row 3 — letters compose into phrases by resonance: harmonic
+ *              plus base shape builds the composite (the grammar is musical,
+ *              not sequential)
+ * gml_sing   : row 4 — a phrase is one time crystal with one system point:
+ *              the whole sentence sings from a single singularity
+ * ------------------------------------------------------------------------*/
+[gml_enter : waveform(w1) --> (waveform(w1))in_gml_chart ]'skin;
+[gml_alpha : waveform(w1) * shape(S) --> letter(w1,S) ]'gml_chart;
+[gml_clock : letter(w1,S) --> letter_clk(w1,S) ]'gml_chart;
+[gml_phrase : letter_clk(w1,S1) * letter_clk(w1,S2) --> phrase(w1,S1,S2) ]'gml_chart;
+[gml_sing : phrase(w1,S1,S2) --> (chart_row(gml,w1))out ]'gml_chart;
+
+/* --------------------------------------------------------------------------
+ * Russell's paradox and higher-order logic (2.12)
+ * russell    : the set that contains the properties of its properties as an
+ *              element — modeled as a set object containing a copy of itself;
+ *              the rule neither rejects nor flattens it, it NESTS it
+ * hol_lift   : a first-order predicate lifted one membrane inward becomes a
+ *              second-order predicate (it may now speak about predicates)
+ * hol_lift3  : one more level, third order — the orders COEXIST as nesting
+ *              depths; no rule here reduces order k+1 to order k
+ * hol_coop   : orders cooperate: a deep predicate and a shallow one jointly
+ *              derive a geometric truth — higher-order logic runs "in a
+ *              single system", as the book requires
+ * conclude   : the three chart rows plus the logic ladder close Chapter 2:
+ *              FIT tells what information IS, GML is its language, and the
+ *              logic of the whole is geometric and higher-order
+ * ------------------------------------------------------------------------*/
+[russell : russell_set --> set(self_member) * (russell_set)in_order_2 ]'logic;
+[hol_lift : predicate(p) --> predicate_of(p) ]'order_2;
+[hol_lift3 : predicate(p) --> (predicate_of(p))in_order_3 ]'order_2;
+[hol_coop : predicate_of(p) * russell_set --> truth_geometric(p) ]'order_2;
+
+[conclude : chart_row(fit,blob) * chart_row(gml,w1)
+        --> chapter2(fit_is_information_gml_is_language) ]'skin;
