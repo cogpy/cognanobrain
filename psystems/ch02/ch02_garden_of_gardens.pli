@@ -42,6 +42,8 @@
 @mskin    = composer;
 @mbed_1   = crystal(tc_a), crystal(tc_b);
 @mbed_2   = crystal(tc_c);
+@mgarden_1 = tend;
+@mgarden_2 = tend;
 @mnursery = graft_stock;
 
 /* --------------------------------------------------------------------------
@@ -63,6 +65,8 @@
  * replant     : the composite flower is replanted as a new crystal seed in a
  *               garden bed — gardens enrich each other recursively
  * ------------------------------------------------------------------------*/
+[tend_bed : tend --> (tend)in_bed_1 ]'garden_1;
+[tend_bed : tend --> (tend)in_bed_2 ]'garden_2;
 [bloom : crystal(T) --> flower(T) ]'bed_1;
 [bloom : crystal(T) --> flower(T) ]'bed_2;
 
