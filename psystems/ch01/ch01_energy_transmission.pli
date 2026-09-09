@@ -7,32 +7,54 @@
  * Sections: 1.7
  * Functionality: Energy transmission in the brain beyond the neuron skin: energy-flow rules crossing nested membranes.
  * Traceability: src/cpp/nanobrain_philosophical.h, nanobrain_unified.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Initial multiset: one energy quantum energy(1) in the skin, with one
+ *                   catalyst object (pump/guide/clock/relay) per membrane.
  * ==========================================================================*/
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'neuron_skin []'interior []'field ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure: NESTED neuronal compartments (1.7). Energy is not all
+ * about the neuron skin (the membrane where Hodgkin-Huxley ion channels
+ * live): quanta flow INWARD through the neuron membrane into microtubule
+ * time-crystal networks and OUTWARD into the inter-neural field.
+ *
+ *   skin (organism)
+ *     |- field              : the field BETWEEN neurons
+ *     '- neuron_membrane    : the classical neuron "skin"
+ *          '- cytoskeleton  : interior scaffold
+ *               '- microtubule : time-crystal core (innermost)
+ * ------------------------------------------------------------------------*/
+@mu = [ []'field [ [ []'microtubule ]'cytoskeleton ]'neuron_membrane ]'skin;
 
-@mskin = seed;
-@mneuron_skin = unit(neuron_skin), fuel;
-@minterior = unit(interior), fuel;
-@mfield = unit(field), fuel;
+/* Sample initial multiset: one energy quantum at the neuron skin. */
+@mskin = energy(1);
+@mneuron_membrane = pump;
+@mcytoskeleton    = guide;
+@mmicrotubule     = clock;
+@mfield           = relay;
 
 /* --------------------------------------------------------------------------
  * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * inject      : an energy quantum arrives at the neuron skin
+ * cross_skin  : most energy crosses the neuron skin INWARD — it does not
+ *               stay at the Hodgkin-Huxley membrane (priority over leak)
+ * leak        : the small classical fraction leaks back out (action
+ *               potential at the skin), lower priority
+ * dive        : energy descends into the microtubule core
+ * resonate    : at the microtubule time crystal the quantum pumps the clock
+ *               — energy becomes temporal coherence (cf. time_crystal_core)
+ * radiate     : the coherent core radiates energy OUT to the inter-neural
+ *               field, skipping the skin on the way out
+ * propagate   : the field carries energy to the organism skin
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_neuron_skin ]'skin;
-[seed_dispense : seed --> (work)in_interior ]'skin;
-[seed_dispense : seed --> (work)in_field ]'skin;
-[step : work * unit(neuron_skin) * fuel --> done(neuron_skin) ]'neuron_skin;
-[step : work * unit(interior) * fuel --> done(interior) ]'interior;
-[step : work * unit(field) * fuel --> done(field) ]'field;
-[report : done(neuron_skin) --> (result(neuron_skin))out ]'neuron_skin;
-[report : done(interior) --> (result(interior))out ]'interior;
-[report : done(field) --> (result(field))out ]'field;
+[inject     : energy(1) --> (energy(1))in_neuron_membrane ]'skin;
+[cross_skin : energy(1) * pump --> (energy(1))in_cytoskeleton ]'neuron_membrane, 1;
+[leak       : energy(1) * pump --> (energy(0))out ]'neuron_membrane;
+[dive       : energy(1) * guide --> (energy(1))in_microtubule ]'cytoskeleton;
+[resonate   : energy(1) * clock --> coherence(1) * clock ]'microtubule;
+[radiate    : coherence(1) --> (field_energy(1))out ]'microtubule;
+[through    : field_energy(1) --> (field_energy(1))out ]'cytoskeleton;
+[through    : field_energy(1) --> (field_energy(1))out ]'neuron_membrane;
+[propagate  : field_energy(1) * relay --> transmitted(1) ]'field;
+[to_field   : energy(1) --> (energy(1))in_field ]'skin;
