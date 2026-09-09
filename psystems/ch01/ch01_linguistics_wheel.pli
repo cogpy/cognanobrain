@@ -13,26 +13,43 @@
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
+/* --------------------------------------------------------------------------
+ * Membrane structure: three ROTATING membranes (1.9) — the wheel of space,
+ * time and imaginary worlds. A concept enters at the space membrane and the
+ * wheel turns: space -> time -> imaginary -> space -> ... exchanging the
+ * object cyclically. One full rotation re-encodes the concept in all three
+ * linguistic frames.
+ * ------------------------------------------------------------------------*/
 @mu = [ []'space []'time []'imaginary ]'skin;
 
-@mskin = seed;
-@mspace = unit(space), fuel;
-@mtime = unit(time), fuel;
-@mimaginary = unit(imaginary), fuel;
+/* Sample initial multiset: one concept to be carried around the wheel. */
+@mskin = seed, concept(c1);
+@mspace = place(here);
+@mtime = phase(t0);
+@mimaginary = world(w0);
 
 /* --------------------------------------------------------------------------
- * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
- * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_space ]'skin;
-[seed_dispense : seed --> (work)in_time ]'skin;
-[seed_dispense : seed --> (work)in_imaginary ]'skin;
-[step : work * unit(space) * fuel --> done(space) ]'space;
-[step : work * unit(time) * fuel --> done(time) ]'time;
-[step : work * unit(imaginary) * fuel --> done(imaginary) ]'imaginary;
-[report : done(space) --> (result(space))out ]'space;
-[report : done(time) --> (result(time))out ]'time;
-[report : done(imaginary) --> (result(imaginary))out ]'imaginary;
+* Evolution rules — the three membranes ROTATE: each membrane sends its
+* object out, and the skin (the wheel axle) turns it into the next frame:
+* space -> time -> imaginary -> space (cell-like P systems exchange objects
+* only with parent/child membranes, so the skin mediates each turn).
+* enter        : the concept enters the wheel at the space membrane
+* ground       : space grounds the concept at a place (where it is)
+* turn_st      : wheel turn 1 — the grounded concept passes from space to
+*                time, becoming a phase (when it is)
+* turn_ti      : wheel turn 2 — the phased concept passes from time to the
+*                imaginary membrane, becoming a world (what-if it is)
+* turn_is      : wheel turn 3 — the world passes back to space; the wheel
+*                has completed one rotation and the concept carries all
+*                three frames at once
+* speak        : a concept carrying space+time+imaginary frames leaves the
+*                wheel as a linguistic utterance
+* ------------------------------------------------------------------------*/
+[enter   : concept(c1) --> (concept(c1))in_space ]'skin;
+[ground  : concept(c1) * place(here) --> (located(c1))out ]'space;
+[turn_st : located(c1) --> (to_time(c1))in_time ]'skin;
+[phase_  : to_time(c1) * phase(t0) --> (phased(c1))out ]'time;
+[turn_ti : phased(c1) --> (to_imaginary(c1))in_imaginary ]'skin;
+[dream   : to_imaginary(c1) * world(w0) --> (imagined(c1))out ]'imaginary;
+[turn_is : imagined(c1) --> (to_space(c1))in_space ]'skin;
+[speak   : to_space(c1) --> (utterance(c1, space_time_imaginary))out ]'space;

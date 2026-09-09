@@ -7,24 +7,47 @@
  * Sections: 1.8
  * Functionality: Terminologies of life that computers do not support, as objects with rewrite semantics.
  * Traceability: src/cpp/nanobrain_philosophical.h, nanobrain_unified.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Initial multiset: seed in the skin; six life-term objects (self, will,
+ *                   emotion, qualia, meaning, consciousness) in the
+ *                   life_terms membrane; one program object in computer.
  * ==========================================================================*/
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'life_terms ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure: a membrane of life terminologies beside a membrane of
+ * computer-supported operations (1.8). Computers support NONE of the life
+ * terms; the life_terms membrane gives them rewrite semantics instead.
+ * ------------------------------------------------------------------------*/
+@mu = [ []'life_terms []'computer ]'skin;
 
+/* Sample initial multiset: six life terms computers do not support. */
 @mskin = seed;
-@mlife_terms = unit(life_terms), fuel;
+@mlife_terms = term(self), term(will), term(emotion),
+               term(qualia), term(meaning), term(consciousness);
+@mcomputer = program;
 
 /* --------------------------------------------------------------------------
- * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * Evolution rules (each rule IS the rewrite semantics of a term)
+ * self_refer : self — a term that rewrites into a reference to ITSELF;
+ *              no Turing machine instruction has this fixpoint
+ * choose     : will — rewrites into one CHOICE, destroying the alternatives
+ * feel       : emotion — modulates every co-present term (catalyst mood)
+ * experience : qualia — rewrites into a private object that cannot be sent
+ *              out: it dissolves at the membrane boundary (it cannot be
+ *              communicated/copied, only lived)
+ * signify    : meaning — binds a symbol to the world-model of the membrane
+ * become     : consciousness — integrates all rewritten terms into one
+ *              living state object
+ * compute    : the computer membrane can only COPY tokens — every life term
+ *              sent into it degrades to data (the asymmetry of 1.8)
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_life_terms ]'skin;
-[step : work * unit(life_terms) * fuel --> done(life_terms) ]'life_terms;
-[report : done(life_terms) --> (result(life_terms))out ]'life_terms;
+[self_refer : term(self) --> term(self) * self_ref ]'life_terms;
+[choose     : term(will) * option(a) * option(b) --> choice ]'life_terms;
+[feel       : term(emotion) * self_ref --> mood * self_ref ]'life_terms;
+[experience : term(qualia) --> private(quale) ]'life_terms;
+[signify    : term(meaning) * choice --> belief ]'life_terms;
+[become     : private(quale) * mood * belief --> living_state ]'life_terms;
+[compute    : program * seed --> data(life_terms) ]'computer;
+[degrade    : data(life_terms) --> copy(life_terms) ]'computer;
+[report     : living_state --> (alive)out ]'life_terms;

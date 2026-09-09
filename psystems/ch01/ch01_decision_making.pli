@@ -13,26 +13,50 @@
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'perceive []'integrate []'decide ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure: skin holding the decision rule CHAIN (1.6) — the key
+ * discoveries of brain-inspired decision making wired in sequence:
+ *   perceive -> integrate -> resonate -> decide
+ * The four stage membranes are siblings in the skin; the skin ROUTES each
+ * intermediate object from one stage to the next (cell-like P systems send
+ * objects only to a parent, a child, or the local membrane, so every hand
+ * off goes out to the skin and into the next stage).
+ * ------------------------------------------------------------------------*/
+@mu = [ []'perceive []'integrate []'resonate []'decide ]'skin;
 
-@mskin = seed;
-@mperceive = unit(perceive), fuel;
-@mintegrate = unit(integrate), fuel;
-@mdecide = unit(decide), fuel;
+/* Sample initial multiset: one stimulus for the chain plus fuel per stage. */
+@mskin = stimulus(s1);
+@mperceive  = fuel;
+@mintegrate = fuel;
+@mresonate  = fuel;
+@mdecide    = fuel;
 
 /* --------------------------------------------------------------------------
- * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * Evolution rules (the decision rule chain)
+ * sense       : the stimulus enters the perception stage
+ * perceive    : raw stimulus -> feature object (time-crystal features, not
+ *               bits — cf. ch01_tapes_languages.pli)
+ * integrate   : features from the current AND remembered contexts fuse into
+ *               an integrated situation (memory-driven, non-local)
+ * resonate    : the situation is matched against prime-pattern hypotheses;
+ *               decisions emerge from time-crystal RESONANCE, not search
+ * prime_match : a hypothesis whose prime signature resonates is promoted —
+ *               priority 1 beats plain hypothesizing (the outline's key
+ *               discovery: resonance answers BEFORE exhaustive evaluation)
+ * decide      : the winning pattern becomes an action (chain output)
+ * report      : the action leaves the chain to the environment
+ * route_%s    : the skin forwards each intermediate object into the next
+ *               stage membrane of the chain
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_perceive ]'skin;
-[seed_dispense : seed --> (work)in_integrate ]'skin;
-[seed_dispense : seed --> (work)in_decide ]'skin;
-[step : work * unit(perceive) * fuel --> done(perceive) ]'perceive;
-[step : work * unit(integrate) * fuel --> done(integrate) ]'integrate;
-[step : work * unit(decide) * fuel --> done(decide) ]'decide;
-[report : done(perceive) --> (result(perceive))out ]'perceive;
-[report : done(integrate) --> (result(integrate))out ]'integrate;
-[report : done(decide) --> (result(decide))out ]'decide;
+[sense       : stimulus(s1) --> (stimulus(s1))in_perceive ]'skin;
+[perceive    : stimulus(s1) * fuel --> (feature(tc(s1)))out ]'perceive;
+[route_feat  : feature(tc(s1)) --> (feature(tc(s1)))in_integrate ]'skin;
+[integrate   : feature(tc(s1)) * fuel --> (situation(s1))out ]'integrate;
+[route_sit   : situation(s1) --> (situation(s1))in_resonate ]'skin;
+[hypothesize : situation(s1) * fuel
+            --> pattern(primes(15)) * hypothesis(s1) ]'resonate;
+[prime_match : pattern(primes(15)) * hypothesis(s1)
+            --> (matched(s1))out ]'resonate, 1;
+[route_match : matched(s1) --> (matched(s1))in_decide ]'skin;
+[decide      : matched(s1) * fuel --> (action(s1))out ]'decide;
+[report      : action(s1) --> decision(s1) ]'skin;

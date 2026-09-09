@@ -7,36 +7,82 @@
  * Sections: 1.10, 1.10.1-1.10.3, 1.11
  * Functionality: The triad defining an artificial brain: a language of time crystals (prime symmetries), a magnetic-light device storing charge, and a pattern of all prime arrangements. Conclusion (1.11) as meta-rule set over Darwin/Turing/Hodgkin-Huxley.
  * Traceability: src/cpp/nanobrain_philosophical.h, nanobrain_unified.h
- * Initial multiset: sample objects in each membrane so the simulator can run
- *                   at least one evolution step.
+ * Initial multiset: seed in the skin; primes 2,3,5 in tc_language; one
+ *                   photon in magnetic_light; three arrangements in
+ *                   prime_pattern; the three legacy pillars in meta.
  * ==========================================================================*/
 
 @model<psystems_basic>
 
-/* Membrane structure: skin with one membrane per functional unit. */
-@mu = [ []'tc_language []'magnetic_light_device []'prime_pattern_store []'meta ]'skin;
+/* --------------------------------------------------------------------------
+ * Membrane structure: the TRIAD (1.10) — three membranes that together
+ * define an artificial brain — plus a meta membrane for the conclusion
+ * (1.11).
+ *
+ *   tc_language        : 1.10.1 a language of time crystals written by the
+ *                        symmetry of primes (inlines common/alphabet_primes)
+ *   magnetic_light     : 1.10.2 a magnetic-light device that stores charge
+ *                        and builds a time crystal
+ *   prime_pattern      : 1.10.3 the pattern of all possible choices to
+ *                        arrange primes
+ *   meta               : 1.11 conclusion — meta-rules over the religion-of-
+ *                        science triangle Darwin / Turing / Hodgkin-Huxley
+ * ------------------------------------------------------------------------*/
+@mu = [ []'tc_language []'magnetic_light []'prime_pattern []'meta ]'skin;
 
+/* Sample initial multiset: a seed plus the triangle of legacies in meta. */
 @mskin = seed;
-@mtc_language = unit(tc_language), fuel;
-@mmagnetic_light_device = unit(magnetic_light_device), fuel;
-@mprime_pattern_store = unit(prime_pattern_store), fuel;
-@mmeta = unit(meta), fuel;
+@mtc_language    = prime(2), prime(3), prime(5);
+@mmagnetic_light = photon;
+@mprime_pattern  = arrange(3), arrange(5), arrange(2);
+@mmeta           = pillar(darwin), pillar(turing), pillar(hodgkin_huxley);
 
 /* --------------------------------------------------------------------------
- * Evolution rules
- * seed_dispense : the skin injects a work token into each functional membrane
- * step_%s-local : each membrane transforms its unit object and consumes fuel
- * report        : finished results are sent out to the skin
+ * Evolution rules — 1.10.1: a language of time crystals
+ * letter       : each prime is a letter of the language (silent until used)
+ * word         : primes combine by symmetry into one time-crystal word
  * ------------------------------------------------------------------------*/
-[seed_dispense : seed --> (work)in_tc_language ]'skin;
-[seed_dispense : seed --> (work)in_magnetic_light_device ]'skin;
-[seed_dispense : seed --> (work)in_prime_pattern_store ]'skin;
-[seed_dispense : seed --> (work)in_meta ]'skin;
-[step : work * unit(tc_language) * fuel --> done(tc_language) ]'tc_language;
-[step : work * unit(magnetic_light_device) * fuel --> done(magnetic_light_device) ]'magnetic_light_device;
-[step : work * unit(prime_pattern_store) * fuel --> done(prime_pattern_store) ]'prime_pattern_store;
-[step : work * unit(meta) * fuel --> done(meta) ]'meta;
-[report : done(tc_language) --> (result(tc_language))out ]'tc_language;
-[report : done(magnetic_light_device) --> (result(magnetic_light_device))out ]'magnetic_light_device;
-[report : done(prime_pattern_store) --> (result(prime_pattern_store))out ]'prime_pattern_store;
-[report : done(meta) --> (result(meta))out ]'meta;
+[letter : prime(P) --> letter(P) ]'tc_language;
+[word   : letter(2) * letter(3) * letter(5) --> tc_word(symmetry(2,3,5)) ]'tc_language;
+
+/* --------------------------------------------------------------------------
+ * Evolution rules — 1.10.2: the magnetic-light device
+ * absorb : the device absorbs a photon of magnetic light as stored charge
+ * build  : stored charge condenses into a time crystal (charge -> crystal)
+ * ------------------------------------------------------------------------*/
+[absorb : photon --> charge(1) ]'magnetic_light;
+[build  : charge(1) --> time_crystal(1) ]'magnetic_light;
+
+/* --------------------------------------------------------------------------
+ * Evolution rules — 1.10.3: pattern of all possible prime arrangements
+ * permute : two arrangements swap into a new ordering choice
+ * close   : every arrangement is a valid pattern object of the store
+ * ------------------------------------------------------------------------*/
+[permute : arrange(2) * arrange(3) --> arrange(23) ]'prime_pattern;
+[close   : arrange(N) --> pattern(N) ]'prime_pattern;
+
+/* --------------------------------------------------------------------------
+ * Evolution rules — 1.10: the triad assembles an artificial brain
+ * assemble : language + device-crystal + prime pattern join into one
+ *            artificial brain object (sent out to the skin)
+ * ------------------------------------------------------------------------*/
+[assemble : tc_word(symmetry(2,3,5)) --> (language_ready)out ]'tc_language;
+[assemble : time_crystal(1) --> (crystal_ready)out ]'magnetic_light;
+[assemble : pattern(23) --> (pattern_ready)out ]'prime_pattern;
+[triad    : language_ready * crystal_ready * pattern_ready
+         --> artificial_brain ]'skin;
+
+/* --------------------------------------------------------------------------
+ * Evolution rules — 1.11 conclusion: the religion of science has a triangle
+ * reify_darwin / reify_turing / reify_hh : each legacy pillar is re-read as
+ *   a limited meta-rule (selection, sequential tape, neuron-skin physics)
+ * transcend : the triangle is closed and transcended by the triad — the
+ *   artificial brain answers what the three pillars could not ask
+ * ------------------------------------------------------------------------*/
+[reify_darwin : pillar(darwin) --> meta_rule(selection) ]'meta;
+[reify_turing : pillar(turing) --> meta_rule(tape) ]'meta;
+[reify_hh     : pillar(hodgkin_huxley) --> meta_rule(neuron_skin) ]'meta;
+[triangle     : meta_rule(selection) * meta_rule(tape) * meta_rule(neuron_skin)
+             --> (triangle_closed)out ]'meta;
+[transcend    : triangle_closed * artificial_brain
+             --> conclusion(philosophical_transformation) ]'skin;
